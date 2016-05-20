@@ -1,0 +1,649 @@
+
+%\section{Pos es tupla(x:Nat, y:Nat)}
+
+%\section{Placa es Nat}
+
+%\section{Nombre es String}
+
+\section{Tabla}
+
+\subsection{Interfaz}
+
+\sexc{tabla}
+$\textbf{usa}$  
+\generos{nat, dato, campo, tipo, registro, conjTrie, string, diccTrie(string, alfha), diccAVL(nat, beta)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Operaciones}
+
+
+%%%%%% observadores basicos %%%%%%
+
+\operacion{nombre}{in t: tab }{res : string}
+ {true}
+ {$res \igobs nombre(t)$}
+ {Devuelve el nombre de la tabla ingresada por parametro.}
+ {O($1$)}
+ {El nombre de la tabla se retorna por referencia, no modificable.}
+
+\operacion{claves}{in t: tab }{res : itConjTrie(campo)}
+ {true}
+ {$res \igobs claves(t)$}
+ {Devuelve un conjunto de campos que son claves en la tabla ingresada por parametro.}
+ {O($1$)}
+ {Se devuelve un iterador al conjunto claves, hay aliasing ''no modificable''.}
+
+ 
+\operacion{indices}{in t: tab }{res : itConjTrie(   itConj ALGO (dato)   )}
+ {true}
+ {$res \igobs indices(t)$}
+ {Devuelve un conjunto a los indices de la tabla ingresada por parametro.}
+ {O($calcular$)}
+ {Se devuelve un iterador al conjunto, que contiene los iteradores de los indices, hay aliasing.}
+ 
+\operacion{campos}{in t: tab }{res : itConjTrie(campo)}
+ {true}
+ {$res \igobs campos(t)$}
+ {Devuelve un conjunto a los campos de la tabla ingresada por parametro.}
+ {O($1$)}
+ {Se devuelve un iterador al conjunto, hay aliasing ''no modificable''.}
+
+\operacion{tipoCampo}{in c: campo,in t: tab }{res : tipo}
+ {c $\in$ campos(t)}
+ {$res \igobs tipoCampo(t)$}
+ {Devuelve el tipo del campo c en la tabla ingresada por parametro.}
+ {O($1$)}
+ {Se devuelve el tipo del campo, hay aliasing ''no modificable''.}
+ 
+\operacion{registros}{in t: tab }{res : itConj(registro)}% deberia ser lista algo asi el conjunto
+ {true}
+ {$res \igobs registros(t)$}
+ {Devuelve un conjunto a los registros de la tabla ingresada por parametro.}
+ {O($L + log(n)$) } %tambien podria ser  O($R*(log(n+mz))$)
+ {Se devuelve un iterador al conjunto de registros, hay aliasing.}
+
+ 
+\operacion{cantidadDeAcccesos}{in t: tab }{res : nat}
+ {true}
+ {$res \igobs cantidadDeAccesos(t)$}
+ {Devuelve la cantidad de modificaciones de la tabla ingresada por parametro.}
+ {O($1$)}
+ {Se devuelve la cantidad de cambios, hay aliasing ''no modificable''.}
+
+ 
+ %%%%%% generadores %%%%%%%
+ 
+ \operacion{nuevaTabla}{in nombre: string, in claves: conjTrie(campo), in columnas: registro }{res : tab}
+ {$\neg\emptyset$?(claves) $\land$ claves$\subseteq$campos(columnas)}
+ {$res \igobs cantidadDeAccesos(t)$}
+ {Crea una tabla sin registros.}
+ {O($calcular$)}
+ {}
+
+ \operacion{agregarRegistro}{in r: registro, in t: tab}{}
+ {t\_0=t $\land$ campos(r)$\igobs$campos(t) $\land$ puedorInsertar?(r,t)}
+ {agregarRegistro(r,t\_0)}
+ {Agrega un registro a la tabla pasada por parametro.}
+ {O($T*L + in$)}
+ {} 
+ 
+ \operacion{borrarRegistro}{in crit: registro, in t: tab}{}
+ {t\_0=t $\land$ $\#$(campos(r))=1 $\yluego$ dameUno(campos(crit))$\in$claves(t)}
+ {borrarRegistro(r,t\_0)}
+ {Borra los registros que cumplan el criterio pasado por parametro.}
+ {O($T*L + in$)}
+ {} 
+ 
+  \operacion{indexar}{in crit: registro, in t: tab}{}
+ {t\_0=t $\land$ puedeIndexar(c,t)}
+ {indexar(c,t\_0)}
+ {Borra los registros que cumplan el criterio pasado por parametro.}
+ {O($T*L + in$)}
+ {} 
+ 
+%%%%%% Otras Operaciones %%%%%%%%%%%
+
+ \operacion{puedoInsertar?}{in r: registro, in t: tab}{res:bool}
+ {$true$}
+ {$res \igobs puedoInsertar?(r,t)$}
+ {Informa si el registro pasado por parametro no tiene valores repetidos con respectos a los registros existentes, para los campos clave en la tabla pasada por parametro.}
+ {O($T*L + in$)}
+ {} 
+ 
+  \operacion{compatible}{in r: registro, in t: tab}{res:bool}
+ {$true$}
+ {$res \igobs compatible(r,t)$}
+ {Informa si el registro pasado por parametro tiene correspondecia de nombre y tipo de campos de tabla pasada por parametro.}
+ {O($1$)}
+ {} 
+ 
+  \operacion{minimo}{in c: campo, in t: tab}{res:dato}
+ {$\neg\emptyset$?(registro(t)) $\land$ c$\in$indices(t)}
+ {$res \igobs minimo(c,t)$}
+ {Retorna el minimo....(completar)}
+ {O($T*L+in$)}
+ {}
+  
+  \operacion{maximo}{in c: campo, in t: tab}{res:dato}
+ {$\neg\emptyset$?(registro(t)) $\land$ c$\in$indices(t)}
+ {$res \igobs maximo(c,t)$}
+ {Retorna el maximo....(completar)}
+ {O($T*L+in$)}
+ {} 
+
+  \operacion{puedeIndexar}{in c: campo, in t: tab}{res:bool}
+ {$True$}
+ {$res \igobs puedeIndexar(c,t)$}
+ {Informa si se puede crear un nuevo indice.}
+ {O($T*L+in$)}
+ {} 
+ 																							% aca seria conj sobre lista algo asi%
+
+
+  \operacion{coincidencias}{in r: registro, in cj: conj(registro)}{res: conj(registro)}
+ {$True$}
+ {$res \igobs coincidencias(r,cj)$}
+ {Compara el valor del registro con el conjunto de registros y retorna la interseccion.}%se puede escribir mas correcto%
+ {O($T*L+in$)}% aca tambien hay que usar renombres para que sea con complejidad de los conjuntos%
+ {} 
+
+  \operacion{hayCoincidencia}{in r: registro,in cj1: conjTrie(campo), in cj2: conj(registro)}{res:bool}
+ {$True$}
+ {$res \igobs hayCoincidencia(r,cj1,cj2)$}
+ {Compara los valores del registro para los campos dados por parametro, con el conjunto de registros.}
+ {O($T*L+in$)}% hay que usar renombres para que sea con complejidad de los conjuntos%
+ {} 
+
+
+ \operacion{combinarRegistros}{in c: campo,in cj1: conj(registro), in cj2: conj(registro)}{$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$
+ res: conj(registro)}
+ {$True$}% en el tp no da una restriccion pero capaz hay que agregarla.
+ {$res \igobs combinarRegistros(c,cj1,cj2)$}
+ {Combina los valores de los registros para el campo dado por parametro.}
+ {O($T*L+in$)}% aca tmb hay que usar renombres para que sea con complejidad de los conjuntos
+ {} 
+
+  \operacion{dameColumna}{in c: campo,in cj: conj(registro)}{res: conj(dato)}
+ {$True$}% en el tp no da una restriccion pero capaz hay que agregarla.
+ {$res \igobs dameColumna(c,cj1,cj2)$}
+ {Reune en un conjunto los valores del campo pasado por parametro.}
+ {O($T*L+in$)}% aca tmb hay que usar renombres para que sea con complejidad de los conjuntos
+ {} 
+
+  \operacion{mismosTipos}{in r: registro,in t: tab}{res: bool}
+ {campos(r)$\subseteq$campos(t)}% en el tp no da una restriccion pero capaz hay que agregarla.
+ {$res \igobs mismosTipos(r,t)$}
+ {Compara los tipos correspondientes a los campos del registro y la tabla.}
+ {O($1$)}% aca tmb hay que usar renombres para que sea con complejidad de los conjuntos
+ {} 
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representación}
+
+\serc{Tabla}{
+  \donde{tab}{\tupla{
+  		Nombre:\mbox{String},
+  		Indices: \mbox{\tupla{IndicesL:Lista(campo), IndicesA: Arreglo(Indice) }},
+		Registros:\mbox{Lista(Registro)},
+		Campos:\mbox{DiccTrie(Campo,Bool)},
+		\#Accesos:\mbox{Nat}
+    }
+      \donde{Indice}{Dicc(Dato,conj(Registro))}
+  }
+}
+
+\subsubsection*{Invariante de representación}
+
+\begin{enumerate}
+  \item El Nombre de la tabla es un String acotado.
+  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
+  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
+  \item 
+
+\end{enumerate}
+
+
+\subsubsection*{Función de abstracción}
+\abs{sistema}{CampusSeguro}{s}{cs}
+$s.campus \igobs campus(cs)$ $\land$ \\
+$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
+$s.hippies \igobs hippies(cs)$ $\land$ \\
+$s.agentes \igobs agentes(cs)$ $\land$ \\
+$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\subsection{Algoritmos}
+
+\algoritmo{nombre}{in t:tab}{res:string}{
+  \State $res \larr t.nombre$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{claves}{in t:tab}{res:itDiccTrie(campo)}{
+  \State $res \larr CrearItRapido(t.campos.clavesDeTabla)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{indices}{in t:tab}{res:arreglo(Indice)}{
+  \State $res \larr t.Indices$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{
+  \State $res \larr CrearItConjTrie(claves(t.Campos))$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{tipoCampo}{in c:campo, in t:tab}{res:Tipo}{
+  \State $res \larr Significado(t.Campos,c)$ \complejidad{O(1)}
+}{O(1)}
+
+ \algoritmo{registros}{in t:tab}{res:itConj(registro)}{
+    \State $res \larr CrearItConj( t.registros )$ \complejidad{$\theta$(L+ log(n))}
+ }{$\theta$(L+ log(n))}
+
+  \algoritmo{cantDeAccesos}{in t:tab}{res:nat}{
+    \State $res \larr t.cantDeAccesos$ \complejidad{$\theta$(1)}
+ }{$\theta$(1)}
+
+  \algoritmo{puedoInsertar?}{in r:registro, in t:tab}{res:bool}{
+    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia(r,claves(r),registros(t))  \complejidad{$\theta$(L+log(n))}
+ }{$\theta$(L+log(n))}
+
+
+  \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
+      \State res $\larr$ campatible(r,t) $\yluego$ mismosTipos(r,t)  \complejidad{$\theta$(1)}
+ }{O($1$)}
+
+
+  \algoritmo{puedeIndexar}{in c:campo, in t:tab}{res:bool}{
+      \State res  $\larr $ Definido?(t.campos,c) $\yluego \neg$ Esta?(c,t.Indices.IndicesL) $\land$ \\ (long(t.Indices.IndicesL)=0 $\lor$ (long(t.Indices.IndicesL)$<$2 $\land$ \\ (tipoCampo(c,t)!=tipoCampo(t.Indices.IndicesL.primero,t))))    \complejidad{$\theta$(1)} %funcion axuliar hayIndiceC?(c,t)
+ }{O(calcular)}
+ 
+
+  \algoritmo{combinarRegistros}{in c:campo, in cr1:itConj(registro), in/out cr2:itConj(registro)}{}{
+  	\State 	\While{HaySiguiente(cr1)}
+				\State	combinarTodos(c,Siguiente(cr1),cr2);	
+	\State 	\EndWhile   
+ }{O(calcular)}
+ 
+   \algoritmo{hayCoincidencia}{in r:registro, in cc:itConjTrie(campo), in cr:itConj(registro)}{res:bool}{
+    \State	res $\larr$ false;
+  	\State 	\While{HaySiguiente(cr)}
+				\State	res $\larr$ 	coincideAlguno(r,cc,Siguiente(cr)) $\lor$res;
+				\State	Avanzar(cr);
+	\State 	\EndWhile   
+ }{O(calcular)}
+
+ \algoritmo{coincidencias}{in crit:registro, in cr:itConj(registro)}{res:itConj(registro)}{
+  	\State 	res $\larr$ CrearItConj(vacio());
+  	\State 	\While{HaySiguiente(cr)}
+				\State	\If {coincidenTodos(crit,campos(crit),Siguiente(cr))} 
+								\State	AgregarAtras(res,Siguiente) 
+				\State	\EndIf				
+	\State	Avanzar(cr);
+	\State	\EndWhile   
+ }{O(calcular)}
+ 
+  \algoritmo{minimo}{in c:campo, in t:tab}{res:dato}{
+  	\State 	res $\larr$ min( dameColumna(  c,  CrearItConj(t.registros))  );
+ }{O(calcular)}
+ 
+   \algoritmo{maximo}{in c:campo, in t:tab}{res:dato}{
+  	\State 	res $\larr$ max( dameColumna(  c,  CrearItConj(t.registros))  );
+ }{O(calcular)}
+ 
+    \algoritmo{dameColumna}{in c:campo, in cr:itConj(registro)}{res:itConj(dato)}{
+  	\State 	res $\larr$ CrearItConj(vacio());
+  	\State 	\While{HaySiguiente(cr)}
+				\State	\If {Definido?(Siguiente(cr),c)} 
+								\State	AgregarAtras(res,Obtener(Siguiente(cr), c)) 
+				\State	\EndIf				
+	\State	Avanzar(cr);
+	\State	\EndWhile     	
+ }{O(calcular)}
+ 
+    \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
+  	\State 	res $\larr$ True;
+  	\State 	itconjClaves $\larr$ CrearItConj(claves(r)); 
+  	\State 	\While{HaySiguiente(itconjClaves)}
+				\State	res $\larr$ res$\land$(tipo?(Obtener(r,Siguiente(itconjClaves)))=tipoCampo(Siguiente(itconjClaves)),t)	
+				\State	Avanzar(cr);
+	\State	\EndWhile     	
+ }{O(calcular)}
+
+
+  \algoritmo{moverHippie}{in/out campus:campusSeguro, in nombre:string}{}{
+      \If {$\neg(encerrado?(campus,campus.hippies.obtener(nombre)))$} \complejidad{O(long(nombre))}
+        \State // Obtener pos siguiente y actualizar posicion de hippie
+        \State $posVieja \larr campus.hippies.obtener(nombre)$ \complejidad{O(long(nombre))}
+        \State $posNueva \larr proxPosHippie(campus,nombre)$ \complejidad{O(long(nombre) + $N_e$)}
+        \State $campus.campus[posVieja.x][posVieja.y].hayHippie \larr False$ \complejidad{O(1)}
+        \State $campus.campus[posNueva.x][posNueva.y].hayHippie \larr True$ \complejidad{O(1)}
+        \State $itHippie \larr campus.campus[posVieja.x][posVieja.y].hippie$ \complejidad{O(1)}
+        \State $campus.campus[posVieja.x][posVieja.y].hippie \larr NULL$ \complejidad{O(1)}
+        \State $campus.campus[posNueva.x][posNueva.y].hippie \larr itHippie$ \complejidad{O(1)}
+        \State // Sancionar agentes que rodean a los estudiantes que encierro
+        \State sancionarAgentesEncerrandoEstVecinos(campus,posNueva) \complejidad{O(1)}
+        \State // Capturar hippies encerrados
+        \State aplicarHippiesVecinos(campus,posNueva) \complejidad{O(long(nombre))}
+        \State // Hippificar estudiantes
+        \State hippificarEstudiantesVecinos(campus,posNueva) \complejidad{O(long(nombre))}
+      \EndIf
+  }{O(long(nombre) + $N_e$)}
+
+  \algoritmo{moverAgente}{in/out campus:campusSeguro, in placa:placa}{}{
+      \State // Obtener pos siguiente y actualizar pos de agente
+      \State $posVieja \larr busquedaBinariaPorPlaca(campus.agentesPorPlaca, placa).pos$ \complejidad{O(log($N_a$))}
+      \If {$\neg(encerrado?(campus,posVieja))$ \\$\land$ \\$campus.campus[posVieja.x][posVieja.y].agente.siguienteSignificado().cantSanciones < 3$} \complejidad{O(1)}
+          \State $proxPos \larr campus.proxPosAgente(posVieja)$ \complejidad{O($N_h$)}
+          \State $campus.campus[posVieja.x][posVieja.y].hayAgente \larr False$ \complejidad{O(1)}
+          \State $campus.campus[proxPos.x][proxPos.y].hayAgente \larr True$ \complejidad{O(1)}
+          \State $itAgente \larr campus.campus[posVieja.x][posVieja.y].agente$ \complejidad{O(1)}
+          \State $campus.campus[proxPos.x][proxPos.y].agente \larr itAgente$ \complejidad{O(1)}
+          \State $campus.campus[posVieja.x][posVieja.y].agente \larr NULL$ \complejidad{O(1)}
+          \State $\pi_2(busquedaBinaria(campus.agentesPorPlaca, placa)).pos \larr proxPos$ \complejidad{O(log($N_a$))}
+          \State $sancionarAgentesEncerrandoEstVecinos(campus,proxPos)$ \complejidad{O(1)}
+          \State $aplicarHippiesVecinos(campus,proxPos)$ \complejidad{O(long(nombre))}
+      \EndIf
+  }{O($N_h + log(N_a) + long(nombre)$)}
+
+  \algoritmo{conMismasSanciones}{in campus:campusSeguro, in placa:placa}{res:Conj(agente)}{
+      \State $posAgente$ $\larr$ $campus.agentes.obtener(placa)$ \complejidad{O($\theta(1)$)}
+      \State $res$ $\larr$ $campus.campus[posAgente.x][posAgente.y].agente.siguienteSignificado().mismcampus.agentes$ \complejidad{O(1)}
+  }{O($\theta(1)$)}
+
+  \algoritmo{conKSanciones}{in campus:campusSeguro, in k:nat}{res:Conj(agente)}{
+      \State $res \larr \emptyset$ \complejidad{O(1)}
+      \If {$campus.conKSanciones.ocurrioSancion$}
+          \State // 'Copio' la lista de porSanciones a un vector, asi luego puedo hacer bus binaria sobre el
+          \State $campus.conKSanciones \larr CrearArreglo(campus.porSanciones.tamanio())$ \complejidad{O(1)}
+          \State $it \larr CrearItLista(campus.porSanciones)$ \complejidad{O(1)}
+          \State $i \larr 0$ \complejidad{O(1)}
+          \While {$it.haySiguiente$} \complejidad{$O(N_a)$}
+              \State $conKSanciones.arreglo[i].cantSanciones \larr it.siguienteSignificado().cantSanciones$ \complejidad{O(1)}
+              \State // Por referencia
+              \State $conKSanciones.arreglo[i].conKSanciones \larr it.siguienteSignificado().agentes$ \complejidad{O(1)}
+              \If {$it.siguienteSignificado().cantSanciones = k$}
+                  \State $res \larr it.siguienteSignificado().agentes$ \complejidad{O(1)}
+              \EndIf
+              \State $i++$ \complejidad{O(1)}
+              \State $it.avanzar()$ \complejidad{O(1)}
+          \EndWhile
+          \State $return$ $res$ \complejidad{O(1)}
+      \Else
+          \State $bb \larr busquedaBinaria(conKSanciones.arreglo, k)$ \complejidad{$O(log(N_a))$}
+          \If {$\pi_1(bb)$}
+            \State $return$ $res \larr \pi_2(bb)$ \complejidad{$O(1)$}
+          \Else
+            \State $return$ $res \larr \emptyset$ \complejidad{$O(1)$}
+          \EndIf
+      \EndIf
+  }{O($N_a$) $\lor$ O($log(N_a)$)}
+
+  \algoritmo{masVigilante}{in campus:campusSeguro}{res:placa}{
+      \State $res$ $\larr$ $campus.masVigilante.siguienteClave()$ \complejidad{O(1)}
+  }{O(1)}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmos operaciones auxiliares}
+\algoritmo{agregarEstudiante}{in/out campus:campusSeguro, in pos:pos, in nombre:nombre}{}{
+    \State $campus.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
+    \State $campus.campus[pos.x][pos.y].estudiante \larr definir(campus.estudiantes, nombre, pos)$ \complejidad{O(long(nombre))}
+}{O(long(nombre))}
+
+\algoritmo{agregarHippie}{in/out campus:campusSeguro, in pos:pos, in nombre:nombre}{}{
+    \State $campus.campus[pos.x][pos.y].hayHippie \larr True$ \complejidad{O(1)}
+    \State $campus.campus[pos.x][pos.y].hippie \larr definir(campus.hippies, nombre, pos)$ \complejidad{O(long(nombre))}
+}{O(long(nombre))}
+
+
+ \algoritmo{sancionarAgentesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
+    % Sancionar VECINOS
+    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+    \If {$campus.atrapadoPorAgente?(pos)$} 
+       \While {$i < vecinos.tamanio()$}  \complejidad{O(1)}
+           \If {$campus.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
+               \State $campus.sancionarAgente(vecinos[i].agente)$ \complejidad{O(1)}
+           \EndIf
+           \State $i++$
+       \EndWhile
+    \EndIf
+ }{O(1)}
+
+\algoritmo{sancionarAgentesEncerrandoEstVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
+   \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+   \State $i \larr 0$
+   \While {$i < vecinos.tamanio$} \complejidad{O(1)}
+      \If {$campus.campus[vecinos[i].x][vecinos[i].y].hayEst$ $\land$ $atrapadoPorAgente?(campus,pos)$}  \complejidad{O(1)}
+          \State $sancionarAgentesVecinos(campus,pos)$ \complejidad{O(1)}
+      \EndIf
+      \State $i++$
+    \EndWhile
+}{O(1)}
+
+\algoritmo{sancionarAgente}{in/out campus:campusSeguro, in/out agente:itDiccRapido}{}{
+    \State $campus.conKSanciones.ocurrioSancion \larr True$ \complejidad{O(1)}
+    \State $agente.siguiente.cantSanciones + 1$ \complejidad{O(1)}
+    \State $agente.siguiente.miUbicacion.eliminarSiguiente()$ \complejidad{O(1)}
+    \State // El iterador mismas apunta a la posicion correspondiente del agente dentro de la lista ordenada por cantSanciones
+    \State // Como la lista en el peor caso puede contener a todos los agentes con igual cant de sanciones
+    \State // la mayor cantidad posible de iteraciones del ciclo es 4
+    \While {$agente.siguiente.mismcampus.haySiguiente()$ \\$\land$ $agente.siguiente.mismas.siguiente.cantSanciones < agente.siguiente.cantSanciones$}
+      \State $agente.siguiente.mismas.avanzar()$ \complejidad{O(1)}
+    \EndWhile
+    \State // Si no hay siguiente o  si la cantidad de sanciones del siguiente es menor que la del agente, entonces, 
+    \State // creo un conMismasBucket, lo inserto como siguiente y me guardo el iterador en miUbicacion
+    \State // Sino, agrego el agente al conj de agentes del siguiente y me guardo el iterador en miUbicacion
+    \If {$\neg(agente.siguiente.mismas.haySiguiente)$ $\lor$
+        \\$(agente.siguiente.mismas.haySiguiente \land$\\$agente.siguiente.cantSanciones=agente.siguiente.mismas.cantSanciones)$} \complejidad{O(1)}
+      \State $nConMismasB \larr nuevaTupla(CrearNuevoDiccLineal(), agente.siguiente.cantSanciones)$
+      \State $agente.siguiente.mismas \larr agente.siguiente.mismas.agregarComoSiguiente(nConMismasB)$ \complejidad{O(1)}
+      \State $agente.siguiente.miUbicacion$ $\larr$
+      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
+    \Else 
+      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
+    \EndIf
+}{O(1)}
+
+ \algoritmo{atrapadoPorAgente?}{in campus:campusSeguro, in pos:pos}{res:bool}{
+    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$
+    \State $alMenos1Agente \larr False$ \complejidad{O(1)}
+    \State $i \larr 0$
+    \If {$\neg(encerrado?(pos, campus.campusEstatico.vecinos(pos)))$}
+      \State $return$ $false$
+    \EndIf
+    \State // Veo si hay algun agente alrededor
+     \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
+       \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
+          \State $return$ $true$            
+        \EndIf
+        \State $i++$ \complejidad{O(1)}
+    \EndWhile
+ }{O(1)}
+
+ \algoritmo{hippificarEstudiantesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
+    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+    \State $i \larr 0$ \complejidad{O(1)}
+    \While {$i<vecinos.tamanio()$} \complejidad{O(long(nombre))}
+        \If {$estAHippie?(campus,vecinos[i])$}
+            \State $hippificar(campus,vecinos[i])$ \complejidad{O(long(nombre))}
+        \EndIf
+        \State $i++$ \complejidad{O(1)}
+    \EndWhile
+ }{O(long(nombre))}
+
+\algoritmo{hippificar}{in/out campus:campusSeguro, in pos:pos}{}{
+    \State // PRE: La posicion esta en el tablero y hay estudiante en la posicion
+    \State $as.campus[pos.x][pos.y].hayHippie \larr True$ \complejidad{O(1)}
+    \State $as.campus[pos.x][pos.y].hippie.agregarComoSiguiente(nombre, pos)$ \complejidad{O(long(nombreEstudiante))}
+    \State $as.campus[pos.x][pos.y].hayEst \larr False$ \complejidad{O(1)}
+    \State $as.campus[pos.x][pos.y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombreEstudiante))}
+}{O(long(nombre))}
+
+ \algoritmo{estAHippie?}{in campus:campusSeguro, in pos:pos}{res:bool}{
+    \If {$\neg(encerrado?(pos,vecinos))$}
+      \State $return$ $false$ \complejidad{O(1)}
+    \EndIf
+    \State $i$ $\larr$ $0$ \complejidad{O(1)}
+    \State $cantHippies$ $\larr$ $0$ \complejidad{O(1)}
+    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+    \While {$i < vecinos.tamanio()$}
+      \If {$campus[vecinos[i].x][vecinos[i].y].hayHippie$}
+        \State $cantHippies++$ \complejidad{O(1)}
+      \EndIf
+      \State $i++$
+    \EndWhile
+    \State $return$ $cantHippies \ge 2$ \complejidad{O(1)}
+ }{O(1)}
+
+\algoritmo{hippieAEst?}{in campus:campusSeguro, in pos:pos}{res:bool}{
+  \State $i$ $\larr$ $0$ \complejidad{O(1)}
+  \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+  \While {$i < vecinos.tamanio()$} \complejidad{O(1)}
+      \If {$\neg(as.campus[vecinos[i].x][vecinos[i].y].hayEst?)$}
+        \State $return$ $False$ \complejidad{O(1)}
+      \EndIf
+  \EndWhile
+  \State $return$ $True$
+}{O(1)}
+
+ \algoritmo{encerrado?}{in campus:campusSeguro, in pos:pos}{}{
+    \State $vecinos \larr vecinos(as.campusEstatico, pos)$ \complejidad{O(1)}
+    \State $i \larr vecinos.tamanio()$ \complejidad{O(1)}
+    \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
+       \If {$\neg(campus.campus[vecinos[i].x][vecinos[i].y].hayAgente?$ $\lor$
+             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayEst?$ $\lor$
+             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\lor$
+             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayObst?)$} \complejidad{O(1)}
+              \State $return$ $false$ \complejidad{O(1)}
+        \EndIf
+        \State $i++$ \complejidad{O(1)}
+    \EndWhile
+    \State $return true$
+ }{O(1)}
+
+ \algoritmo{aplicarHippiesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
+    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
+    \State $i \larr 0$ \complejidad{O(1)}
+    \While {$i < vecinos.tamanio()$} \complejidad{O(long(nombre))}
+       \State aplicarHippie(campus, pos) \complejidad{O(long(nombre))}
+    \EndWhile
+ }{O(long(nombre))}
+
+ \algoritmo{aplicarHippie}{in/out campus:campusSeguro, in pos:pos}{}{
+    \State // PRE: pos valida y hayHippie en campus.campus[pos.x][pos.y]
+    \If {$campus.campus[pos.x][pos.y].hayHippie$}
+      \If {$as.hippieAEst(pos)$} \complejidad{O(1)}
+          \State $campus:campusSeguro.campus[pos.x][pos.y].hayHippie \larr False$ \complejidad{O(1)}
+          \State $campus:campusSeguro.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
+          \State $as.campus[pos.x][pos.y].estudiante \larr CrearIt(campus.hippies)$ \complejidad{O(1)}
+          \State $campus.campus[pos.x][pos.y].estudiante.$
+          \State $agregarComoSiguiente(campus.campus[pos.x][pos.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
+          \State $campus.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
+      \Else
+        \If {$campus.campus[pos.x][pos.y].hayHippie?$ $\land$ $atrapadoPorAgente(pos)$}
+            \State $vecinos \larr campus.campusSeguro.vecinos(pos)$ \complejidad{O(1)}
+            \State $i \larr 0$ \complejidad{O(1)}
+            \While {$i < vecinos.tamanio()$} \complejidad{O(1)}
+                \State $posAct \larr vecinos[pos.x][pos.y]$ \complejidad{O(1)}
+                \State $info$ $\larr$ $campus.campus[vecinos[i].x][vecinos[i].y]$ \complejidad{O(1)}
+                \If {$posAct.hayAgente$}
+                    \State $info.agente.siguiente.cantCapturas++$ \complejidad{O(1)}
+                    \State // Actualizar mas vigilante
+                    \If {$campus.masVigilante.siguienteSignificado().cantCapturas < $\\$info.agente.siguienteSignificado().cantCapturas$}
+                        \State $campus.masVigilante \larr info.agente$ \complejidad{O(1)}
+                    \Else
+                        \If{$campus.masVigilante.siguienteSignificado().cantCapturas = $\\$info.agente.siguienteSignificado().cantCapturas$\\
+                            $\land campus.masVigilante.siguienteClave() < info.agente.siguienteClave()$} \complejidad{O(1)}
+                              \State $campus.masVigilante \larr info.agente$ \complejidad{O(1)}
+                        \EndIf
+                    \EndIf
+                \EndIf
+                \State $i++$
+            \EndWhile
+            \State $campus.campus[pos.x][pos.y].hayHippie? = False$ \complejidad{O(1)}
+            \State $campus.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
+        \EndIf
+      \EndIf
+    \EndIf
+ }{O(long(nombre))}
+
+ \algoritmo{proxPosHippie}{in/out campus:campusSeguro, in nombre:string}{res:pos}{
+    \State // PRE: El nombre es un hippie y el hippie no esta encerrado
+    \State $posHippie \larr campus.hippies.obtener(nombre)$ \complejidad{O(long(nombre))}
+    \If {$campus.estudiantes.tamanio()>0$}
+      \State // Retorna de las posiciones mas cercanas, la que esta mas cerca del (0,0)
+      \State $proxPos \larr aPosMasCercana(campus.campusEstatico,posHippie,campus.estudiantes.significados)$ \complejidad{O($N_e$)}
+    \Else
+        \State // Retorna el ingreso mas cercan, en caso de empate, el de abajo
+        \State $proxPos \larr aIngresoMasCercano(campus.campusEstatico,posHippie)$ \complejidad{$O(1)$}
+    \EndIf
+    \State $res \larr proxPos$ \complejidad{O(1)}
+ }{O($N_e$)}
+
+  \algoritmo{proxPosAgente}{in/out campus:campusSeguro, in posAgente:pos}{res:pos}{
+    \State // PRE: En la posicion hay un agente que se puede mover
+    \If {$campus.hippies.tamanio()>0$}
+      \State // Retorna de las posiciones mas cercanas, la que esta mas cerca del (0,0)
+      \State $proxPos \larr aPosMasCercana(campus.campusEstatico,posAgente,campus.hippies.significados)$ \complejidad{O($N_h$)}
+    \Else
+        \State // Retorna el ingreso mas cercano, en caso de empate, el de abajo
+        \State $proxPos \larr aIngresoMasCercano(campus.campusEstatico,posAgente)$ \complejidad{$O(1)$}
+    \EndIf
+    \State $res \larr proxPos$ \complejidad{O(1)}
+ }{O($N_h$)}
+
+
+ \algoritmo{aIngresoMasCercano}{in p:pos, cs: campusSeguro}{res:pos}{
+	\If{$p.Y\leq c.alto/2$}
+		\If{$PosValida(cs.campus,<p.X,p.Y-1>)\land \lnot HayAlgo(cs,<p.X,p.Y-1>)$}
+			\State $res \larr <p.X,p.Y-1>$
+		\Else
+			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
+				\State $res \larr <p.X+1,p.Y>$
+			\Else
+				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
+					\State $res \larr <p.X-1,p.Y>$
+				\Else
+					\State $res \larr <p.X,p.Y+1>$
+				\EndIf
+			\EndIf
+		\EndIf
+	\Else
+		\If{$PosValida(cs.campus,<p.X,p.Y+1>)\land \lnot HayAlgo(cs,<p.X,p.Y+1>)$}
+			\State $res \larr <p.X,p.Y-1>$
+		\Else
+			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
+				\State $res \larr <p.X+1,p.Y>$
+			\Else
+				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
+					\State $res \larr <p.X-1,p.Y>$
+				\Else
+					\State $res \larr <p.X,p.Y-1>$
+				\EndIf
+			\EndIf
+		\EndIf
+	\EndIf
+}
+{O($1$)}
+
+ \algoritmo{ibusquedaBinariaPorSanciones}{in ar:arreglo(val:nat otr: $\alpha$>), in sanc:nat}{res:$<\alpha , bool>$)}{
+ 	\State $res.\pi_2 \larr false$
+	\State $min \larr 0$
+	\State $max \larr |ar|$
+    \While {$max-min>1$} \complejidad{O(log($|ar|$))}
+       \State $med \larr (max-min)/2$
+       \If {$ar[med].val \leq sanc$}
+       		\State $min \larr med$
+       \Else
+       		\State $max \larr med$
+       	\EndIf
+    \EndWhile
+    \If {$ar[min].val = sanc$}
+    	\State $res \larr <ar[min].otr, true>$
+    \EndIf
+ }{O(log($|ar|$)}
