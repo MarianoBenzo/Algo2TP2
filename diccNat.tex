@@ -1,0 +1,221 @@
+%\\\\\\\\\\\\!TEX root = tp2.tex
+
+\section{Diccionario por Naturales}
+
+\subsection{Interfaz}
+
+\sexc{Diccionario(\kappa, \sigma)}
+$\textbf{usa}$ Bool, Nat
+\generos{diccNat(\kappa, \sigma)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Operaciones}
+
+
+\operacion{Vacio}{}{res : diccNat(\kappa, \sigma)}
+ {$true$}
+ {$res \igobs vacio()$}
+ {Crea un nuevo diccionario}
+ {$O(1)$}
+ {}
+ 
+ \operacion{Definido?}{in d:diccNat(\kappa, \sigma) in n:\kappa}{res:Bool}
+  {$true$}
+  {$res \igobs def?(n,d)$}
+  {Indica si la clave esta definida}
+  {$O(m)$}
+  {}
+
+ \operacion{Definir}{in/out d:diccNat(\kappa, \sigma) in n:\kappa, in s:\sigma}{}
+  {$\neg def?(n,d) \land d=d_0$}
+  {$d \igobs Definir(n, s, d_0)$}
+  {Se define s en el diccionario}
+  {$O(m)$}
+  {}
+
+ \operacion{Borrar}{in/out d:diccNat(\kappa, \sigma) in n:\kappa}{}
+ {$d \igobs d_0 \land def?(n,d)$}
+ {$d \igobs Borrar(n,d_0)$}
+ {Elimina el elemento n}
+ {$O(m)$}
+ {}
+
+ \operacion{Significado}{in d:diccNat(\kappa, \sigma) in n:\kappa}{res:\sigma}
+ {$def?(n,d)$}
+ {$res \igobs obtener(n,d)$}
+ {Se retornan los significados}
+ {$O(m)$}
+ {}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Representación}
+
+diccNat
+\serc{puntero(estr(\kappa, \sigma))}{
+	\\
+	\donde{estr(\kappa, \sigma)}{\tupla{ clave: \kappa, significado:\sigma, hijoDer: puntero(estr(\kappa \sigma)), hijoIzq: puntero(estr(\kappa \sigma))}}
+}
+
+\subsubsection*{Invariante de representación}
+
+\rep{estr}{e} 
+\begin{enumerate}
+\item Para todo hijoDer de un estr, si no es NULL, su clave es mayor a la clave de su padre.
+\item Para todo hijoIzq de un estr, si no es NULL, su clave es menor a la clave de su padre.
+\item No hay ciclos, ni nodos con dos padres.
+\end{enumerate}
+
+
+\subsubsection*{Función de abstracción}
+\abs{diccNat(\kappa, \sigma)}{dicc(\kappa, \sigma)}{d}{c}
+$((\paratodo{\kappa}{k})( k \in claves(c) \implies (\exists n: estr(\kappa, \sigma))(n \in arbol(d) \land n.clave = k)) \land ((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
+  
+$arbol: puntero(estr(\kappa, \sigma)) \larr conj(puntero(estr(\kappa, \sigma)))$
+
+$arbol(n) \equiv $
+\begin{algorithmic}
+\If {$n.hijoIzq \neq null \land n.hijoDer \neq null$}
+	\State $Ag(n, arbol(n.hijoIzq) \cup arbol(n.hijoDer))$
+\Else
+	\If {$n.hijoIzq \neq null$}
+		\State $Ag(n,arbol(n.hijoIzq))$
+	\Else
+		\If {$n.hijoDer \neq null$} 
+		\State $Ag(n,arbol(n.hijoDer))$ 
+		\Else 
+		\State $Ag(n,\emptyset)$ 
+		\EndIf
+	\EndIf
+\EndIf
+\end{algorithmic}
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmos}
+
+\algoritmo{iVacio}{}{res:estr}{
+  \State $res \larr NULL$
+}{O(1)}
+
+\algoritmo{iDefinir}{in/out d:estr, in n:\kappa, in s:\sigma}{}{
+  
+  
+  \If {$d == NULL$}
+    \State $res \larr <n,s,NULL,NULL>$ 				\complejidad{O(1)}
+  \EndIf
+  
+  \If {$d \neq NULL \land n < d.clave$}
+    \State $d.hijoIzq \larr iDefinir(d.hijoIzq,n,s)$ 	\complejidad{O(log(m))}
+  \EndIf
+  
+  \If {$d \neq NULL \land n > d.clave$}
+    \State $d.hijoDer \larr iDefinir(d.hijoDer,n,s)$ 	\complejidad{O(m)}
+  \EndIf
+}{O(m)}
+
+\algoritmo{iEliminar}{in/out d:estr, in n:\kappa}{}{
+  \If {$d == NULL$}
+    \State $Fin Funcion$
+    \complejidad{O(1)}
+   
+    \ElsIf {$n > d.clave$}
+    \State $d.hijoDer \larr iBorrar(d.hijoDer,n)$
+    \complejidad{O(m)}
+    
+    \ElsIf {$n < d.clave$}
+    \State $d.hijoIzq \larr iBorrar(d.hijoIzq,n)$
+    \complejidad{O(m)}
+    
+    \ElsIf {$d.hijoIzq == NULL \land d.hijoDer == NULL$}
+    \State $Borrar(d)$
+    \complejidad{O(1)}
+    \State $d \larr NULL$
+    \complejidad{O(1)}
+    
+	\ElsIf {$d.hijoIzq == NULL$}
+    \State $aux \larr d.hijoDer$
+    \complejidad{O(1)}
+    
+    \While{$aux.hijoIzq \neq NULL$}
+    \complejidad{O(m)}
+    \State $aux \larr aux.hijoIzq$
+    \complejidad{O(1)}   
+    \EndWhile 
+    
+    \State $d.hijoDer \larr iBorrar(aux.clave, d.hijoDer)$
+    \State $d.clave \larr aux.clave$
+    \complejidad{O(1)} 
+    \State $d.significado \larr aux.significado$
+    \complejidad{O(1)} 
+	
+	\Else
+    
+	\State $aux \larr d.hijoIzq$
+    \complejidad{O(1)}
+    
+    \While{$aux.hijoDer \neq NULL$}
+    \complejidad{O(m)}
+    \State $aux \larr aux.hijoDer$
+    \complejidad{O(1)}   
+    \EndWhile 
+    
+    \State $d.hijoIzq \larr iBorrar(aux.clave, d.hijoIzq)$
+    \State $d.clave \larr aux.clave$
+    \complejidad{O(1)} 
+    \State $d.significado \larr aux.significado$
+    \complejidad{O(1)}     
+    
+  \EndIf
+  
+
+}{O(m)}
+
+
+\algoritmo{iSignificado}{in/out d:estr, in n:\kappa}{res:\sigma}{
+  \State $nodoActual \larr d$ 
+  \complejidad{O(1)}
+  \While {$\neg(nodoActual == NULL) \land \neg res$}
+  	\complejidad{O(m)}
+  \If {$nodoActual.clave == n$}
+    \State $res \larr nodoActual.significado$
+    \complejidad{O(1)}
+  \Else
+   	\If {$c < nodoActual.clave$}
+   	 	\State $nodoActual \larr nodoActual.hijoIzq$
+   	 	\complejidad{O(1)}
+   	\Else
+   		\State $nodoActual \larr nodoActual.hijoDer$
+   	 	\complejidad{O(1)}
+ 	\EndIf
+  \EndIf
+  	
+  
+  \EndWhile
+}{O(m)}
+
+\algoritmo{iDefinido?}{in/out d:estr, in n:\kappa}{res:bool}{
+  \State $nodoActual \larr d$ 
+  \complejidad{O(1)}
+  \State $res \larr FALSE$ 
+  \complejidad{O(1)}
+  \While {$\neg(nodoActual == NULL) \land \neg res$}
+  	\complejidad{O(m)}
+  \If {$nodoActual.clave == n$}
+    \State $res \larr TRUE$
+    \complejidad{O(1)}
+  \Else
+   	\If {$c < nodoActual.clave$}
+   	 	\State $nodoActual \larr nodoActual.hijoIzq$
+   	 	\complejidad{O(1)}
+   	\Else
+   		\State $nodoActual \larr nodoActual.hijoDer$
+   	 	\complejidad{O(1)}
+ 	\EndIf
+  \EndIf
+  \EndWhile
+}{O(m)}
+
+m: En peor caso es igual a la cantidad de elementos del arbol. En promedio es log(cantidad de elementos del arbol).
