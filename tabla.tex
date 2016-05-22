@@ -184,8 +184,8 @@ $\textbf{usa}$
   \donde{tab}{\tupla{
   		Nombre:\mbox{String},
   		Indices: \mbox{ConjTrie(\tupla{IndicesC:campo, IndicesA: Arreglo(Indice)) }},
-		Registros:\mbox{Lista(Registro)},
-		Campos:\mbox{DiccTrie(Campo,Bool)},
+		Registros:\mbox{Conj(Registro)},
+		Campos:\mbox{DiccTrie(Campo,Tipo)},
 		\#Accesos:\mbox{Nat}
     }
       \donde{Indice}{Dicc(Dato,conj(Registro))}
@@ -228,7 +228,7 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
   \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}
 }{O(1)}
 
-\algoritmo{indices}{in t:tab}{res:itConjTrie(Indice)}{ //
+\algoritmo{indices}{in t:tab}{res:itConjTrie(Indice)}{ 
   \State $res \larr CrearItConjTrie(t.Indices)$ \complejidad{O(1)}
 }{O(1)}
 
