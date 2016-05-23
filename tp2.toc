@@ -14,3 +14,7 @@
 \contentsline {subsection}{\numberline {4.1}Interfaz}{18}{subsection.4.1}
 \contentsline {subsection}{\numberline {4.2}Representaci\IeC {\'o}n}{19}{subsection.4.2}
 \contentsline {subsection}{\numberline {4.3}Algoritmos}{20}{subsection.4.3}
+\contentsline {section}{\numberline {5}Registro}{21}{section.5}
+\contentsline {subsection}{\numberline {5.1}Interfaz}{21}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Representaci\IeC {\'o}n}{22}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Algoritmos}{23}{subsection.5.3}

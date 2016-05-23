@@ -11,7 +11,7 @@
 
 \sexc{registro}
 $\textbf{usa}$  
-\generos{dicc(campo,dato), itDicc(campo,dato)}
+\generos{dicc(campo\,dato), itDicc(campo\,dato)}
 
 
 
@@ -24,129 +24,119 @@ $\textbf{usa}$
 
 %%%%%%%%%%%%%%%%%%%%%%% Otras Operaciones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\operacion{campos}{in r: dicc(campo, dato)}{res : itConj(campo)}
+\operacion{campos}{in r: dicc(campo\, dato)}{res : itConj(campo)}
  {true}
  {$res \igobs claves(r)$}
  {Devuelve un conjunto de campos que son claves del registro ingresado por parametro}
- {O($calc$) [$\Theta(\sum_{c' in  c}equal(c,c'))$, donde $c$ $=$ claves($d$)]}
+ {O($calc$)} %\[$\Theta(\sum\_{c' in  c}equal(c,c')), donde $c$ $=$ claves($d$)\]%
  {Se devuelve un iterador al conjunto, hay aliasing}
 
-\operacion{borrar?}{in crit: dicc(campo, dato), in r: dicc(campo,dato)}{res : bool}
- {#campos(crit) = 1}
+\operacion{borrar?}{in crit: dicc(campo\, dato), in r: dicc(campo\,dato)}{res : bool}
+ {$\#$campos(crit) = 1}
  {$res \igobs borrar?(crit, r)$}
- {Devuelve true si y solo si todos los campos de crit pertenecen a campos de r}
+ {Devuelve true si y solo si todos los campos de crit pertenecen a campos de r.}
  {O($calc$)} % O(obtener(#cc))
  {}
 
-\operacion{agCampos}{in/out  r1: dicc(campo, dato) in  r2: dicc(campo, dato)}{res : reg}
- {$ r1 \igobs r1_0 $}
- {$r1 \igobs agregarCampos(r1_0, r2) $}
+\operacion{agCampos}{in/out  r1: dicc(campo\, dato) in  r2: dicc(campo\, dato)}{res : reg}
+ {$ r1 \igobs r1\_0 $}
+ {$r1 \igobs agregarCampos(r1\_0, r2) $}
  {agrega los datos de los campos faltantes de r2 a los campos de r1}
- {O($calcular$)  }
+ {O($calcular$) }
  {}
  
-\operacion{copiarCampos}{in/out  r_1: dicc(campo, dato), in  cc: conj(campo), in r2: reg}{}
- {$r1 \igobs r1_0 \and  cc in  campos(r2) $}
- {$r1 \igobs copiarCampos(cc, r1_0, r2)$}
+\operacion{copiarCampos}{in/out  r\_1: dicc(campo\, dato), in  cc: conj(campo), in r2: reg}{}
+{$r1 \igobs r1\_0 \land  cc \in  campos(r2) $}
+{$r1 \igobs copiarCampos(cc, r1\_0, r2)$}
  {copia los datos que se encuentran en los campos de r2 a r1}
- {O($calc$)}
- {}
+{O($calc$)}
+ {}%
 
-\operacion{coincideAlguno}{in  r1: dicc(campo, dato), in cc: conj(campo), in  r2: dicc(campo, dato)}{res : bool}
- {cc \subseteq campos(r1)\cap campos(r2)}
+\operacion{coincideAlguno}{in  r1: dicc(campo\, dato), in cc: conj(campo), in  r2: dicc(campo\, dato)}{res : bool}
+ {cc $\subseteq campos(r1)\cap$ campos(r2)}
  {$res \igobs coincideAlguno(r1, r2)$}
  {Devuelve true si y solo si alguno de los campos(dato) de cc pertenece a r1 y r2}
  {O($calc$)}
  {}
  
-\operacion{coincidenTodos}{in r1: dicc(campo, dato), in cc: conj(campo), in r2: dicc(campo, dato)}{res : bool }
- {cc \subseteq campos(r1)\cap campos(r2)}
+\operacion{coincidenTodos}{in r1: dicc(campo\, dato), in cc: conj(campo), in r2: dicc(campo\, dato)}{res : bool }
+ {cc $\subseteq$ campos(r1)$\cap$ campos(r2)}
  {$res \igobs $}
  {Devuelve ture si y solo si todos los campos(dato) de cc pertenecen a r1 y r2}
  {O($calc$) } 
  {}
  
-\operacion{enTodos}{in c: campo, in cr: conj(registro)}{res : bool}
+\operacion{enTodos}{in c: campo\, in cr: conj(registro)}{res : bool}
  {true}
  {$res \igobs enTodos(c,cr)$}
  {Devuelve true si y solo si campo c pertenece a los campos de cada uno de los registros cr}
  {O($calc$)}
  {}
 
-\operacion{combinarTodos}{in c: campo, in r1:dicc(campo, dato), in cr: conj(dicc(campo,dato))}{res : conj(itDicc(campo, dato))}
- {c $in $ campos(r1) $\land$ enTodos(c,cr)}
- {$res \igobs cantidadDeAccesos(t)$}
- {Devuelve }
- {O($1$)}
+\operacion{combinarTodos}{in c: campo\, in r1:dicc(campo dato), in cr: conj(dicc(campo\,dato))}
+{res : conj(itDicc(campo\, dato))}
+ {c $\in $ campos(r1) $\land$ enTodos(c,cr)}
+{$res \igobs cantidadDeAccesos(t)$}
+{Devuelve. }
+{O($1$)}
  {}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
 \serc{Registro}{
-  \donde{dicc(campo, dato)}
-      \donde{dic}{diccTrie(Dato,campo)}
-  }
+  \donde{dicc(campo\, dato)}
+%   	\donde{dic}{diccTrie(Dato,campo)}
 }
 
-\subsubsection*{Invariante de representación}
-
-\begin{enumerate}
-  \item El Nombre de la tabla es un String acotado.
-  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
-  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
-  \item 
-
-\end{enumerate}
-
-\subsubsection*{Función de abstracción}
-\abs{sistema}{CampusSeguro}{s}{cs}
-$s.campus \igobs campus(cs)$ $\land$ \\
-$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
-$s.hippies \igobs hippies(cs)$ $\land$ \\
-$s.agentes \igobs agentes(cs)$ $\land$ \\
-$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+%\subsubsection*{Invariante de representación}
+%
+%\begin{enumerate}
+%  \item El Nombre de la tabla es un String acotado.
+%  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
+%  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
+%  \item 
+%
+%\end{enumerate}
+%
+%\subsubsection*{Función de abstracción}
+%\abs{sistema}{CampusSeguro}{s}{cs}
+%$s.campus \igobs campus(cs)$ $\land$ \\
+%$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
+%$s.hippies \igobs hippies(cs)$ $\land$ \\
+%$s.agentes \igobs agentes(cs)$ $\land$ \\
+%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
 
 \subsection{Algoritmos}
 
-  \algoritmo{campos}{in r: dicc(campo, dato)}{conj(campo)}{
+\algoritmo{campos}{in r: dicc(campo\, dato)}{res:conj(campo)}{
   \State $res \larr CrearItConjTrie(r.ClavesDicc)$ \complejidad{O(1)}
 }{O(1)}
  
-   \algoritmo{borrar?}{in cr: dicc(campo, dato) in r: dicc(campo, dato)}{res:bool}{
-    \State  res $\larr$ false;
-    \State  \While{HaySiguiente(cr)}
-        \State  res $\larr$   coincideAlguno(r,cc,Siguiente(cr)) $\lor$res;
-        \State  Avanzar(cr);
-  \State  \EndWhile   
- }{O(calcular)}
-
- \algoritmo{agregarCampos}{in r1: dicc(campo, dato) in r2: reg}{res:reg}{
+ 
+\algoritmo{agregarCampos}{in r1: dicc(campo\, dato) in r2: reg}{res:reg}{
     \State  res $\larr$ CrearItConj(vacio());
-    \State  \While
-        \State  \If 
-                \State  
- 
+}{O(calcular)}
 
  
-  \algoritmo{copiarCampos}{in cc: conj(campo) in/out r1: dicc(campo, dato) in r2: reg}{}{
+  \algoritmo{copiarCampos}{in cc: conj(campo) in/out r1: dicc(campo\, dato) in r2: reg}{}{
     \State  res $\larr$ min( dameColumna(  c,  CrearItConj(t.registros))  );
-
+ }{O(calcular)}
  
-   \algoritmo{coincideAlguno}{in r1: dicc(campo, dato) in cc: conj(campo), in r2: reg}{res:bool}{
+   \algoritmo{coincideAlguno}{in r1: dicc(campo\, dato) in cc: conj(campo), in r2: reg}{res:bool}{
     \State  res $\larr$ 
-
+ }{O(calcular)}
  
-    \algoritmo{coincidenTodos}{in r1: dicc(campo, dato) in cc: conj(campo), in r2: reg}{res:bool}{
+    \algoritmo{coincidenTodos}{in r1: dicc(campo\, dato) in cc: conj(campo), in r2: reg}{res:bool}{
     \State  res $\larr$ 
-    \State  \While{
+    \State  \While{}
         \State  \If 
                 \State 
         \State  \EndIf        
@@ -154,19 +144,20 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
   \State  \EndWhile       
  }{O(calcular)}
  
-    \algoritmo{enTodos}{in c:campo, in cr: conj(registro)}{res:bool}{
+    \algoritmo{enTodos}{in c:campo\, in cr: conj(registro)}{res:bool}{
     \State  res $\larr$ True;
     \State  ; 
     \State  \While
         \State  
         \State 
   \State  \EndWhile       
-
-  \algoritmo{combinarTodos}{in c: campo, in r1: dicc(campo, dato) in cr: conj(registro)}{res:itConj(reg)}{
+ }{O(calcular)}
+ 
+  \algoritmo{combinarTodos}{in c: campo\, in r1: dicc(campo\, dato) in cr: conj(registro)}{res:itConj(reg)}{
       \If {$\neg(encerrado?(campus,campus.hippies.obtener(nombre)))$} \complejidad{O(long(nombre))}
         \State 
         \State \complejidad{O(long(nombre))}
       \EndIf
-  }{O(long(nombre) + $N_e$)}
+  }{O(long(nombre) + $N\_e$)}
 
  
