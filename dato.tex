@@ -1,0 +1,196 @@
+
+%\section{Pos es tupla(x:Nat, y:Nat)}
+
+\section{Tipo es Bool}
+
+%\section{Nombre es String}
+
+\section{Dato($\alpha$)}
+
+\subsection{Interfaz}
+
+\sexc{dato}
+$\textbf{usa}$  
+\generos{nat, string, tipo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Operaciones}
+
+
+%%%%%% observadores basicos %%%%%%
+
+\operacion{tipo?}{in d: dato }{res : tipo}
+ {true}
+ {$res \igobs tipo?(d)$}
+ {Devuelve el tipo del dato ingresado por parametro.}
+ {O($1$)}
+ {Se retorna res por referencia.}
+
+\operacion{valorNat}{in d: dato }{res : nat}
+ {Nat?(d)}
+ {$res \igobs valorNat(t)$}
+ {Devuelve valor numerido del dato por parametro.}
+ {O($1$)}
+ {Se devuelve res por referencia.}
+
+\operacion{valorString}{in d: dato }{res : string}
+ {String?(d)}
+ {$res \igobs valorString(t)$}
+ {Devuelve valor del dato por parametro.}
+ {O($1$)}
+ {Se devuelve res por referencia.}
+ 
+ %%%%%% generadores %%%%%%%
+
+ \operacion{datoNat}{in n: $\alpha$,in tipoDelDato: tipo}{res : dato}
+ {$tipoDelDato$}
+ {$res \igobs datoNat(n,tipoDelDato)$}
+ {Crea un dato de valor numerico.}
+ {O($1$)}
+ {Se devuelve res por referencia.}
+ 
+ \operacion{datoStr}{in n: $\alpha$,in tipoDelDato: tipo}{res : dato}
+ {$\neg tipoDelDato$}
+ {$res \igobs datoString(n,tipoDelDato)$}
+ {Crea un dato de valor de letras.}
+ {O($1$)}
+ {Se devuelve res por referencia.}
+
+%%%%%% Otras Operaciones %%%%%%%%%%%
+
+ \operacion{mismoTipo?}{in d1: dato, in d2: dato}{res:bool}
+ {$true$}
+ {$res \igobs mismoTipo?(d1,d2)$}
+ {Informa si los datos pasados por parametro son del mismo tipo de valor.}
+ {O($1$)}
+ {} 
+ 
+  \operacion{String?}{in d: dato}{res:bool}
+ {$true$}
+ {$res \igobs String?(d)$}
+ {Informa si el dato pasado por parametro es de tipo string.}
+ {O($1$)}
+ {} 
+ 
+  \operacion{Nat?}{in d: dato}{res:bool}
+ {$true$}
+ {$res \igobs Nat?(d)$}
+ {Informa si el dato pasado por parametro es de tipo nat.}
+ {O($1$)}
+ {}  
+ 
+  \operacion{min}{in cd: Conj(dato)}{res:dato}
+ {$\neg$EsVacio?(cd)}
+ {$res \igobs min(cd)$}
+ {Retorna el minimo entre los valores del conjunto de datos pasado por parametro.}
+ {O($Cardinal(cd)$)}
+ {Retorna res por referencia.}
+
+  \operacion{max}{in cd: Conj(dato)}{res:dato}
+ {$\neg$EsVacio?(cd)}
+ {$res \igobs max(cd)$}
+ {Retorna el maximo entre los valores del conjunto de datos pasado por parametro.}
+ {O($Cardinal(cd)$)}
+ {Retorna res por referencia.}
+
+  \operacion{<=}{in d1: dato, in d2: dato}{res:bool}
+ {mismoTipo?(d1,d2)}
+ {$res \igobs <=(d1,d2)$}
+ {Retorna el maximo entre los valores del conjunto de datos pasado por parametro.}
+ {O($Cardinal(cd)$)}
+ {Retorna res por referencia.}
+ oincidenTodos(crit,campos(crit),Siguiente(cr))
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Representación}
+
+\serc{dato}{{\tupla{Valor: $\alpha$, TipoValor: bool}
+  }
+}
+
+\subsubsection*{Invariante de representación}
+
+\begin{enumerate}
+  \item El Nombre de la tabla es un String acotado.
+  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
+  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
+  \item 
+
+\end{enumerate}
+
+
+\subsubsection*{Función de abstracción}
+\abs{sistema}{CampusSeguro}{s}{cs}
+$s.campus \igobs campus(cs)$ $\land$ \\
+$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
+$s.hippies \igobs hippies(cs)$ $\land$ \\
+$s.agentes \igobs agentes(cs)$ $\land$ \\
+$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\subsection{Algoritmos}
+
+\algoritmo{tipo?}{in a: dato}{res:bool}{
+  \State $res \larr a.TipoValor$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{valorNat}{in a: dato}{res: nat}{
+  \State $res \larr a.Valor$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{valorStr}{in a: dato}{res: string}{
+  \State $res \larr a.Valor$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{mismoTipo?}{in d1: dato, in d2: dato}{res: bool}{ 
+  \State $res \larr tipo?(d1)=tipo?(d2)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{Nat?}{in a: dato}{res: bool}{
+  \State $res \larr tipo?(a)$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{String?}{in a: dato}{res: bool}{
+  \State $res \larr $\neg Nat?(a)$ \complejidad{O(1)}
+}{O(1)}
+
+   \algoritmo{min}{in cd: Conj(dato)}{res: dato}{
+  	\State	itcd $\larr$ CrearItConj(cd)				
+  	\State	minimo $\larr$ Siguiente(itcd)
+  	\State 	\While{HaySiguiente(itcd)}
+  					\State	\If {Siguiente(itcd)<=minimo} 
+							  	\State	minimo $\larr$ Siguiente(itcd);
+				\State	\EndIf				
+				\State	Avanzar(itcr);
+	\State 	\EndWhile   
+ }{O(Cardinal(cd))}
+
+   \algoritmo{max}{in cd: Conj(dato)}{res: dato}{
+  	\State	itcd $\larr$ CrearItConj(cd)				
+  	\State	maximo $\larr$ Siguiente(itcd)
+  	\State 	\While{HaySiguiente(itcd)}
+  					\State	\If {maximo<=Siguiente(itcd)} 
+							  	\State	minimo $\larr$ Siguiente(itcd);
+					\State	\EndIf				
+				\State	Avanzar(itcr);
+	\State 	\EndWhile   
+ }{O(Cardinal(cd))}
+
+   \algoritmo{<=}{in d1: dato, in d2: dato}{res: bool}{
+  	\State	\If {String?(d1)} 
+			  		\State	res $\larr$ valorStr(d1)<=valorStr(d2)
+	\State	\Else
+			  		\State	res $\larr$ valorNat(d1)<=valorNat(d2)			
+	\State	\EndIf				
+ }{O(1)}
+ 
+ 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmos operaciones auxiliares}
