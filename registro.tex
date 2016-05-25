@@ -29,14 +29,14 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
  {$\#$campos(crit) = 1}
  {$res \igobs borrar?(crit, r)$}
  {Devuelve true si y solo si todos los campos de crit pertenecen a campos de r.}
- {O($(1)$)} 
+ {O($1$)} 
  {}
 
-\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{res : itReg}
+\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{}
  {$ r_1 \igobs r1_0 $}
  {$r_1 \igobs agregarCampos(r1_0, r2) $}
  {agrega los datos de los campos faltantes de r2 a los campos de r1}
- {O($(1)$)} 
+ {O($1$)} 
  {}
  
  \operacion{copiarCampos}{in/out  $r_1$: reg, in  cc: conj(campo), in $r_2$: reg}{}
@@ -79,21 +79,22 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 \newpage
 \subsection{Representación}
 
-%\serc{dic}{
-%  \donde{dic}{\tupla{
-%      claves:\mbox{lista(campo)}\,
-%      significado: \mbox{diccTrie(campo, lista(dato))}
-%    }
-%      \donde{diccTrie}{Dicc(dato\,Conj(Dato))}
-%  }
-%}
-
-\subsubsection{Invariante de representación}
-\Rep{dicc}{d}{\#claves(secuADicc($d$.claves)) $=$ long($d$.claves) $\land$ long($d$.claves) = long($d$.significados)}
+\serc{DiccTrie}{
+  \donde{DiccTrie}{\tupla{
+      claves:\mbox{lista(campo)},
+      significados: \mbox{DiccTrie(campo, dato)},
+    }
+  }
+}
 
 
-\subsubsection{Función de abstracción}
-  \AbsFc{dicc}{reg}{d}{\IF vacía?($d$.claves) THEN vacío ELSE definir(prim($d$).claves, prim($d$).significado, Abs(fin($d$))) FI}
+\subsubsection*{Invariante de representación}
+\rep{dicc}{d}{true $\Leftrightarrow$ $\#$claves(secuADicc($d$.claves)) $=$ long($d$.claves) $\land$ long($d$.claves) = long($d$.significados)}
+
+
+\subsubsection*{Función de abstracción}
+\abs{DiccTrie}{reg}{d}{r}{\IF vacía?($d$.claves) THEN vacío ELSE definir(prim($d$).claves, prim($d$).significado, Abs(fin($d$))) FI}
+}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,66 +102,79 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 
 \subsection{Algoritmos}
 
-\algoritmo{campos}{in r: reg}{res:conj(campo)}{
+\algoritmo{campos}{in r: reg}{res: Conj(campo)}{
   \State cn $\larr$ vacio(); \complejidad{O(1)}
   \State it $\larr$ crearItDicc(r);
-  \State \While {haySiguiente(it)}; \complejidad{O(1)}
+  \While {haySiguiente(it)}; \complejidad{O(1)}
           \State agregar(cn, clave.siguiente(it)); \complejidad{O(1)}
           \State avanzar(it); \complejidad{O(1)}
-          \State \Endwhile
+ \EndWhile
   \State res $\larr$ cn; \complejidad{O(1)}
 }{O(1)}
 
 
-\algoritmo{borrar?}{in crit: reg in r: reg}{res:conj(campo)}{
+\algoritmo{borrar?}{in crit: reg in r: reg}{res: bool}{
   \State cc $\larr$ crit.campos; \complejidad{O(1)}
-  \State res $\larr$ coincidenTodos(crit,cc,r): \complejidad{O(1)}
+  \State res $\larr$ coincidenTodos(crit, cc, r): \complejidad{O(1)}
 }{O(1)}
 
  
  
 \algoritmo{agregarCampos}{in $r_1$: reg in $r_2$: reg}{res:}{
-    \State  itr $\larr$ CrearItDiccTrie(vacio()); \complejidad{O(1)}
     \State cc $\larr$ $r_2$.campos / $r_1$.campos;\complejidad{O(1)}
     \State res $\larr$ copiarCampos(cc,$r_2,r_1$); \complejidad{O()}
-}{O()}
+}{O(1)}
 
  
-  \algoritmo{copiarCampos}{in cc: conj(campo) in/out $r_1$: reg, in $r_2$: reg}{}{
-    \State  itr $\larr$ crearItDicc($r_1$);
-    \State  itcc $\larr$ crearItConj(cc);
-    \State  \If {vacio(cc)} \complejidad{O()}
-            \State 
-
- }{O()}
+  \algoritmo{copiarCampos}{in cc: conj(campo) in/out r1: reg, in r2: reg}{}{
+    \State  itcc $\larr$ crearItConj(cc); \complejidad{O(1)}
+    \While {haySiguiente(itcc)}; \complejidad{O(1)}
+                    \State definirRapido(siguiente(itcc), obtener(siguiente(itcc)\,r2), r1); \complejidad{O(1)}
+                    \State avanzar(itcc); \complejiad{O(1)}
+    \EndWhile
+ }{O(1)}
  
-   \algoritmo{coincideAlguno}{in r1: reg in cc: conj(campo), in r2: reg}{res:bool}{
-   \State itcc $\larr$ crearItConj(cc);
-   \State res $\larr$ true;
-   \State \While {haySiguiente(ittcc) \land res};
-          \State \If {\not obtener(siguiente(itcr),$r_1$) = obtener(siguiente(itcr),$r_2$)};
-                  \State res $\larr$  false;
-                  \State \Endif
-          \State avanzar(itcc);
- }{O()}
+   \algoritmo{coincideAlguno}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
+   \State res $\larr$ false; \complejidad {O(1)}
+          \If {$\not$ vacio?(cc)};  \complejidad {O(1)}
+              \State itcc $\larr$ crearItConj(cc); \complejidad {O(1)}
+   \While {haySiguiente(ittcc)}; \complejidadd {O(1)}
+          \If {obtener(siguiente(itcc),$r_1$) == obtener(siguiente(itcc),r2)};
+                  \State res $\larr$  true; \complejidad {O(1)}
+           \EndIf
+          \State avanzar(itcc); \complejidad {O(1)}
+    \EndWhile
+ }{O(1)}
  
-    \algoritmo{coincidenTodos}{in r1: reg in cc: conj(campo), in r2: reg}{res:bool}{
-    \State  res $\larr$       
- }{O(calcular)}
+    \algoritmo{coincidenTodos}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
+    \State res $\larr$ true; \complejidad {O(1)}
+    \State itcc $\larr$ crearItConj(cc); \complejidad {O(1)}
+    \While {haySiguiente(itcc) $\land$ res}; \complejidadd {O(1)}
+          \If { $\not$(obtener(siguiente(itcc)\, r1) == obtener(siguiente(itcr)\, r2))};
+                  \State res $\larr$  false; \complejidad {O(1)}
+           \EndIf
+          \State avanzar(itcc);\complejidad {O(1)}
+    \EndWhile
+ }{O(1)}
  
     \algoritmo{enTodos}{in c:campo in cr: conj(reg)}{res:bool}{
-    \State  res $\larr$ True;
-    \State itCr $\larr$  CrearItConjTrie()
-    \State \While {\not vacio(cr) \land res};
-                \If {\not pertenece(c,cr.dameUno)};
-                    \State res $\larr$ false
-                \Endif
-                \State enTodos(c,cr.sinUno);
-            \Endwhile   
- }{O(calcular)}
+    \State res $\larr$ True; \complejidad{O(1)}
+    \State itcr $\larr$  CrearItConj(cr); \complejidad{O($\#$(cr))}
+    \State \While {haySiguiente(itcr) $\land$ res}; \complejidad{O($\#$(cr))}
+                \If { $\not$ pertenece(c,siguiente(itcr))}; \complejidad{O(1)}
+                    \State res $\larr$ false; \complejidad{O(1)}
+                \EndIf
+    \EndWhile   
+ }{O($\#$(cr))}
  
   \algoritmo{combinarTodos}{in c: campo in r1: reg in cr: conj(reg)}{}{
+    \State itcr $\larr$  CrearItConjDic(cr); \complejidad{O($\#$(cr))}
+    \State \While {haySiguiente(itcr) $\land$ res}; \complejidad{O($\#$(cr))}
+                \If {obtener(c,siguiente(itcr) == obtener(c,r)}; \complejidad{O(1)}
+                    \State agregarCampos(r, siguiente(itcr)); \complejidad{O(1)}
+                \EndIf
+    \EndWhile   
+ }{O($\#$(cr))}
      
-  }{O(long(nombre) + $N\_e$)}
 
  
