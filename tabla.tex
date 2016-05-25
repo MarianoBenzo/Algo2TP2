@@ -187,21 +187,47 @@ $\textbf{usa}$
 		Registros:\mbox{Conj(Registro)},
 		Campos:\mbox{DiccTrie(Campo,Tipo)},
 		\#Accesos:\mbox{Nat}
-    }
+    }	
       \donde{Indice}{Dicc(Dato,Conj(Registro))}
   }
 }
 
+
+  
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item El Nombre de la tabla es un String acotado.
-  \item Indices un diccionario con claves que son campos y significados son Indice
-  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
-  \item 
-
+  \item Para todos los registros de r, el tipo de los datos de las columnas de r, deben coincidir con los tipos de las columnas en e.campos.
+  \item Todas las columnas de e.campos y su tipo, deben coincidir con los campos y tipo de todos los registros de e.registros. Es decir no debe haber campos de mas.'
+  \item El nombre de la tabla que figura en e.nombre, es un string de longitut acotada.
+  \item Para todo registro r de e.registros y para todo campo c de e.Indices.DiccClaves, se debe cumplir que si tenemos valor $\larr$ Obtener(r, c) y ind $\larr$ Obtener(e.Indices, c). Al evaluar que r $\in$ Obtener(ind, valor) y deben ser del mismo tipo.
+  \item Para todo campo c, que pertenece a e.Indices.DiccClaves, si tenemos que  ind $\larr$ Obtener(e.Indices, c), y para todo dato d perteneciente a ind.DiccClaves entonces Obtener(ind, d) esta incluido o es igual a e.registros.
+  \item Para todo registro r perteneciente  a e.registros r.DiccClaves es igual a e.campos.DiccClaves.
+  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados, mas la cantidad de indices creados.
 \end{enumerate}
 
+%\rep{tab}{e}True $\iff$\\
+%(1.) $(\forall r: registro)(Pertenece?(e.registros, r)$\yluego$(\forall c: campo)())$
+%  \item Para todos los registros de r, el tipo de los datos de las columnas de r, deben coincidir con los tipos de las columnas en e.campos.
+%  \item Todas las columnas de e.campos y su tipo, deben coincidir con los campos y tipo de todos los registros de e.registros.
+%  \item El nombre de la tabla que figura en e.nombre, es un string de longitut acotada.
+%  \item Para todo registro r de e.registros y para todo campo c de e.Indices.DiccClaves, se debe cumplir que si tenemos valor $\larr$ Obtener(r, c) y ind $\larr$ Obtener(e.Indices, c). Al evaluar que r $\in$ Obtener(ind, valor) y deben ser del mismo tipo.
+%  \item Para todo campo c, que pertenece a e.Indices.DiccClaves, si tenemos que  ind $\larr$ Obtener(e.Indices, c), y para todo dato d perteneciente a ind.DiccClaves entonces Obtener(ind, d) esta incluido o es igual a e.registros.
+%  \item Para todo registro r perteneciente  a e.registros r.DiccClaves es igual a e.campos.DiccClaves.
+%  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados, mas la cantidad de indices creados.
+
+
+%\subsubsection*{Función de representaciòn}
+%\rep{tab}{Tabla}{s}{cs}
+%$s.campus \igobs campus(cs)$ $\l ,Mand$ \\
+%$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
+%$s.hippies \igobs hippies(cs)$ $\land$ \\
+%$s.agentes \igobs agentes(cs)$ $\land$ \\
+%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
 
 \subsubsection*{Función de abstracción}
 \abs{sistema}{CampusSeguro}{s}{cs}

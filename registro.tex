@@ -79,14 +79,14 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 \newpage
 \subsection{Representación}
 
-\serc{dic}{
-  \donde{dic}{\tupla{
-      claves:\mbox{lista(campo)},
-      significado: \mbox{diccTrie(campo, lista(dato))},
-    }
-      \donde{diccTrie}{Dicc(dato,Conj(Dato))}
-  }
-}
+%\serc{dic}{
+%  \donde{dic}{\tupla{
+%      claves:\mbox{lista(campo)}\,
+%      significado: \mbox{diccTrie(campo, lista(dato))}
+%    }
+%      \donde{diccTrie}{Dicc(dato\,Conj(Dato))}
+%  }
+%}
 
 \subsubsection{Invariante de representación}
 \Rep{dicc}{d}{\#claves(secuADicc($d$.claves)) $=$ long($d$.claves) $\land$ long($d$.claves) = long($d$.significados)}
