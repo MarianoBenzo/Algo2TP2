@@ -5,7 +5,7 @@
 \subsection{Interfaz}
 
 \sexc{Diccionario(\kappa, \sigma)}
-$\textbf{usa}$ Bool, Nat
+$\textbf{usa}$ Bool
 \generos{diccNat(\kappa, \sigma)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -27,7 +27,7 @@ $\textbf{usa}$ Bool, Nat
   {$O(m)$}
   {}
 
- \operacion{Definir}{in/out d:diccNat(\kappa, \sigma) in n:\kappa, in s:\sigma}{}
+ \operacion{Definir}{in/out d:diccNat(\kappa, \sigma)\, in n:\kappa, in s:\sigma}{}
   {$\neg def?(n,d) \land d=d_0$}
   {$d \igobs Definir(n, s, d_0)$}
   {Se define s en el diccionario}
@@ -48,31 +48,40 @@ $\textbf{usa}$ Bool, Nat
  {$O(m)$}
  {}
 
+ \operacion{Claves}{in d:diccNat(\kappa \sigma)}{res:conjLog(\kappa)}
+ {$true$}
+ {$res \igobs claves(d)$}
+ {Se retornan el conjunto de claves del diccionario}
+ {$O(1)$}
+ {}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Representación}
 
 diccNat
-\serc{puntero(estr(\kappa, \sigma))}{
+\serc{raiz: puntero(estr(\kappa\, \sigma))}{
 	\\
-	\donde{estr(\kappa, \sigma)}{\tupla{ clave: \kappa, significado:\sigma, hijoDer: puntero(estr(\kappa \sigma)), hijoIzq: puntero(estr(\kappa \sigma))}}
-}
+	\donde{estr(\kappa, \sigma)}{\tupla{ clave: \kappa, significado:\sigma, hijoDer: puntero(estr(\kappa \sigma)), hijoIzq: puntero(estr(\kappa \sigma)), diccClaves: conjLog(\kappa)}}}
 
 \subsubsection*{Invariante de representación}
 
-\rep{estr}{e} 
+\rep{estr}{e}
 $true \iff ((\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
-(n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL))$
+(n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$
+(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL) \land $\\$ 
+((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(e)) \impluego  Pertenece?(e.diccClaves, n.clave) \land $\\$
+(\paratodo{\kappa}{k})(k \in e.diccClaves) \implies (\exists n: estr(\kappa, \sigma))(n \in arbol(e) \land n.clave = k)))$
 \begin{enumerate}
 \item Para todo hijoDer de un estr, si no es NULL, su clave es mayor a la clave de su padre.
 \item Para todo hijoIzq de un estr, si no es NULL, su clave es menor a la clave de su padre.
 \item No hay ciclos, ni nodos con dos padres.
+\item Todos las claves de los elementos del arbos estan en diccClaves y viceversa.
 \end{enumerate}
 
 
 \subsubsection*{Función de abstracción}
 \abs{diccNat(\kappa, \sigma)}{dicc(\kappa, \sigma)}{d}{c}
-$((\paratodo{\kappa}{k})( k \in claves(c) \implies (\exists n: estr(\kappa, \sigma))(n \in arbol(d) \land n.clave = k)) \land ((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
+$((\paratodo{\kappa}{k})( k \in claves(c) \implies $\\$(\exists n: estr(\kappa, \sigma))(n \in arbol(d) \land n.clave = k) \land (k \in d.diccClaves)) \land $\\$((\paratodo{\kappa}{k})(k \in d.diccClaves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
   
 $arbol: puntero(estr(\kappa, \sigma)) \larr conj(puntero(estr(\kappa, \sigma)))$
 
@@ -116,9 +125,11 @@ $arbol(n) \equiv $
   \If {$d \neq NULL \land n > d.clave$}
     \State $d.hijoDer \larr iDefinir(d.hijoDer,n,s)$ 	\complejidad{O(m)}
   \EndIf
+  
+  \State $AgregarRapido(d.diccClaves, n)$ \complejidad{O(m)}
 }{O(m)}
 
-\algoritmo{iEliminar}{in/out d:estr, in n:\kappa}{}{
+\algoritmo{iBorrar}{in/out d:estr, in n:\kappa}{}{
   \If {$d == NULL$}
     \State $Fin Funcion$
     \complejidad{O(1)}
@@ -171,7 +182,7 @@ $arbol(n) \equiv $
     \complejidad{O(1)}     
     
   \EndIf
-  
+  \State $Eliminar(d.diccClaves, n)$ \complejidad{O(m)}
 
 }{O(m)}
 

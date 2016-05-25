@@ -1,0 +1,218 @@
+%\\\\\\\\\\\\!TEX root = tp2.tex
+
+\section{Conjunto en Promedio Logaritmico}
+
+\subsection{Interfaz}
+
+\sexc{conj(\alpha)}
+$\textbf{usa}$
+\generos{conjLog(\alpha)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection*{Operaciones}
+
+
+\operacion{Vacio}{}{res : conjLog(\alpha)}
+ {$true$}
+ {$res \igobs vacio()$}
+ {Crea un conjunto vacio}
+ {$O(1)$}
+ {}
+ 
+ \operacion{Pertenece?}{in c:conjLog(\alpha), in a:\alpha}{res:Bool}
+  {$true$}
+  {$res \igobs a \in c$}
+  {Indica si el elemento a esta en el conjunto}
+  {$O(m)$}
+  {}
+
+ \operacion{Agregar}{in/out c:conjLog(\alpha), in a:\alpha}{}
+  {$c \igobs c_0$}
+  {$c \igobs Ag(a, c_0)$}
+  {Si a no pertenece a c, entonces lo agrega}
+  {$O(m)$}
+  {}
+
+ \operacion{AgregarRapido}{in/out c:conjLog(\alpha), in a:\alpha}{}
+  {$c \igobs c_0 \land a \not\in c$}
+  {$c \igobs Ag(a, c_0)$}
+  {Se agrega a en c}
+  {$O(m)$}
+  {}
+  
+  
+ \operacion{Eliminar}{in/out c:conjLog(\alpha), in a:\alpha}{}
+ {$true$}
+ {$res \igobs c-\{a\}$}
+ {Elimina el elemento a}
+ {$O(m)$}
+ {}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Representación}
+
+conjLog
+\serc{puntero(estr(\alpha))}{
+	\\
+	\donde{estr(\alpha)}{\tupla{ dato: \alpha, hijoDer: puntero(estr(\alpha)), hijoIzq: puntero(estr(\alpha))}}
+}
+
+\subsubsection*{Invariante de representación}
+
+\rep{estr}{e}
+$true \iff ((\paratodo{estr(\alpha)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
+(n_1.dato < n_2.dato \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.dato > n_2.dato \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(\alpha)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.dato \neq n_2.dato \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL))$
+\begin{enumerate}
+\item Para todo hijoDer de un estr, si no es NULL, su dato es mayor a el dato de su padre.
+\item Para todo hijoIzq de un estr, si no es NULL, su dato es menor a el dato de su padre.
+\item No hay ciclos, ni nodos con dos padres.
+\end{enumerate}
+
+
+\subsubsection*{Función de abstracción}
+\abs{conjLog(\alpha)}{conj(\alpha)}{cl}{c}
+$((\paratodo{\alpha}{a})( a \in c \implies Pertenece?(cl, a)) \land $\\$((\paratodo{estr(\alpha)}{n})(n \in arbol(cl) \implies n.dato \in c)))$
+  
+$arbol: puntero(estr(\alpha)) \larr conj(puntero(estr(\alpha)))$
+
+$arbol(n) \equiv $
+\begin{algorithmic}
+\If {$n.hijoIzq \neq null \land n.hijoDer \neq null$}
+	\State $Ag(n, arbol(n.hijoIzq) \cup arbol(n.hijoDer))$
+\Else
+	\If {$n.hijoIzq \neq null$}
+		\State $Ag(n,arbol(n.hijoIzq))$
+	\Else
+		\If {$n.hijoDer \neq null$} 
+		\State $Ag(n,arbol(n.hijoDer))$ 
+		\Else 
+		\State $Ag(n,\emptyset)$ 
+		\EndIf
+	\EndIf
+\EndIf
+\end{algorithmic}
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algoritmos}
+
+\algoritmo{iVacio}{}{res:estr}{
+  \State $res \larr NULL$
+}{O(1)}
+
+\algoritmo{iAgregar}{in/out c:estr, in a:\alpha}{}{
+  
+  \If {$\neg iPertenece?(c,a)$}
+  
+  \If {$c == NULL$}
+    \State $res \larr <a,NULL,NULL>$ 				\complejidad{O(1)}
+  \EndIf
+  
+  \If {$c \neq NULL \land a < c.dato$}
+    \State $c.hijoIzq \larr iAgregarRapido(c.hijoIzq,a)$ 	\complejidad{O(m)}
+  \EndIf
+  
+  \If {$c \neq NULL \land a > c.dato$}
+    \State $c.hijoDer \larr iAgregarRapido(c.hijoDer,a)$ 	\complejidad{O(m)}
+  \EndIf
+  
+  \EndIf
+}{O(m)}
+
+\algoritmo{iAgregarRapido}{in/out c:estr, in a:\alpha}{}{
+  
+  
+  \If {$c == NULL$}
+    \State $res \larr <a,NULL,NULL>$ 				\complejidad{O(1)}
+  \EndIf
+  
+  \If {$c \neq NULL \land a < c.dato$}
+    \State $c.hijoIzq \larr iAgregarRapido(c.hijoIzq,a)$ 	\complejidad{O(m)}
+  \EndIf
+  
+  \If {$c \neq NULL \land a > c.dato$}
+    \State $c.hijoDer \larr iAgregarRapido(c.hijoDer,a)$ 	\complejidad{O(m)}
+  \EndIf
+}{O(m)}
+
+\algoritmo{iEliminar}{in/out c:estr, in a:\alpha}{}{
+  \If {$c == NULL$}
+    \State $Fin Funcion$
+    \complejidad{O(1)}
+   
+    \ElsIf {$a > c.dato$}
+    \State $c.hijoDer \larr iEliminar(c.hijoDer,a)$
+    \complejidad{O(m)}
+    
+    \ElsIf {$a < c.dato$}
+    \State $c.hijoIzq \larr iEliminar(c.hijoIzq,a)$
+    \complejidad{O(m)}
+    
+    \ElsIf {$c.hijoIzq == NULL \land c.hijoDer == NULL$}
+    \State $Borrar(c)$
+    \complejidad{O(1)}
+    \State $c \larr NULL$
+    \complejidad{O(1)}
+    
+	\ElsIf {$c.hijoIzq == NULL$}
+    \State $aux \larr c.hijoDer$
+    \complejidad{O(1)}
+    
+    \While{$aux.hijoIzq \neq NULL$}
+    \complejidad{O(m)}
+    \State $aux \larr aux.hijoIzq$
+    \complejidad{O(1)}   
+    \EndWhile 
+    
+    \State $c.hijoDer \larr iEliminar(aux.dato, c.hijoDer)$
+    \State $c.dato \larr aux.dato$
+    \complejidad{O(1)} 
+    
+	\Else
+    
+	\State $aux \larr c.hijoIzq$
+    \complejidad{O(1)}
+    
+    \While{$aux.hijoDer \neq NULL$}
+    \complejidad{O(m)}
+    \State $aux \larr aux.hijoDer$
+    \complejidad{O(1)}   
+    \EndWhile 
+    
+    \State $c.hijoIzq \larr iEliminar(aux.dato, c.hijoIzq)$
+    \State $c.dato \larr aux.dato$
+    \complejidad{O(1)} 
+    
+  \EndIf
+  
+
+}{O(m)}
+
+
+
+\algoritmo{iPertenece?}{in/out c:estr, in a:\alpha}{res:bool}{
+  \State $nodoActual \larr c$ 
+  \complejidad{O(1)}
+  \State $res \larr FALSE$ 
+  \complejidad{O(1)}
+  \While {$\neg(nodoActual == NULL) \land \neg res$}
+  	\complejidad{O(m)}
+  \If {$nodoActual.dato == a$}
+    \State $res \larr TRUE$
+    \complejidad{O(1)}
+  \Else
+   	\If {$a < nodoActual.dato$}
+   	 	\State $nodoActual \larr nodoActual.hijoIzq$
+   	 	\complejidad{O(1)}
+   	\Else
+   		\State $nodoActual \larr nodoActual.hijoDer$
+   	 	\complejidad{O(1)}
+ 	\EndIf
+  \EndIf
+  \EndWhile
+}{O(m)}
+
+m: En peor caso es igual a la cantidad de elementos del arbol. En promedio es log(cantidad de elementos del arbol).
