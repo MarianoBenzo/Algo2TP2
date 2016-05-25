@@ -61,6 +61,8 @@ diccNat
 \subsubsection*{Invariante de representación}
 
 \rep{estr}{e} 
+$true \iff ((\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
+(n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL))$
 \begin{enumerate}
 \item Para todo hijoDer de un estr, si no es NULL, su clave es mayor a la clave de su padre.
 \item Para todo hijoIzq de un estr, si no es NULL, su clave es menor a la clave de su padre.
