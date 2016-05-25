@@ -144,14 +144,13 @@ $\textbf{usa}$
 
 \serc{Base}{
   \donde{estr}{\tupla{
-		Tablas:{DiccTrie(Campo,info\_tabla)},
-		Joins:{DiccTrie(Campo,info\_join)}
-		}
-		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla}}
+		Tablas:{DiccTrie(Campo,info\_tabla)}}
+		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(string\, info\_join)}}
       	\donde{info\_join}{\tupla{R: nat, 
       								Rborrados: Conj(registro), 
       								Ragregados: Conj(registro),
-      								campoJ: campo, campoT: tipo}}
+      								campoJ: campo, campoT: tipo,
+      								Join: Conj(registro)}}
 }
 }
 
@@ -182,19 +181,98 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
 \newpage
 
 \subsection{Algoritmos}
-%
-%\algoritmo{nombre}{in t:tab}{res:string}{
-%  \State $res \larr t.nombre$ \complejidad{O(1)}
-%}{O(1)}
-%
-%\algoritmo{claves}{in t:tab}{res:itConjTrie(campo)}{
-%  \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}
-%}{O(1)}
-%
-%\algoritmo{indices}{in t:tab}{res:itConjTrie(Indice)}{ 
-%  \State $res \larr CrearItConjTrie(t.Indices)$ \complejidad{O(1)}
-%}{O(1)}
-%
+
+\algoritmo{tablas}{in b: estr}{res: ConjTrie(string)}{
+  \State $res \larr b.tablas.DiccClaves $ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{hayJoin?}{in t1: string, in t2: string, in b: estr}{res: bool}{
+	\State   res $\larr$ Pertenece?(b.Joins, $\langle t1, t2\rangle$  )$\lor$Pertenece?(b.Joins, $\langle t2, t1\rangle$ )\complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{campoJoin}{in t1: string, in t2: string, in b: estr}{res: campo}{
+   \If{Pertenece?(b.Joins, $\langle t1, t2\rangle$ )}\complejidad{O(1)}
+				\State	res $\larr$ Obtener(e.Joins, $\langle t1, t2\rangle$).campoJ\complejidad{O(1)}
+	\Else
+				\State	res $\larr$ Obtener(e.Joins, $\langle t2, t1\rangle$).campoJ\complejidad{O(1)}
+	\EndIf
+}{O(1)}
+%%%%%%%%%%%%% generadores %%%%%%%%%%%%%
+\algoritmo{nuevaDB}{}{res: estr)}{ 
+  \State res $\larr  \langle vacio(), vacio()\rangle$ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{agregarTabla}{in t: tabla, in b: estr}{}{
+	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t\rangle$  \complejidad{O(1)}
+	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
+	\State	Falta hacer algo?
+}{O(1)}
+
+\algoritmo{insertarEntrada}{in reg: registro, in t: string, in b: estr}{}{
+	\State	T\_actual $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1)}
+	\State	agregarRegistro(reg, T\_actual)						\complejidad{O(1)}
+	\State	Falta hacer algo?
+}{O(1)}
+
+\algoritmo{borrar}{in cr: registro, in t: string, in b: estr}{}{
+	\State	T\_actual $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1)}
+	\State	borrarRegistro(r, T\_actual)						\complejidad{O(1)}
+	\State	Falta hacer algo?
+}{O(1)}
+
+\algoritmo{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in/out b: estr}{}{
+	\State	Join $\larr$ vacio()
+	\State	T\_actual1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
+	\State	T\_actual2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
+	% Vemos si existe un join en ambas tablas para c
+	\If{Definido?(T\_actual1.Indices, c) $\land$ Definido?(T\_actual2.Indices, c)}
+			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)
+			\State	ind2 $\larr$ Obtener(T\_actual2.Indices, c)
+			\If{tipoCampo(T\_actual1, c)}
+					\State	itvalores $\larr$ CrearItConjNat(ind1.PorNat.DiccClaves)
+					\While{HaySiguiente(itvalores)}
+							\State	r1 $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
+							\State	r2	$\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
+							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
+							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
+							\State	AgregarRapido(Join,DameUno(nuevor))
+							\State	Avanzar(itvalores)
+					\EndWhile
+			\Else
+					\State	itvalores $\larr$ CrearItConjString(ind1.PorString.DiccClaves)
+					\While{HaySiguiente(itvalores)}
+							\State	r1 $\larr$ Obtener(ind1.PorString, Siguiente(itvalores))
+							\State	r2	$\larr$ Obtener(ind2.PorString, Siguiente(itvalores))
+							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
+							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
+							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
+							\State	AgregarRapido(Join, DameUno(nuevor))
+							\State	Avanzar(itvalores)
+					\EndWhile
+			\EndIf
+	\Else
+			\State	cjr1 $\larr$ T\_actual1.registros
+			\State	cjr2 $\larr$ T\_actual1.registros
+			\State	Join$\larr$combinarRegistros(c, cjr1,cjr2)
+	\EndIf
+	\State info\_join $\larr$ $\langle 0, vacio(), vacio(), c, tipoCampo(T\_actual1, c), Join\rangle$
+	\State Definir(b.Joins,	$\langle t1, t2\rangle$ , info\_join)
+
+}{O(1)}
+
+\algoritmo{borrarJoin}{in t1: string, in t2: string, in/out b: estr}{}{
+	\If{Pertenece?(b.Joins, $\langle t1, t2\rangle$  )}
+			\State	Borrar(b.Joins, $\langle t1, t2\rangle$ )
+	\Else
+			\If{Pertenece?(b.Joins, $\langle t2, t1\rangle$ )}
+					\State	Borrar(b.Joins, $\langle t2, t1\rangle$)
+			\EndIf
+	\EndIf
+}{O(1)}
+
+
+
 %\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{
 %  \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}
 %}{O(1)} % en otras operaciones tiene q figurar ese conjunto

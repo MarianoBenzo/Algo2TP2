@@ -188,7 +188,8 @@ $\textbf{usa}$
 		Campos:\mbox{DiccTrie(Campo,Tipo)},
 		\#Accesos:\mbox{Nat}
     }	
-      \donde{Indice}{Dicc(Dato,Conj(Registro))}
+      \donde{Indice}{\tupla{PorNat: DiccTrie(Dato$\,$ Conj(Registro)), PorString: DiccTrie(Dato\, Conj(Registro))}
+      }
   }
 }
 
@@ -376,12 +377,14 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
  
 
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
-  	\State	res $\larr$ vacio();                      \complejidad{$\theta$(1)}
+
 	\State	itcr1 $\larr$ CrearItConjTrie(cr1) \complejidad{$\theta$(1)}  
+	\State	copiacr2 $\larr$ Copiar(cr2)		\complejidad{$\theta$(Cardinal(cr2))}  
   	\While{HaySiguiente(itcr1)}         \complejidad{$\theta$(Cardinal(cr1))}
-		\State	AgregarRapido(res, combinarTodos(c,Siguiente(itcr1),cr2)) \complejidad{$\theta$(1)}	%combinarTodos deberia hacer por copia asi no afecta el original.
+		\State	combinarTodos(c,Siguiente(itcr1),copiacr2) \complejidad{$\theta$(1)}	%combinarTodos deberia hacer por copia asi no afecta el original.
 				\State	Avanzar(itcr1); 					\complejidad{$\theta$(1)}  
 	\EndWhile   
+  	\State	res $\larr$ copiacr2;                      \complejidad{$\theta$(1)}
 }{O(Cardinal(cr1))}
  
 \algoritmo{hayCoincidencia}{in r:registro, in cc:ConjTrie(campo), in cr:Conj(registro)}{res:bool}{
