@@ -143,9 +143,8 @@ $\textbf{usa}$
 \subsection{Representación}
 
 \serc{Base}{
-  \donde{estr}{\tupla{
-		Tablas:{DiccTrie(Campo,info\_tabla)}}
-		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(string\, info\_join)}}
+  \donde{estr}{DiccTrie(string, info\_tabla)
+		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(string; info\_join)}}
       	\donde{info\_join}{\tupla{R: nat, 
       								Rborrados: Conj(registro), 
       								Ragregados: Conj(registro),
@@ -166,16 +165,16 @@ $\textbf{usa}$
 
 
 \subsubsection*{Función de abstracción}
-\abs{sistema}{CampusSeguro}{s}{cs}
-$s.campus \igobs campus(cs)$ $\land$ \\
-$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
-$s.hippies \igobs hippies(cs)$ $\land$ \\
-$s.agentes \igobs agentes(cs)$ $\land$ \\
-$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+%\abs{sistema}{CampusSeguro}{s}{cs}
+%$s.campus \igobs campus(cs)$ $\land$ \\
+%$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
+%$s.hippies \igobs hippies(cs)$ $\land$ \\
+%$s.agentes \igobs agentes(cs)$ $\land$ \\
+%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -187,31 +186,33 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
 }{O(1)}
 
 \algoritmo{hayJoin?}{in t1: string, in t2: string, in b: estr}{res: bool}{
-	\State   res $\larr$ Pertenece?(b.Joins, $\langle t1, t2\rangle$  )$\lor$Pertenece?(b.Joins, $\langle t2, t1\rangle$ )\complejidad{O(1)}
+	\State   res $\larr$Definido?(Obtener(b, t1).Joins,t2) $\larr$ Definido?(Obtener(b, t2).Joins,t1)
 }{O(1)}
 
 \algoritmo{campoJoin}{in t1: string, in t2: string, in b: estr}{res: campo}{
-   \If{Pertenece?(b.Joins, $\langle t1, t2\rangle$ )}\complejidad{O(1)}
-				\State	res $\larr$ Obtener(e.Joins, $\langle t1, t2\rangle$).campoJ\complejidad{O(1)}
-	\Else
-				\State	res $\larr$ Obtener(e.Joins, $\langle t2, t1\rangle$).campoJ\complejidad{O(1)}
-	\EndIf
+		\State res$\larr$ Obtener(Obtener(b, t1).Joins, t2).campoJ
 }{O(1)}
+
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
 \algoritmo{nuevaDB}{}{res: estr)}{ 
-  \State res $\larr  \langle vacio(), vacio()\rangle$ \complejidad{O(1)}
+  \State res $\larr vacio() \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{agregarTabla}{in t: tabla, in b: estr}{}{
-	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t\rangle$  \complejidad{O(1)}
+	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t, vacio()\rangle$  \complejidad{O(1)}
 	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
-	\State	Falta hacer algo?
 }{O(1)}
 
 \algoritmo{insertarEntrada}{in reg: registro, in t: string, in b: estr}{}{
 	\State	T\_actual $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1)}
-	\State	agregarRegistro(reg, T\_actual)						\complejidad{O(1)}
-	\State	Falta hacer algo?
+	\State	agregarRegistro(reg, T\_actual)								\complejidad{O(1)}
+	\State	itClaves	$\larr$ CrearItConjTrie(T\_actual.Joins.DiccClaves)\complejidad{O(1)}
+	\State	\While{HaySiguiente(itClaves)}								\complejidad{O(1)}
+					\State	t2 $\larr$ Obtener(b, Siguiente(itClaves)) \complejidad{O(1)}
+					\State	nuevor $\larr$ combinarRegistros(c, cj1, t2.registros)
+					\State	AgregarRapido()
+					\State	Avanzar(itClaves)
+	\State	\EndWhile
 }{O(1)}
 
 \algoritmo{borrar}{in cr: registro, in t: string, in b: estr}{}{
