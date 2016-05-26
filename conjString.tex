@@ -1,57 +1,58 @@
-\section{Modulo Diccionario Lexicografico($String$, $\sigma$)}
+\section{Modulo Conjunto Lexicografico}
 
 \subsection{Interfaz}
 
-\sexc{Diccionario(String, \sigma)}
-$\textbf{usa}$ Bool, Nat
-\generos{diccString(String, \sigma)}
+\sexc{Conjunto(String)}
+$\textbf{usa}$ Bool, Nat, String
+\generos{conjString}
 
-  \Titulo{Operaciones basicas de diccionario}
+  \Titulo{Operaciones basicas de Conjunto}
 
 \operacion{Vacio}{}{res : diccString(String, \sigma)}
  {$true$}
  {$res \igobs vacio()$}
- {Crea un nuevo diccionario}
+ {Crea un nuevo conjunto}
  {$O(1)$}
  {}
 
  
- \operacion{Definido?}{in d:diccString(String, \sigma) in n:String}{res:Bool}
+ \operacion{Pertenece?}{in d:conjString in n:String}{res:Bool}
   {$true$}
   {$res \igobs def?(n,d)$}
-  {Indica si la clave esta definida}
+  {Indica si el elemento pertenece al conjunto}
+  {$O(Longitud(n))$}
+  {}
+  
+   \operacion{Cardinal}{in d:conjString}{res:Nat}
+  {$true$}
+  {$res \igobs \# d$}
+  {Indica el cardinal del conjunto}
   {$O(Longitud(n))$}
   {}
 
- \operacion{Definir}{in/out d:diccString(String, \sigma) in n:String, in s:\sigma}{}
-  {$\neg def?(n,d) \land d=d_0$}
-  {$d \igobs Definir(n, s, d_0)$}
-  {Se define s en el diccionario}
-  {$O(Longitud(n)+copy(s))$}
+ \operacion{Agregar}{in/out d:conjString in n:String}{}
+  {$d=d_0$}
+  {$d \igobs Ag(n, d_0)$}
+  {Agrega el elemento n al conjunto}
+  {$O(Longitud(n))$}
   {$s$ se define por copia}
 
- \operacion{Borrar}{in/out d:diccString(String, \sigma) in n:String}{}
- {$d \igobs d_0 \land def?(n,d)$}
- {$d \igobs Borrar(n,d_0)$}
+ \operacion{Borrar}{in/out d:conjString in n:String}{}
+ {$d \igobs d_0 \land n \in d$}
+ {$d \igobs d_0 - \{ n \}$}
  {Elimina el elemento n}
  {$O(Longitud(n))$}
  {}
 
- \operacion{Significado}{in d:diccString(String, \sigma) in n:String}{res:\sigma}
- {$def?(n,d)$}
- {$res \igobs obtener(n,d)$}
- {Se retorna el significado de n}
- {$O(Longitud(n))$}
- {}
 
  
   \Titulo{Operaciones del iterador}
 
-  El iterador que presentamos permite modificar el diccionario recorrido, eliminando elementos.  Sin embargo, cuando el diccionario es no modificable, no se pueden utilizar las funciones de eliminacion.  Ademas, las claves de los elementos iterados no pueden modificarse nunca, por cuestiones de implementacion.  Cuando $d$ es modificable, decimos que $it$ es modificable.
+  El iterador que presentamos permite modificar el diccionario recorrido.
   
 
   Para simplificar la notacion, vamos a utilizar clave y significado en lugar de $\Pi_1$ y $\Pi_2$ cuando utilicemos una tupla($String,\sigma$).
- \operacion{CrearIt}{in d: diccString(String, \sigma) in n:String}{res: itDiccString($String,\sigma$)}
+ \operacion{CrearIt}{in d: conjString in n:String}{res: itDiccString($String,\sigma$)}
  {$true$}
  {alias(esPermutacion(SecuSuby($res$), $d$)) $\land$ vacia?(Anteriores($res$))}
  {crea un iterador bidireccional del diccionario, que apunta al primer elemento del mismo en orden lexicografico.}
@@ -59,71 +60,46 @@ $\textbf{usa}$ Bool, Nat
   {hay aliasing entre los significados en el iterador y los del diccionario}
 
 
-  \operacion{HaySiguiente}{in it:itDiccString(String,\sigma) in n:String}{res:bool}
+  \operacion{HaySiguiente}{in it:itConjString in n:String}{res:bool}
 	{$true$}  
   {$res$ $\igobs$ haySiguiente?($it$)}
   {devuelve \texttt{true} si y solo si en el iterador todavia quedan elementos para avanzar.}
   {$O(1)$}
   {}
 
-  \operacion{HayAnterior}{in it: itDiccString(String,\sigma) in n:String}{res:bool}
+  \operacion{HayAnterior}{in it: itConjString in n:String}{res:bool}
 	{$true$}    
   {$res$ $\igobs$ hayAnterior?($it$)}
   {devuelve \texttt{true} si y solo si en el iterador todavia quedan elementos para retroceder.}
   {$O(1)$}
   {}
 
-  \operacion{Siguiente}{in it: itDiccString(String,\sigma) in n:String}{res:tupla(String, \sigma)}
+  \operacion{Siguiente}{in it: itConjString in n:String}{res:tupla(String, \sigma)}
   {HaySiguiente?($it$)}
   {alias($res$ $\igobs$ Siguiente($it$))}
   {devuelve el elemento siguiente del iterador.}
   {$O(1)$}
   {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
   
-  \operacion{SiguienteClave}{in it: itDiccString(String,\sigma) in n:String}{res:String}
-  {HaySiguiente?($it$)}
-  {alias($res$ $\igobs$ Siguiente($it$).clave)}
-  {devuelve la clave del elemento siguiente del iterador.}
-  {$O(1)$}
-  {$res$ no es modficable.}
 
-  \operacion{SiguienteSignificado}{in it: itDiccString(String,\sigma) in n:String}{res:$\sigma$}
-  {HaySiguiente?($it$)}
-  {alias($res$ $\igobs$ Siguiente($it$).significado)}
-  {devuelve el significado del elemento siguiente del iterador.}
-  {$O(1)$}
-  {$res$ es modificable si y solo si $it$ es modficable.}
-
-  \operacion{Anterior}{in it: itDiccString(String,\sigma) in n:String}{tupla(clave: $String$, significado: $\sigma$)}
+  \operacion{Anterior}{in it: itConjString in n:String}{tupla(clave: $String$, significado: $\sigma$)}
   {HayAnterior?($it$)}
   {alias($res$ $\igobs$ Anterior($it$))}
   {devuelve el elemento anterior del iterador.}
   {$O(1)$}
   {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
 
-  \operacion{AnteriorClave}{in it: itDiccString(String,\sigma) in n:String}{res:$String$}
-  {HayAnterior?($it$)}
-  {alias($res$ $\igobs$ Anterior($it$).clave)}
-  {devuelve la clave del elemento anterior del iterador.}
-  {$O(1)$}
-  {$res$ no es modficable.}
-
-  \operacion{AnteriorSignificado}{in it: itDiccString(String,\sigma) in n:String}{res:$\sigma$}
-  {HayAnterior?($it$)}
-  {alias($res$ $\igobs$ Anterior($it$).significado)}
-  {devuelve el significado del elemento anterior del iterador.}
-  {$O(1)$}
-  {$res$ es modificable si y solo si $it$ es modficable.}
 
 
-  \operacion{Avanzar}{inout it: itDiccString(String,\sigma) in n:String}{}
+
+  \operacion{Avanzar}{inout it: itConjString in n:String}{}
   {$it = it_0$ $\land$ HaySiguiente?($it$)}
   {$it$ $\igobs$ Avanzar($it_0$)}
   {avanza a la posicion siguiente del iterador.}
   {$O(1)$}
   {}
 
-  \operacion{Retroceder}{inout it: itDiccString(String,\sigma) in n:String}{}
+  \operacion{Retroceder}{inout it: itConjString in n:String}{}
   {$it = it_0$ $\land$ HayAnterior?($it$)}
   {$it$ $\igobs$ Retroceder($it_0$)}
   {retrocede a la posicion anterior del iterador.}
@@ -133,33 +109,22 @@ $\textbf{usa}$ Bool, Nat
 
 
 \subsection{Representacion}
-diccString\serc{dLex)}{
+diccString\serc{cLex)}{
 	\\
-	\donde{dLex}{\tupla{raiz: puntero(nodo)}}
-}
-nodo\serc{enodo)}{
-	\\
-	\donde{enodo}{\tupla{dato: \sigma, esSig?: Bool, continuaciones: puntero(char) $\sqsubset 256 \sqsupset$  }}
+	\donde{cLex}{\tupla{dicL: diccString($String$, bool), cardinal: Nat}}
 }
 
 
-\subsubsection*{Invariante de representación}
 
 
-\begin{enumerate}
-\item Todo Nodo, si sus continuaciones son todos punteros a null, es porque es significado.
-\item No hay ciclos, ni nodos con dos padres.
-\end{enumerate}
-
-\subsubsection*{Función de abstracción}
 
 \subsubsection*{Respresentación del iterador}
   \Titulo{Representacion del iterador}
 
   El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.
-itDiccString($String$, $\sigma$)\serc{itdLex)}{
+itConjString\serc{itcLex)}{
 	\\
-	\donde{dLex}{\tupla{claves: Lista($String$), significados: Lista($\sigma$)}}
+	\donde{itcLex}{\tupla{claves: Lista($String$), significados: Lista($\sigma$)}}
 }
 
 
