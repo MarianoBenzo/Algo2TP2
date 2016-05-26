@@ -6,7 +6,7 @@
 $\textbf{usa}$ Bool, Nat
 \generos{diccString(String, \sigma)}
 
-  \Titulo{Operaciones basicas de diccionario}
+  \subsection{Operaciones basicas de diccionario}
 
 \operacion{Vacio}{}{res : diccString(String, \sigma)}
  {$true$}
@@ -45,7 +45,7 @@ $\textbf{usa}$ Bool, Nat
  {}
 
  
-  \Titulo{Operaciones del iterador}
+  \subsection{Operaciones del iterador}
 
   El iterador que presentamos permite modificar el diccionario recorrido, eliminando elementos.  Sin embargo, cuando el diccionario es no modificable, no se pueden utilizar las funciones de eliminacion.  Ademas, las claves de los elementos iterados no pueden modificarse nunca, por cuestiones de implementacion.  Cuando $d$ es modificable, decimos que $it$ es modificable.
   
@@ -154,7 +154,6 @@ nodo\serc{enodo)}{
 \subsubsection*{Función de abstracción}
 
 \subsubsection*{Respresentación del iterador}
-  \Titulo{Representacion del iterador}
 
   El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.
 itDiccString($String$, $\sigma$)\serc{itdLex)}{
