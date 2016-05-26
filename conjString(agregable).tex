@@ -1,0 +1,145 @@
+\section{Modulo Conjunto Lexicografico}
+
+\subsection{Interfaz}
+
+\sexc{Conjunto(String)}
+$\textbf{usa}$ Bool, Nat, String
+\generos{conjString}
+
+\subsubsection*{Operaciones básicas}
+
+\operacion{Vacio}{}{res : diccString(String, \sigma)}
+ {$true$}
+ {$res \igobs vacio()$}
+ {Crea un nuevo conjunto}
+ {$O(1)$}
+ {}
+
+ 
+ \operacion{Pertenece?}{in d:conjString in n:String}{res:Bool}
+  {$true$}
+  {$res \igobs def?(n,d)$}
+  {Indica si el elemento pertenece al conjunto}
+  {$O(Longitud(n))$}
+  {}
+  
+   \operacion{Cardinal}{in d:conjString}{res:Nat}
+  {$true$}
+  {$res \igobs \# d$}
+  {Indica el cardinal del conjunto}
+  {$O(Longitud(n))$}
+  {}
+
+ \operacion{Agregar}{in/out d:conjString in n:String}{}
+  {$d=d_0$}
+  {$d \igobs Ag(n, d_0)$}
+  {Agrega el elemento n al conjunto}
+  {$O(Longitud(n))$}
+  {$s$ se define por copia}
+
+ \operacion{Borrar}{in/out d:conjString in n:String}{}
+ {$d \igobs d_0 \land n \in d$}
+ {$d \igobs d_0 - \{ n \}$}
+ {Elimina el elemento n}
+ {$O(Longitud(n))$}
+ {}
+
+
+ 
+  \Titulo{Operaciones del iterador}
+
+  El iterador que presentamos permite modificar el diccionario recorrido.
+  
+
+  Para simplificar la notacion, vamos a utilizar clave y significado en lugar de $\Pi_1$ y $\Pi_2$ cuando utilicemos una tupla($String,\sigma$).
+ \operacion{CrearIt}{in d: conjString in n:String}{res: itDiccString($String,\sigma$)}
+ {$true$}
+ {alias(esPermutacion(SecuSuby($res$), $d$)) $\land$ vacia?(Anteriores($res$))}
+ {crea un iterador bidireccional del diccionario, que apunta al primer elemento del mismo en orden lexicografico.}
+  {$O(CL*long(k))$ Donde $CL$ es la cantidad de claves de d y $k$ la palabra mas larga de d}
+  {hay aliasing entre los significados en el iterador y los del diccionario}
+
+
+  \operacion{HaySiguiente}{in it:itConjString in n:String}{res:bool}
+	{$true$}  
+  {$res$ $\igobs$ haySiguiente?($it$)}
+  {devuelve \texttt{true} si y solo si en el iterador todavia quedan elementos para avanzar.}
+  {$O(1)$}
+  {}
+
+  \operacion{HayAnterior}{in it: itConjString in n:String}{res:bool}
+	{$true$}    
+  {$res$ $\igobs$ hayAnterior?($it$)}
+  {devuelve \texttt{true} si y solo si en el iterador todavia quedan elementos para retroceder.}
+  {$O(1)$}
+  {}
+
+  \operacion{Siguiente}{in it: itConjString in n:String}{res:tupla(String, \sigma)}
+  {HaySiguiente?($it$)}
+  {alias($res$ $\igobs$ Siguiente($it$))}
+  {devuelve el elemento siguiente del iterador.}
+  {$O(1)$}
+  {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
+  
+
+  \operacion{Anterior}{in it: itConjString in n:String}{tupla(clave: $String$, significado: $\sigma$)}
+  {HayAnterior?($it$)}
+  {alias($res$ $\igobs$ Anterior($it$))}
+  {devuelve el elemento anterior del iterador.}
+  {$O(1)$}
+  {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
+
+
+
+
+  \operacion{Avanzar}{inout it: itConjString in n:String}{}
+  {$it = it_0$ $\land$ HaySiguiente?($it$)}
+  {$it$ $\igobs$ Avanzar($it_0$)}
+  {avanza a la posicion siguiente del iterador.}
+  {$O(1)$}
+  {}
+
+  \operacion{Retroceder}{inout it: itConjString in n:String}{}
+  {$it = it_0$ $\land$ HayAnterior?($it$)}
+  {$it$ $\igobs$ Retroceder($it_0$)}
+  {retrocede a la posicion anterior del iterador.}
+  {$O(1)$}
+  {}
+
+
+
+\subsection{Representacion}
+diccString\serc{cLex)}{
+	\\
+	\donde{cLex}{\tupla{dicL: diccString($String$, bool), cardinal: Nat}}
+}
+
+
+
+
+
+\subsubsection*{Respresentación del iterador}
+  \Titulo{Representacion del iterador}
+
+  El iterador del conjunto lo recorre en orden lexicográfico. Los significados están por referencia.
+itConjString\serc{itcLex)}{
+	\\
+	\donde{itcLex}{itDiccString($String$, Bool)}
+}
+
+
+  
+
+  ~
+
+  %\tadOperacion{Join}{secu($\alpha$)/a,secu($\beta$)/b}{secu(tupla($\alpha,\beta$))}{long($a$) $=$ long($b$)}
+  %\tadAxioma{Join($a$, $b$)}{\IF vacia?($a$) THEN \secuencia{} ELSE \secuencia{$\langle${prim($a$), prim($b$)}$\rangle$}[Join(Fin($a$), Fin($b$))] FI}
+
+
+
+\subsection{Algoritmos}
+
+\algoritmo{iVacio}{}{res:diccString}{
+  \State $res.dicL \larr Vacio()$ \complejidad{O(1)}
+  \State $res.cardinal \larr 0$ \complejidad{O(1)}
+}{O(1)}

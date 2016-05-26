@@ -6,7 +6,7 @@
 $\textbf{usa}$ Bool, Nat, String
 \generos{conjString}
 
-  \Titulo{Operaciones basicas de Conjunto}
+\subsubsection*{Operaciones básicas}
 
 \operacion{Vacio}{}{res : diccString(String, \sigma)}
  {$true$}
@@ -121,10 +121,10 @@ diccString\serc{cLex)}{
 \subsubsection*{Respresentación del iterador}
   \Titulo{Representacion del iterador}
 
-  El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.
+  El iterador del conjunto lo recorre en orden lexicográfico. Los significados están por referencia.
 itConjString\serc{itcLex)}{
 	\\
-	\donde{itcLex}{\tupla{claves: Lista($String$), significados: Lista($\sigma$)}}
+	\donde{itcLex}{itDiccString($String$, Bool)}
 }
 
 
@@ -140,8 +140,8 @@ itConjString\serc{itcLex)}{
 \subsection{Algoritmos}
 
 \algoritmo{iVacio}{}{res:diccString}{
-  \State $res.raiz \larr NULL$ \complejidad{O(1)}
-  \State $res.cardinal \larr NULL$ \complejidad{O(1)}
+  \State $res.dicL \larr Vacio()$ \complejidad{O(1)}
+  \State $res.cardinal \larr 0$ \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{iDefinir}{in/out d:diccString, in n:String, in s:\sigma}{}{
@@ -278,25 +278,10 @@ itConjString\serc{itcLex)}{
   \State $res.significado \larr it.dignificados.siguiente*.dato$ \complejidad{O(1)(es una referencia)}
 }{O(1)}
 
-\algoritmo{iSiguienteclave}{in/out it:itDiccString, in n:String}{res: $String$}{
-  \State $res \larr it.claves.siguiente*.dato$ \complejidad{O(1)(es una referencia)}
-}{O(1)}
-
-\algoritmo{iSiguienteSignificado}{in/out it:itDiccString, in n:String}{res: $\sigma$}{
-  \State $res \larr it.significados.siguiente*.dato$ \complejidad{O(1)(es una referencia)}
-}{O(1)}
 
 \algoritmo{iAnterior}{in/out it:itDiccString, in n:String}{res: tupla(string,\sigma)}{
   \State $res.clave \larr it.claves.anterior*.dato$ \complejidad{O(1)(es una referencia)}
   \State $res.significado \larr it.significados.anterior*.dato$ \complejidad{O(1)(es una referencia)}
-}{O(1)}
-
-\algoritmo{iAnteriorClave}{in/out it:itDiccString, in n:String}{res: $String$}{
-  \State $res \larr it.claves.anterior*.dato$ \complejidad{O(1)(es una referencia)}
-}{O(1)}
-
-\algoritmo{iAnteriorSignificado}{in/out it:itDiccString, in n:String}{res: $\sigma$}{
-  \State $res \larr it.significados.anterior*.dato$ \complejidad{O(1)(es una referencia)}
 }{O(1)}
 
 \algoritmo{iAvanzar}{in/out it:itDiccString, in n:String}{}{
