@@ -146,10 +146,11 @@ $\textbf{usa}$
   \donde{estr}{DiccTrie(string, info\_tabla)
 		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(string; info\_join)}}
       	\donde{info\_join}{\tupla{R: nat, 
-      								Rborrados: Conj(registro), 
-      								Ragregados: Conj(registro),
-      								campoJ: campo, campoT: tipo,
-      								Join: Conj(registro)}}
+      								Rcambios: Lista(registro),
+      								campoJ: campo, 
+      								campoT: tipo,
+      								JoinS: ConjTrie(registro),
+      								JoinN: ConjNat(registro)}}
 }
 }
 
@@ -195,7 +196,7 @@ $\textbf{usa}$
 
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
 \algoritmo{nuevaDB}{}{res: estr)}{ 
-  \State res $\larr vacio() \complejidad{O(1)}
+  \State res $\larr$ vacio() \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{agregarTabla}{in t: tabla, in b: estr}{}{

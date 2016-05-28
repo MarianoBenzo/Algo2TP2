@@ -186,9 +186,10 @@ $\textbf{usa}$
   		Indices: \mbox{DiccTrie(campo, Indice)},
 		Registros:\mbox{Conj(Registro)},
 		Campos:\mbox{DiccTrie(Campo,Tipo)},
-		\#Accesos:\mbox{Nat}
-    }	
-      \donde{Indice}{\tupla{PorNat: DiccTrie(Dato$\,$ Conj(Registro)), PorString: DiccTrie(Dato\, Conj(Registro))}
+		\#Accesos:\mbox{Nat},
+		IndiceS:\mbox{\tupla{Habilitado: bool, 
+		PorString: DiccTrie(\mbox{string, Conj(Registro)}}},
+		IndiceN:\mbox{\tupla{Habilitado: bool, PorNat: DiccTrie(\mbox{nat, Conj(Registro))}}}	
       }
   }
 }
