@@ -4,25 +4,7 @@
 \contentsline {subsection}{\numberline {1.2}Representaci\IeC {\'o}n}{5}{subsection.1.2}
 \contentsline {subsection}{\numberline {1.3}Algoritmos}{6}{subsection.1.3}
 \contentsline {subsection}{\numberline {1.4}Algoritmos operaciones auxiliares}{9}{subsection.1.4}
-\contentsline {section}{\numberline {2}Diccionario por Naturales}{9}{section.2}
+\contentsline {section}{\numberline {2}Base de Datos}{9}{section.2}
 \contentsline {subsection}{\numberline {2.1}Interfaz}{9}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}Representaci\IeC {\'o}n}{10}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Algoritmos}{11}{subsection.2.3}
-\contentsline {section}{\numberline {3}Conjunto en Promedio Logaritmico}{13}{section.3}
-\contentsline {subsection}{\numberline {3.1}Interfaz}{13}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Representaci\IeC {\'o}n}{14}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Algoritmos}{15}{subsection.3.3}
-\contentsline {section}{\numberline {4}Modulo Diccionario Lexicografico($String$, $\ensuremath {\mathsigma \xspace }$)}{16}{section.4}
-\contentsline {subsection}{\numberline {4.1}Interfaz}{16}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Operaciones basicas de diccionario}{16}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Operaciones del iterador}{17}{subsection.4.3}
-\contentsline {subsection}{\numberline {4.4}Representacion}{18}{subsection.4.4}
-\contentsline {subsection}{\numberline {4.5}Algoritmos}{19}{subsection.4.5}
-\contentsline {section}{\numberline {5}Modulo Conjunto Lexicografico}{21}{section.5}
-\contentsline {subsection}{\numberline {5.1}Interfaz}{21}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Representacion}{23}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}Algoritmos}{23}{subsection.5.3}
-\contentsline {section}{\numberline {6}Base de Datos}{23}{section.6}
-\contentsline {subsection}{\numberline {6.1}Interfaz}{23}{subsection.6.1}
-\contentsline {subsection}{\numberline {6.2}Representaci\IeC {\'o}n}{25}{subsection.6.2}
-\contentsline {subsection}{\numberline {6.3}Algoritmos}{27}{subsection.6.3}
+\contentsline {subsection}{\numberline {2.2}Representaci\IeC {\'o}n}{11}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Algoritmos}{13}{subsection.2.3}
