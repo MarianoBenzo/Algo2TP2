@@ -200,12 +200,20 @@ $\textbf{usa}$
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item Para todos los registros de r, el tipo de los datos de las columnas de r, deben coincidir con los tipos de las columnas en e.campos.
-  \item Todas las columnas de e.campos y su tipo, deben coincidir con los campos y tipo de todos los registros de e.registros. Es decir no debe haber campos de mas.'
-  \item El nombre de la tabla que figura en e.nombre, es un string de longitut acotada.
-  \item Para todo registro r de e.registros y para todo campo c de e.Indices.DiccClaves, se debe cumplir que si tenemos valor $\larr$ Obtener(r, c) y ind $\larr$ Obtener(e.Indices, c). Al evaluar que r $\in$ Obtener(ind, valor) y deben ser del mismo tipo.
-  \item Para todo campo c, que pertenece a e.Indices.DiccClaves, si tenemos que  ind $\larr$ Obtener(e.Indices, c), y para todo dato d perteneciente a ind.DiccClaves entonces Obtener(ind, d) esta incluido o es igual a e.registros.
-  \item Para todo registro r perteneciente  a e.registros r.DiccClaves es igual a e.campos.DiccClaves.
+% Las claves estan en los campos.
+\item	t.Claves esta inclido o es igual a t.Campos.
+% 
+\item	t.Nombre es un string acotado.
+% Los campos de cada registro es igual a los campos de la tabla.
+\item	Para todo registro r de t.Registros, entonces Campos(r) es igual al t.Campos.
+% Los campos de cada registro, tienen el mismo tipo que los campos de la tabla.
+\item	Para todo registro r de t.Registros y para todo campo c de Campos(r), entonces Tipo?(Obtener(r,c)) es igual Obtener(t.Campos, c).
+% Si el indice esta EnUso y tiene un campo que pertenece a t.Campos, para toda clave c de t.IndiceS.Indice, el significado de Obtener(t.IndiceS.Indice, c) esta incluido en t.Registro.
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo Dato d, si Definido?(t.IndiceS.Indice, d) es true, entonces Obtener(t.IndiceS.Indice, d) esta incluido o es igual a t.Registros.
+% Todo registro de la tabla pertenece a algun significado de t.IndiceS.Indice
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo registro r de t.Registros entonces Definido?(t.IndiceS.Indice, Obtener(r, t.IndiceS.CampoI)) es true y r pertenece a Obtener(t.IndiceS.Indice, Obtener(r, t.IndiceS.CampoI)).
+%
+\item	Lo anterior tambien aplica para t.IndiceN.Indice
   \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados, mas la cantidad de indices creados.
 \end{enumerate}
 
@@ -233,16 +241,14 @@ $\textbf{usa}$
 %$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
 
 \subsubsection*{Función de abstracción}
-\abs{sistema}{CampusSeguro}{s}{cs}
-$s.campus \igobs campus(cs)$ $\land$ \\
-$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
-$s.hippies \igobs hippies(cs)$ $\land$ \\
-$s.agentes \igobs agentes(cs)$ $\land$ \\
-$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+\abs{tab}{Tabla}{s}{t}
+$s.Nombre \igobs nombre(t)$ $\land$ \\
+$s.Claves \igobs claves(t)$ $\land$ \\
+$s.Indices \igobs indices(t)$ $\land$ \\
+$s.Registros \igobs registros(t)$ $\land$ \\
+$s.Campos.DiccClaves \igobs campos(t)$ $\land$ \\
+$s.\#Accesos \igobs cantidadDeAccesos(t)$ $\land$ \\
+$((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \igobs tipoCampo(c, t))$ \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -470,14 +476,52 @@ $(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(p
 }{O(Cardinal(cr))}
 
  \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(registro)}{
-	\If{Cardinal(Indices(t))$\geq$1}
-			\State	
-
-  	\State 	res $\larr$ Vacio(); 				\complejidad{$\theta$(1)}
+ 	\State Conj(registro) salida	$\larr$ Vacio()
+%	\If{Cardinal(Indices(t))$\geq$1}
+%	\State Si hay indice, obtengo los valores de crit para los campos de los indices que existan
+%		\If{t.IndiceS.EnUso}
+%				\State	vals $\larr$ Obtener(crit, t.IndiceS.CampoI)
+%				\State	Conj(registro) rind	$\larr$ Obtener(t.IndiceS.Indice, vals)
+%				\State	itrind $\larr$ CrearItConj(rind)
+%				\While{HaySiguiente(itrind)}
+%						\State r1 $\larr$ Siguiente(Siguiente(itcr))
+%						\State Esta ultima linea, se debe a que estoy iterando, 
+%						\State iteradores de conjunto al elemento
+%						\If{coincidenTodos(r1,t.Claves,crit)}
+%								\State AgregarRapido(salida, r1) 
+%								\State Agrego por referencia.
+%						\EndIf
+%						\State Avanzar(itcr)
+%				\EndWhile
+%		\Else
+%				\If{t.IndiceN.EnUso}
+%						\State	valn $\larr$ Obtener(crit, t.IndiceN.CampoI)
+%						\State	Conj(registro) rind	$\larr$ Obtener(t.IndiceN.Indice, valn)
+%						\State	itrind $\larr$ CrearItConj(rind)
+%						\While{HaySiguiente(itrind)}
+%								\State r1 $\larr$ Siguiente(Siguiente(itcr))
+%								\State Esta ultima linea, se debe a que estoy iterando, 
+%								\State iteradores de conjunto al elemento
+%								\If{coincidenTodos(r1,t.Claves,crit)}
+%										\State AgregarRapido(salida, r1) 
+%										\State Agrego por referencia.
+%								\EndIf
+%								\State Avanzar(itcr)
+%						\EndWhile
+%				\EndIf
+%		\EndIf
+%		\State Como buscamos los registros que tenga los mismo datos que crit,
+%		\State los registros que cumplan dicho requerimiento. Si aparecen en uno
+%		\State de los indices, en el otro tambien apareceran. Entonces solo comparo
+%		\State los registros que tienen los mismos datos para los campos de los indices
+%		\State correspondientes.
+%	\EndIf
+	\State Debemos comparar todos los registros de cr.
+	\State y agregarlos al conjunto de registros salida
   	\State 	itcr $\larr$ CrearItConj(cr)						
   	\While{HaySiguiente(cr)}							\complejidad{$\theta$(Cardinal(cr))}
 				\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
-								\State	AgregarRapido(res,Siguiente(itcr)) 						\complejidad{$\theta$(1)}
+								\State	AgregarRapido(salida,Siguiente(itcr)) 						\complejidad{$\theta$(1)}
 				\EndIf				
 				\State	Avanzar(itcr);																\complejidad{$\theta$(1)}
 	\EndWhile   
