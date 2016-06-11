@@ -143,8 +143,8 @@ $\textbf{usa}$
 \subsection{Representación}
 
 \serc{Base}{
-  \donde{estr}{DiccTrie(string, info\_tabla)
-		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(string; info\_join)}}
+  \donde{estr}{DiccTrie(NombreTabla, info\_tabla)
+		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(NombreTabla; info\_join)}}
       	\donde{info\_join}{\tupla{R: nat, 
       								Rcambios: Lista(registro),
       								campoJ: campo, 
