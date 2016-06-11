@@ -150,7 +150,9 @@ $\textbf{usa}$
       								campoJ: campo, 
       								campoT: tipo,
       								JoinS: ConjTrie(registro),
-      								JoinN: ConjNat(registro)}}
+      								ValoresS: ConjTrie(String),
+      								JoinN: ConjNat(registro),
+      								ValoresN: ConjNat(Nat)}}
 }
 }
 
@@ -226,21 +228,39 @@ $\textbf{usa}$
 	\State	Join $\larr$ vacio()
 	\State	T\_actual1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
 	\State	T\_actual2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
-	% Vemos si existe un join en ambas tablas para c
-	\If{Definido?(T\_actual1.Indices, c) $\land$ Definido?(T\_actual2.Indices, c)}
-			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)
-			\State	ind2 $\larr$ Obtener(T\_actual2.Indices, c)
+	% Vemos si existe un indice en ambas tablas para c
+	\If{Pertenece?(Indices(T\_actual1), c) $\land$ Pertenece?(Indices(T\_actual1), c)} \complejidad{O(1)}
+			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)  \complejidad{O(calcular)}
 			\If{tipoCampo(T\_actual1, c)}
+					\State	ConjNat(Nat) cjNat $\larr$ vacio()
 					\State	itvalores $\larr$ CrearItConjNat(ind1.PorNat.DiccClaves)
 					\While{HaySiguiente(itvalores)}
-							\State	r1 $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
-							\State	r2	$\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
-							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
-							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
-							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
-							\State	AgregarRapido(Join,DameUno(nuevor))
+							\State	Registro r $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
+							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
+							\If{$\neg$ Pertenece?(cjNat, n)}
+									\State	AgregarRapido(cjNat, r)
+							\EndIf
 							\State	Avanzar(itvalores)
 					\EndWhile
+					\State	ind2 $\larr$ Obtener(T\_actual2.Indices, c)		
+					\State	itvalores $\larr$ CrearItConjNat(ind2.PorNat.DiccClaves)
+					\While{HaySiguiente(itvalores)}
+							\State	Registro r $\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
+							\If{$\neg$ Pertenece?(cjNat, n)}
+									\State	AgregarRapido(cjNat, r)
+							\EndIf
+							\State	Avanzar(itvalores)
+					\EndWhile
+%					\While{HaySiguiente(itvalores)}
+%							\State	r1 $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
+%							\State	r2	$\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+%							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
+%							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
+%							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
+%							\State	AgregarRapido(Join,DameUno(nuevor))
+%							\State	Avanzar(itvalores)
+%					\EndWhile
 			\Else
 					\State	itvalores $\larr$ CrearItConjString(ind1.PorString.DiccClaves)
 					\While{HaySiguiente(itvalores)}

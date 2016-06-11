@@ -189,8 +189,8 @@ $\textbf{usa}$
 		Registros: Conj(Registro),
 		Campos:\mbox{DiccTrie(Campo,Tipo)},
 		Claves:\mbox{ConjTrie(Campo)},
-		IndiceS:\tupla{CampoI: campo, EnUso: bool, Indice: DiccTrie(\mbox{string, Conj(Registro))}},
-		IndiceN:\tupla{CampoI: campo, EnUso: bool, Indice: DiccNat(\mbox{nat, Conj(Registro))}},
+		IndiceS:\tupla{CampoI: campo, EnUso: bool, Indice: DiccTrie(\mbox{string, Conj(ItConj(Registro)))}},
+		IndiceN:\tupla{CampoI: campo, EnUso: bool, Indice: DiccNat(\mbox{nat, Conj(ItConj(Registro)))}},
 		\#Accesos: Nat
   		}
 }
@@ -320,7 +320,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
  
 \newpage
 \algoritmo{agregarRegistro}{in r: registro, in t: tab}{}{
-    \State nuevo $\larr$ AgregarRapido(t.Registros,r)							\complejidad{$\theta$(1)}
+    \State itConj(Registro) nuevo $\larr$ AgregarRapido(t.Registros,r)	\complejidad{$\theta$(1)}
     \State t.\#Accesos++																	\complejidad{$\theta$(1)}
 	\If{t.IndiceS.EnUso}
 					\State valor	$\larr$	Obtener(r, t.IndiceS.CampoI) \complejidad{$\theta$(1)}
@@ -348,15 +348,16 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 }{$\theta$(Log(n))}
 
 \algoritmo{borrarRegistro}{in crit: registro,in t: tab}{}{
-	\State	c $\larr$ Siguiente(Campos(crit))	\complejidad{$\theta$(1)}
+	\State	c $\larr$ Siguiente(Campos(crit))	\complejidad{$\theta$(1)} %chequear
 	\State 	valor $\larr$	Obtener(crit, c)			\complejidad{$\theta$(1)}
 	% Sabemos que c esta incluido en claves(t)
-	% Si hay un indice de un campo clave borrar es O(log(n)) en peor caso
+	% si hay un indice de un campo clave borrar es O(log(n)) en peor caso
 	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
 			\If{Definido?(t.IndiceS.Indice, valor)}
 					\State	itConj(registro) itr $\larr$ Obtener(t.IndiceS.Indice, valor) \complejidad{$\theta$(1)}
-					% Borro el registro del indice,
+					% Borro el registro del conjunto de registros
 					\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
+					% Borro el registro del indice,
 					\State	Borrar(t.IndiceS.Indice, valor) \complejidad{$\theta$(1)}
 			\EndIf
 	\EndIf
@@ -373,13 +374,13 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 					%se supone que cr es un interador de un conj de itconj(registro)
 	\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{$\theta$(1)}
 	\State Dato valorR $\larr$ Obtener(Siguiente(cr), c)		\complejidad{$\theta$(1)}
-	\While{HaySiguiente(cr) $\land$ $\neg$(valorR=valor)}\complejidad{$\theta$(Cardinal(t.registros))}
+	\While{HaySiguiente(cr)}\complejidad{$\theta$(Cardinal(t.registros))}
 			\State valorR $\larr$ Obtener(Siguiente(cr), c)		\complejidad{$\theta$(1)}
+			\If{valorR=valor}
+						\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
+			\EndIf
 			\State Avanzar(cr)													\complejidad{$\theta$(1)}
 	\EndWhile
-	\If{HaySiguiente(cr)}														\complejidad{$\theta$(1)}
-			\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
-	\EndIf
 	\State La complejidad de la operacion borrar depende de si hay o no indices
 	\State para el campo del crit pasado por parametro.
 	\State En caso de que exista dicho indice, en peor caso eliminar es O(Log(n))

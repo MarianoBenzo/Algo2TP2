@@ -4,9 +4,7 @@
 \contentsline {subsection}{\numberline {1.2}Representaci\IeC {\'o}n}{5}{subsection.1.2}
 \contentsline {subsection}{\numberline {1.3}Algoritmos}{6}{subsection.1.3}
 \contentsline {subsection}{\numberline {1.4}Algoritmos operaciones auxiliares}{12}{subsection.1.4}
-\contentsline {section}{\numberline {2}Tipo es Bool}{12}{section.2}
-\contentsline {section}{\numberline {3}Dato($\ensuremath {\mathalpha \xspace }$)}{12}{section.3}
-\contentsline {subsection}{\numberline {3.1}Interfaz}{12}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Representaci\IeC {\'o}n}{13}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Algoritmos}{15}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Algoritmos operaciones auxiliares}{16}{subsection.3.4}
+\contentsline {section}{\numberline {2}Base de Datos}{12}{section.2}
+\contentsline {subsection}{\numberline {2.1}Interfaz}{12}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Representaci\IeC {\'o}n}{14}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Algoritmos}{15}{subsection.2.3}
