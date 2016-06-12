@@ -142,18 +142,21 @@ $\textbf{usa}$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
-\serc{Base}{
-  \donde{estr}{DiccTrie(NombreTabla, info\_tabla)
-		\donde{info\_tabla}{\tupla{\#Accesos: nat, TActual: tabla, Joins: DiccTrie(NombreTabla; info\_join)}}
-      	\donde{info\_join}{\tupla{R: nat, 
-      								Rcambios: Lista(registro),
+\serc{Base}
+{
+\donde{estr}{
+\tupla{TablaMaxima: Tmax, Tablas: DiccTrie(NombreTabla; info\_tabla)}}
+		\donde{info\_tabla}{\tupla{TActual: tabla, Joins: DiccTrie(NombreTabla; info\_join)}}
+      	\donde{info\_join}{\tupla{ 
+      								Rcambios: Cola(DatoCambio),
       								campoJ: campo, 
       								campoT: tipo,
       								JoinS: ConjTrie(registro),
       								ValoresS: ConjTrie(String),
       								JoinN: ConjNat(registro),
       								ValoresN: ConjNat(Nat)}}
-}
+		\donde{Tmax}{\tupla{NomTabla: NombreTabla, $\#$Modif: Nat}}
+		\donde{DatoCambio}{\tupla{Reg: Registro, NomOrigen: NombreTabla, Accion: Bool}}
 }
 
 \subsubsection*{Invariante de representación}
@@ -198,30 +201,82 @@ $\textbf{usa}$
 
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
 \algoritmo{nuevaDB}{}{res: estr)}{ 
-  \State res $\larr$ vacio() \complejidad{O(1)}
+	\State String s
+	\State Nat n $\larr$ 0
+  	\State res $\larr$ $\langle \langle s, 0 \rangle, vacio()\rangle$  \complejidad{O(1)} 
 }{O(1)}
 
-\algoritmo{agregarTabla}{in t: tabla, in b: estr}{}{
+\algoritmo{agregarTabla}{in t: tabla, in/out b: estr}{}{
 	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t, vacio()\rangle$  \complejidad{O(1)}
 	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
 }{O(1)}
 
-\algoritmo{insertarEntrada}{in reg: registro, in t: string, in b: estr}{}{
-	\State	T\_actual $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1)}
-	\State	agregarRegistro(reg, T\_actual)								\complejidad{O(1)}
-	\State	itClaves	$\larr$ CrearItConjTrie(T\_actual.Joins.DiccClaves)\complejidad{O(1)}
-	\State	\While{HaySiguiente(itClaves)}								\complejidad{O(1)}
-					\State	t2 $\larr$ Obtener(b, Siguiente(itClaves)) \complejidad{O(1)}
-					\State	nuevor $\larr$ combinarRegistros(c, cj1, t2.registros)
-					\State	AgregarRapido()
-					\State	Avanzar(itClaves)
-	\State	\EndWhile
-}{O(1)}
+\algoritmo{insertarEntrada}{in reg: registro, in t: string, in/out b: estr}{}{
+	\State	Obtenemos la tabla es O(1) porque su nombre esta acotado.
+	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) Por referencia}
+	\State	Agrego el registro a la tabla. \complejidad{O(1)}
+	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1)}
+	\State	agregarRegistro(reg, T)								\complejidad{O(1)}
+	\State	Ahora si hay Joins actualizo la informacion temporal de cada Join.
+	\If{$\neg\emptyset$?(infoT.Joins)} \complejidad{O(1)}
+				\State	ItConjString(String) itNomTab $\larr$ CrearIt(Claves(infoT.Joins))\complejidad{O(1)}
+				\While{HaySiguiente?(itNomTab)}								\complejidad{O(1)}
+					\State	info\_join infoJ $\larr$ Obtener(infoT.Joins, Siguiente(NomTab)) \complejidad{O(1)}
+					\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(NomTab),  true\rangle$) \complejidad{O(L)}
+					\State	Encolar es O(L) porque se copia un registro con su cantidad de campos acotada
+					\State	y los valores string copiarlos tiene costo O(L), siendo L el valor string mas largo.
+					\State	Avanzar(itClaves)\complejidad{O(1)}
+				\EndWhile
+	\EndIf
+	\If{CantidadDeAccesos(T) $\>$b.TablaMaxima.\#Modif}
+			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
+			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
+	\EndIf
+}{O(T*L + Log(n)) siendo n la cantidad de registros en t.}
 
-\algoritmo{borrar}{in cr: registro, in t: string, in b: estr}{}{
-	\State	T\_actual $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1)}
-	\State	borrarRegistro(r, T\_actual)						\complejidad{O(1)}
-	\State	Falta hacer algo?
+\algoritmo{borrar}{in cr: registro, in t: string, in/out b: estr}{}{
+	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por ref}
+	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1) por ref}
+	\State	NombreTabla NomTab $\larr$ NombreTabla(T)
+	\State	Actualizo la eliminacion en los joins, que por cada tabla con la que se tenga 
+	\State	join por dicho campo, en ese caso el campo pasado
+	\State	por parametro es campo clave de la tabla t.
+	\If{$\neg\emptyset$?(Claves(infoT.Joins))} \complejidad{O(1)}
+			\State	Creo el iterador, para navegar los nombres de tablas con los que tiene Join
+			\State	itNom $\larr$ CrearIt(Claves(infoT.Joins)) \complejidad{O(1)}
+			\While{HaySiguiente?(itNom)} \complejidad{O(Cant de tablas)}
+					\State info\_join infoJ $\larr$ Siguiente(itNom) \complejidad{O(1)}
+					\State Verifico si el Join esta creado en base al 
+					\State campo del cr pasado por parametro.
+					\State 
+					\If{infoJ.campoJ=DameUno(Campos(cr))} \complejidad{O(1)}
+							\State	Entonces solo actualizo la cola temporal del join
+							\State	Registro reg $\larr$ Buscar(cr, T) \complejidad{O(L + Log(n))}
+							\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(itNom),  False\rangle$)\complejidad{O(L)}
+					\Else
+							\State	Si el campo del criterio de borrado, es distinto que el campo del Join.
+							\State	Primero busco que registros coinciden con el criterio
+							\State	en el peor caso con complejidad O(cantidad de registros de t) sin indices.
+							\State	Conj(Registro) cjc $\larr$ Buscar(cr, T)\complejidad{O(L + Log(n))}% Coincidencias(cr, Registros(r))
+							\State	ItConj(Registro) itReg $\larr$ CrearIt(cjc)
+							\State	Luego agrego estos registros a la cola temporal de cambios del join
+							\While{HaySiguiente?(itReg)}
+									\State	Encolar(infoJ.Rcambios, $\langle Siguiente(itReg), NomTab,  False\rangle$) \complejidad{O(L)}
+									\State Avanzar(itReg)
+							\EndWhile
+					\EndIf
+			\EndWhile
+	\EndIf
+	\State	Habiendo eliminados los registros que cumplen con el criterio de borrado
+	\State	Elimino de la tabla los registros que cumplen el criterio de borrado.
+	\State	Siendo n la cantidad de registros de t y T la cantidad de tablas en la base
+	\State	En peor caso con costo O(n)
+	\State	borrarRegistro(r, $T\_$actual)						\complejidad{O(T*L + n)}
+	
+	\If{CantidadDeAccesos(T) $\>$b.TablaMaxima.\#Modif}
+			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
+			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
+	\EndIf
 }{O(1)}
 
 \algoritmo{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in/out b: estr}{}{
