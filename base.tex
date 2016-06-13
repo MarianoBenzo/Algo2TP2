@@ -234,21 +234,33 @@ $\textbf{usa}$
 	\EndIf
 }{O(T*L + Log(n)) siendo n la cantidad de registros en t.}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 \algoritmo{borrar}{in cr: registro, in t: string, in/out b: estr}{}{
-	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por ref}
-	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1) por ref}
-	\State	NombreTabla NomTab $\larr$ NombreTabla(T)
-	\State	Actualizo la eliminacion en los joins, que por cada tabla con la que se tenga 
-	\State	join por dicho campo, en ese caso el campo pasado
-	\State	por parametro es campo clave de la tabla t.
+	\State info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por ref}
+	\State	 Tabla T $\larr$ infoT.TActual \complejidad{O(1) por ref}
+	\State NombreTabla NomTab $\larr$ NombreTabla(T)
+
+	\State La eliminacion en primera etapa depende de si hay
+	\State	 joins con la tabla pasada por parametro
 	\If{$\neg\emptyset$?(Claves(infoT.Joins))} \complejidad{O(1)}
-			\State	Creo el iterador, para navegar los nombres de tablas con los que tiene Join
-			\State	itNom $\larr$ CrearIt(Claves(infoT.Joins)) \complejidad{O(1)}
+			\State Creo el iterador, para navegar los nombres de tablas con los que tiene Join
+			\State itNom $\larr$ CrearIt(Claves(infoT.Joins)) \complejidad{O(1)}
 			\While{HaySiguiente?(itNom)} \complejidad{O(Cant de tablas)}
 					\State info\_join infoJ $\larr$ Siguiente(itNom) \complejidad{O(1)}
 					\State Verifico si el Join esta creado en base al 
 					\State campo del cr pasado por parametro.
-					\State 
 					\If{infoJ.campoJ=DameUno(Campos(cr))} \complejidad{O(1)}
 							\State	Entonces solo actualizo la cola temporal del join
 							\State	Registro reg $\larr$ Buscar(cr, T) \complejidad{O(L + Log(n))}
@@ -257,27 +269,29 @@ $\textbf{usa}$
 							\State	Si el campo del criterio de borrado, es distinto que el campo del Join.
 							\State	Primero busco que registros coinciden con el criterio
 							\State	en el peor caso con complejidad O(cantidad de registros de t) sin indices.
-							\State	Conj(Registro) cjc $\larr$ Buscar(cr, T)\complejidad{O(L + Log(n))}% Coincidencias(cr, Registros(r))
+							\State	Conj(Registro) cjc $\larr$ Buscar(cr, T)\complejidad{O(L + Log(n))}
+																						% Coincidencias(cr, Registros(r))
 							\State	ItConj(Registro) itReg $\larr$ CrearIt(cjc)
 							\State	Luego agrego estos registros a la cola temporal de cambios del join
 							\While{HaySiguiente?(itReg)}
 									\State	Encolar(infoJ.Rcambios, $\langle Siguiente(itReg), NomTab,  False\rangle$) \complejidad{O(L)}
-									\State Avanzar(itReg)
+									\State Avanzar(itReg)\complejidad{O(1)}
 							\EndWhile
 					\EndIf
 			\EndWhile
 	\EndIf
-	\State	Habiendo eliminados los registros que cumplen con el criterio de borrado
-	\State	Elimino de la tabla los registros que cumplen el criterio de borrado.
+	\State	Habiendo actualizado las colas temporales de los joins con los 
+	\State registros que cumplen con el criterio de borrado
+	\State de los joins correspondientes.
+	\State	Elimino del conjunto de registros, aquellos que cumplen el criterio de borrado.
 	\State	Siendo n la cantidad de registros de t y T la cantidad de tablas en la base
 	\State	En peor caso con costo O(n)
 	\State	borrarRegistro(r, $T\_$actual)						\complejidad{O(T*L + n)}
-	
 	\If{CantidadDeAccesos(T) $\>$b.TablaMaxima.\#Modif}
 			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
 			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
 	\EndIf
-}{O(1)}
+}{O(T*L + n)}
 
 \algoritmo{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in/out b: estr}{}{
 	\State	Join $\larr$ vacio()

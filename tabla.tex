@@ -11,7 +11,7 @@
 
 \sexc{tabla}
 $\textbf{usa}$  
-\generos{nat, dato, campo, tipo, registro, conjTrie, string, diccTrie(string, alfha), diccAVL(nat, beta)}
+\generos{nat, dato, campo, tipo, registro, conjString, string, diccString(string, alfha), diccAVL(nat, beta)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -27,21 +27,21 @@ $\textbf{usa}$
  {O($1$)}
  {Se retorna res por copia, por ser un tipo basico.}
 
-\operacion{claves}{in t: tab }{res : itConjTrie(campo)}
+\operacion{claves}{in t: tab }{res : itConjString(campo)}
  {true}
  {$res \igobs claves(t)$}
  {Devuelve un conjunto de campos que son claves en la tabla ingresada por parametro.}
  {O($1$)}
  {Se devuelve un iterador al conjunto claves por referencia.}
  
-\operacion{indices}{in t: tab }{res : itConjTrie(campo)}
+\operacion{indices}{in t: tab }{res : itConjString(campo)}
  {true}
  {$res \igobs indices(t)$}
  {Devuelve un conjunto de los indices de la tabla ingresada por parametro.}
  {O($calcular$)}
  {Se devuelve res por referencia y no es modificable.}
  
-\operacion{campos}{in t: tab }{res : itConjTrie(campo)}
+\operacion{campos}{in t: tab }{res : itConjString(campo)}
  {true}
  {$res \igobs campos(t)$}
  {Devuelve un conjunto a los campos de la tabla ingresada por parametro.}
@@ -73,7 +73,7 @@ $\textbf{usa}$
  
  %%%%%% generadores %%%%%%%
  
- \operacion{nuevaTabla}{in nombre: string, in claves: conjTrie(campo), in columnas: registro }{res : tab}
+ \operacion{nuevaTabla}{in nombre: string, in claves: conjString(campo), in columnas: registro }{res : tab}
  {$\neg\emptyset$?(claves) $\land$ claves$\subseteq$campos(columnas)}
  {$res \igobs nuevaTabla(t)$}
  {Crea una tabla sin registros.}
@@ -147,7 +147,7 @@ $\textbf{usa}$
  {O($L+in$)}% aca tambien hay que usar renombres para que sea con complejidad de los conjuntos%
  {Retorna res por referencia.} 
 
-  \operacion{hayCoincidencia}{in r: registro,in cj1: ConjTrie(campo), in cj2: Conj(registro)}{res:bool}
+  \operacion{hayCoincidencia}{in r: registro,in cj1: ConjString(campo), in cj2: Conj(registro)}{res:bool}
  {$True$}
  {$res \igobs hayCoincidencia(r,cj1,cj2)$}
  {Compara los valores del registro para los campos dados por parametro, con el conjunto de registros.}
@@ -185,14 +185,13 @@ $\textbf{usa}$
 {\donde{tab}
 { 
 \tupla{
-  		Nombre:String,
+  		Nombre: String,
 		Registros: Conj(Registro),
-		Campos:\mbox{DiccTrie(Campo,Tipo)},
-		Claves:\mbox{ConjTrie(Campo)},
-		IndiceS:\tupla{CampoI: campo, EnUso: bool, Indice: DiccTrie(\mbox{string, Conj(ItConj(Registro)))}},
-		IndiceN:\tupla{CampoI: campo, EnUso: bool, Indice: DiccNat(\mbox{nat, Conj(ItConj(Registro)))}},
-		\#Accesos: Nat
-  		}
+		Campos: \mbox{DiccString(Campo,Tipo)},
+		Claves: \mbox{ConjString(Campo)},
+		IndiceS: \tupla{CampoI: campo, EnUso: bool, Indice: DiccString(\mbox{string, Conj(ItConj(Registro)))}, Min: Dato, Max: Dato},
+		IndiceN: \tupla{CampoI: campo, EnUso: bool, Indice: DiccNat(\mbox{nat, Conj(ItConj(Registro)))}, Min: Dato, Max: Dato},
+		\#Accesos: Nat}
 }
 }
 
@@ -207,14 +206,14 @@ $\textbf{usa}$
 % Los campos de cada registro es igual a los campos de la tabla.
 \item	Para todo registro r de t.Registros, entonces Campos(r) es igual al t.Campos.
 % Los campos de cada registro, tienen el mismo tipo que los campos de la tabla.
-\item	Para todo registro r de t.Registros y para todo campo c de Campos(r), entonces Tipo?(Obtener(r,c)) es igual Obtener(t.Campos, c).
-% Si el indice esta EnUso y tiene un campo que pertenece a t.Campos, para toda clave c de t.IndiceS.Indice, el significado de Obtener(t.IndiceS.Indice, c) esta incluido en t.Registro.
-\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo Dato d, si Definido?(t.IndiceS.Indice, d) es true, entonces Obtener(t.IndiceS.Indice, d) esta incluido o es igual a t.Registros.
+\item	Para todo registro r de t.Registros y para todo campo c de Campos(r), entonces Tipo?(Significado(r,c)) es igual Significado(t.Campos, c).
+% Si el indice esta EnUso y tiene un campo que pertenece a t.Campos, para toda clave c de t.IndiceS.Indice, el significado de Significado(t.IndiceS.Indice, c) esta incluido en t.Registro.
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo Dato d, si Definido?(t.IndiceS.Indice, d) es true, entonces Significado(t.IndiceS.Indice, d) esta incluido o es igual a t.Registros.
 % Todo registro de la tabla pertenece a algun significado de t.IndiceS.Indice
-\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo registro r de t.Registros entonces Definido?(t.IndiceS.Indice, Obtener(r, t.IndiceS.CampoI)) es true y r pertenece a Obtener(t.IndiceS.Indice, Obtener(r, t.IndiceS.CampoI)).
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo registro r de t.Registros entonces Definido?(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)) es true y r pertenece a Significado(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)).
 %
 \item	Lo anterior tambien aplica para t.IndiceN.Indice
-  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados, mas la cantidad de indices creados.
+  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados
 \end{enumerate}
 
 %\rep{tab}{e}True $\iff$\\
@@ -222,8 +221,8 @@ $\textbf{usa}$
 %  \item Para todos los registros de r, el tipo de los datos de las columnas de r, deben coincidir con los tipos de las columnas en e.campos.
 %  \item Todas las columnas de e.campos y su tipo, deben coincidir con los campos y tipo de todos los registros de e.registros.
 %  \item El nombre de la tabla que figura en e.nombre, es un string de longitut acotada.
-%  \item Para todo registro r de e.registros y para todo campo c de e.Indices.DiccClaves, se debe cumplir que si tenemos valor $\larr$ Obtener(r, c) y ind $\larr$ Obtener(e.Indices, c). Al evaluar que r $\in$ Obtener(ind, valor) y deben ser del mismo tipo.
-%  \item Para todo campo c, que pertenece a e.Indices.DiccClaves, si tenemos que  ind $\larr$ Obtener(e.Indices, c), y para todo dato d perteneciente a ind.DiccClaves entonces Obtener(ind, d) esta incluido o es igual a e.registros.
+%  \item Para todo registro r de e.registros y para todo campo c de e.Indices.DiccClaves, se debe cumplir que si tenemos valor $\larr$ Significado(r, c) y ind $\larr$ Significado(e.Indices, c). Al evaluar que r $\in$ Significado(ind, valor) y deben ser del mismo tipo.
+%  \item Para todo campo c, que pertenece a e.Indices.DiccClaves, si tenemos que  ind $\larr$ Significado(e.Indices, c), y para todo dato d perteneciente a ind.DiccClaves entonces Significado(ind, d) esta incluido o es igual a e.registros.
 %  \item Para todo registro r perteneciente  a e.registros r.DiccClaves es igual a e.campos.DiccClaves.
 %  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados, mas la cantidad de indices creados.
 
@@ -234,11 +233,11 @@ $\textbf{usa}$
 %$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
 %$s.hippies \igobs hippies(cs)$ $\land$ \\
 %$s.agentes \igobs agentes(cs)$ $\land$ \\
-%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.Significado(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
+%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.Significado(n) \igobs posEstYHippie(n,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.Significado(pl).pos \igobs posAgente(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.Significado(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
+%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.Significado(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
 
 \subsubsection*{Función de abstracción}
 \abs{tab}{Tabla}{s}{t}
@@ -248,7 +247,7 @@ $s.Indices \igobs indices(t)$ $\land$ \\
 $s.Registros \igobs registros(t)$ $\land$ \\
 $s.Campos.DiccClaves \igobs campos(t)$ $\land$ \\
 $s.\#Accesos \igobs cantidadDeAccesos(t)$ $\land$ \\
-$((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \igobs tipoCampo(c, t))$ \\
+$((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c) \igobs tipoCampo(c, t))$ \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -256,15 +255,15 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 \subsection{Algoritmos}
 
 \algoritmo{nombre}{in t:tab}{res:string}{
-  \State $res \larr t.nombre$ \complejidad{O(1)}
+  \State $res \larr t.Nombre$ \complejidad{O(1)}
 }{O(1)}
 
-\algoritmo{claves}{in t:tab}{res:ConjTrie(campo)}{
-  \State $res \larr t.Claves.DiccClaves$ \complejidad{O(1)}
+\algoritmo{claves}{in t:tab}{res:ConjString(campo)}{
+  \State res $\larr$ t.Claves \complejidad{O(1)}
 }{O(1)}
 
-\algoritmo{indices}{in t:tab}{res:ConjTrie(campo)}{
-  \State	res $\larr$ vacio();
+\algoritmo{indices}{in t:tab}{res:ConjString(campo)}{
+  \State	ConjString(campo)res $\larr$ vacio();
   \If{t.IndiceS.EnUso}
 		\State AgregarRapido(res, t.IndiceS.CampoI) \complejidad{O(1)}
   \EndIf
@@ -273,8 +272,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
   \EndIf
 }{O(1)}
 
-\algoritmo{campos}{in t:tab}{res:ConjTrie(campo)}{
-  \State $res \larr t.Campos.DiccClaves$ \complejidad{O(1)}
+\algoritmo{campos}{in t:tab}{res:ConjString(campo)}{
+  \State $res \larr Claves(t.Campos)$ \complejidad{O(1)}
 }{O(1)} % en otras operaciones tiene q figurar ese conjunto
 
 \algoritmo{tipoCampo}{in c:campo, in t:tab}{res:Tipo}{
@@ -283,7 +282,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 
  \algoritmo{registros}{in t:tab}{res:Conj(registro)}{
     \State $res \larr t.registros $ \complejidad{$\theta$(1)}
- }{$\theta$(1)}
+	\State Se retorna el conjunto por referencia
+ }{$\theta$(1) }
 
   \algoritmo{cantDeAccesos}{in t:tab}{res:nat}{
     \State $res \larr t.cantDeAccesos$ \complejidad{$\theta$(1)}
@@ -294,24 +294,26 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 \newpage
 \algoritmo{nuevaTabla}{in nombre: string, in claves: conj(campo), in columnas: registro}{res: tab}{
 	\State Conj(registro) Registros $\larr$ Vacio() \complejidad{O(1)}
-	\State DiccTrie(campo, tipo) Campos $\larr$ Vacio() \complejidad{O(1)}
-	\State ConjTrie(campo) Claves\_ $\larr$ Vacio() \complejidad{O(1)}
-	\State IndiceS $\larr <  DameUno(claves) ,False , Vacio()  >$ 		\complejidad{O(1)}
-	\State IndiceN $\larr <  DameUno(claves) ,False , Vacio()  >$ 		\complejidad{O(1)}
+	\State DiccString(campo, tipo) Campos $\larr$ Vacio() \complejidad{O(1)}
+	\State ConjString(campo) Claves\_ $\larr$ Vacio() \complejidad{O(1)}
+	\State Dato d $\larr$ Obtener(columnas, DameUno(claves))
+	\State IndiceS $\larr <  DameUno(claves), False, Vacio(), d, d  >$ 		\complejidad{O(1)}
+	\State IndiceN $\larr <  DameUno(claves), False, Vacio(), d, d  >$ 		\complejidad{O(1)}
 	\State \#Acessos $\larr$ 0 \complejidad{O(1)}
 	\State res $   \larr <  nombre, Registros, Campos, Claves\_, IndiceS, IndiceN, 0  >$ 		\complejidad{O(1)}
-	%Agrego los campos al dicctrie
+	%Agrego los campos al diccString
 	\State itcampos $\larr$ crearItConj(Campos(columnas)) 				\complejidad{O(1)}
 	\While{HaySiguiente(itcampos)}										\complejidad{O(1)}
 	\State Este while es O(1) y se debe a que el cardinal de campos a iterar es acotado.			
-					\State	valor $\larr$ Significado(r, Siguiente(itcampos)) \complejidad{O(1)}
+					\State	valor $\larr$ Significado(columnas, Siguiente(itcampos)) \complejidad{O(1)}
 					\State	DefinirRapido(res.Campos, Siguiente(itcampos), Tipo?(valor)) \complejidad{O(1)}
 					\State	Avanzar(itcampos) \complejidad{O(1)}
 	\EndWhile \\
 	\State itclaves $\larr$ crearItConj(claves) 				\complejidad{O(1)}
+	\State Paso los campos claves de un conj al conjString
 	\While{HaySiguiente(itclaves)}										\complejidad{O(1)}
 	\State Esto se debe a que \# de campos a iterar es acotada.			
-					\State	AgregarRapido(re.Claves, Siguiente(itclaves)) \complejidad{O(L)}
+					\State	AgregarRapido(res.Claves, Siguiente(itclaves)) \complejidad{O(L)}
 					\State	Avanzar(itcampos) \complejidad{O(1)}
 	\EndWhile
 	\State Donde L es la longitud de la cadena string mas larga y acotada del parametro claves.
@@ -319,75 +321,105 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
  }{$\theta$(1) }
  
 \newpage
-\algoritmo{agregarRegistro}{in r: registro, in t: tab}{}{
+\algoritmo{agregarRegistro}{in r: registro, in/out t: tab}{}{
+	\State Para poder acceder al registro, guardo el iterador al elemento
     \State itConj(Registro) nuevo $\larr$ AgregarRapido(t.Registros,r)	\complejidad{$\theta$(1)}
     \State t.\#Accesos++																	\complejidad{$\theta$(1)}
+	\State Este registro debe ser indexado, si estos indices existieran.
 	\If{t.IndiceS.EnUso}
-					\State valor	$\larr$	Obtener(r, t.IndiceS.CampoI) \complejidad{$\theta$(1)}
-					\If{Definido?(t.IndiceS.Indice, valor)} \complejidad{$\theta$(1)}
-							\State viejo $\larr$ Obtener(t.IndiceS.Indice, valor)\complejidad{$\theta$(1)}
-							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
+					\State Para el indice traigo el valor del campo con el que se creo.
+					\State valor	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{$\theta$(L)}
+					\If{Definido?(t.IndiceS.Indice, valor)} \complejidad{$\theta$(L)}
+							\State viejo $\larr$ Significado(t.IndiceS.Indice, valor)\complejidad{$\theta$(L)}
+							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(L)}
 					\Else
 							\State viejo $\larr$ Vacio() \complejidad{$\theta$(1)}
-							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
-							Definir(t.IndiceS.Indice, valor, viejo) \complejidad{$\theta$(1)}
+							\State AgregarRapido(viejo, nuevo)\complejidad{$\theta$(L)}
+							\State Definir(t.IndiceS.Indice, ValorString(valor), viejo) \complejidad{$\theta$(L)}
+							\State Como ingresamos un nuevo valor, actualizamos el min y max
+							\If{t.IndiceS.Min$\geq$valor} \complejidad{$\theta$(L)}
+								\State t.IndiceS.Min $\larr$ Copiar(valor)\complejidad{$\theta$(L)}
+							\EndIf
+							\If{valor$\geq$t.IndiceS.Max}\complejidad{$\theta$(L)}
+								\State t.IndiceS.Max $\larr$ Copiar(valor)\complejidad{$\theta$(L)}
+							\EndIf
 					\EndIf
+	\State Donde L es la longitud del valor string agregado a t.IndiceS						
 	\EndIf
 	\If{t.IndiceN.EnUso}
-					\State valor	$\larr$	Obtener(r, t.IndiceN.CampoI) \complejidad{$\theta$(Log(n)}
+					\State Para el indice traigo el valor del campo con el que se creo.
+					\State valor	$\larr$	Significado(r, t.IndiceN.CampoI) \complejidad{$\theta$(Log(n)}
 					\If{Definido?(t.IndiceN.Indice, valor)} \complejidad{$\theta$(log(n))}
-							\State viejo $\larr$ Obtener(t.IndiceN.Indice, valor)\complejidad{$\theta$(1)}
+							\State viejo $\larr$ Significado(t.IndiceN.Indice, valor)\complejidad{$\theta$(1)}
 							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
 					\Else
 							\State viejo $\larr$ Vacio() \complejidad{$\theta$(1)}
 							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
-							Definir(t.IndiceN.Indice, valor, viejo) \complejidad{$\theta$(Log(n))}
+							\State Definir(t.IndiceN.Indice, valor, viejo) \complejidad{$\theta$(Log(n))}
+							\State Como ingresamos un nuevo valor, actualizamos el min y max
+							\If{t.IndiceN.Min$\geq$valor} \complejidad{$\theta$(1)}
+								\State t.IndiceS.Min $\larr$ Copiar(valor)\complejidad{$\theta$(1)}
+							\EndIf
+							\If{valor$\geq$t.IndiceS.Max}\complejidad{$\theta$(1)}
+								\State t.IndiceN.Max $\larr$ Copiar(valor)\complejidad{$\theta$(1)}
+							\EndIf
 					\EndIf
 	\EndIf
 	\State Donde n es la cantidad de cantidad de valores distintos definidos en t.IndiceN						
 }{$\theta$(Log(n))}
-
+\newpage
 \algoritmo{borrarRegistro}{in crit: registro,in t: tab}{}{
-	\State	c $\larr$ Siguiente(Campos(crit))	\complejidad{$\theta$(1)} %chequear
-	\State 	valor $\larr$	Obtener(crit, c)			\complejidad{$\theta$(1)}
-	% Sabemos que c esta incluido en claves(t)
-	% si hay un indice de un campo clave borrar es O(log(n)) en peor caso
+	\State	Campo c $\larr$ DameUno(Campos(crit))	\complejidad{$\theta$(1)} %chequear
+	\State 	Dato valor $\larr$	Significado(crit, c)			\complejidad{$\theta$(1)}
+	\State Sabemos que c esta incluido en claves(t)
+	\State si hay un indice de un campo clave borrar es O(log(n)) u O(L) en peor caso
 	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
-			\If{Definido?(t.IndiceS.Indice, valor)}
-					\State	itConj(registro) itr $\larr$ Obtener(t.IndiceS.Indice, valor) \complejidad{$\theta$(1)}
-					% Borro el registro del conjunto de registros
-					\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
-					% Borro el registro del indice,
-					\State	Borrar(t.IndiceS.Indice, valor) \complejidad{$\theta$(1)}
-			\EndIf
-	\EndIf
-	\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
-			\If{Definido?(t.IndiceN.Indice, valor)}
-					\State	itConj(registro) itr $\larr$ Obtener(t.IndiceN.Indice, valor) \complejidad{$\theta$(1)}
-					% Borro el registro del indice,
-					\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
-					\State	Borrar(t.IndiceN.Indice, valor) \complejidad{$\theta$(1)}
-			\EndIf
-	\EndIf				%ya tengo el indice ahora pregunto si ese valor de dato esta definido
-					%No hay indice para c
-%	\State conj(itConj(registro))cr $\larr$ Coincidencias(crit, t.registros)\complejidad{$\theta$(Cardinal(t.registros))}
-					%se supone que cr es un interador de un conj de itconj(registro)
-	\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{$\theta$(1)}
-	\State Dato valorR $\larr$ Obtener(Siguiente(cr), c)		\complejidad{$\theta$(1)}
-	\While{HaySiguiente(cr)}\complejidad{$\theta$(Cardinal(t.registros))}
-			\State valorR $\larr$ Obtener(Siguiente(cr), c)		\complejidad{$\theta$(1)}
-			\If{valorR=valor}
+		\State String S $\larr$ ValorString(valor)
+		\If{Definido?(t.IndiceS.Indice, S)}
+				\State	itConj(registro) itr $\larr$ Significado(t.IndiceS.Indice, S) 																																\complejidad{$\theta$(1)}
+				\State Borro el registro del conjunto de registros
+				\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
+				\State Borro el registro del indice,
+				\State	Borrar(t.IndiceS.Indice, S) \complejidad{$\theta$(1)}
+				\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
+				\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
+				t.\#Accesos++
+		\EndIf
+	\Else
+		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
+				\State N $\larr$ ValorNat(valor)
+				\If{Definido?(t.IndiceN.Indice, valor)}
+						\State	itConj(registro) itr $\larr$ Significado(t.IndiceN.Indice, valor) 		                        																									\complejidad{$\theta$(1)}
+						% Borro el registro del indice,
+						\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
+						\State	Borrar(t.IndiceN.Indice, valor) \complejidad{$\theta$(1)}
 						\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
-			\EndIf
-			\State Avanzar(cr)													\complejidad{$\theta$(1)}
-	\EndWhile
-	\State La complejidad de la operacion borrar depende de si hay o no indices
-	\State para el campo del crit pasado por parametro.
-	\State En caso de que exista dicho indice, en peor caso eliminar es O(Log(n))
-	\State siendo n la cantidad de registros de la tabla pasada por parametro.
-	\State En caso contrario borrar es O(n).
-}{}
-
+						\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
+						t.\#Accesos++
+				\EndIf
+						%ya tengo el indice ahora pregunto si ese valor de dato esta definido
+		\Else
+			\State No hay indice para el campo clave de criterio pasado por parametro
+			\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{$\theta$(1)}
+			\While{HaySiguiente(cr)}\complejidad{$\theta$(Cardinal(t.registros))}
+					\State valorR $\larr$ Significado(Siguiente(cr), c)		\complejidad{$\theta$(1)}
+					\If{valorR=valor}
+						\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
+						\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
+						t.\#Accesos++
+					\EndIf
+					\State Avanzar(cr)													\complejidad{$\theta$(1)}
+			\EndWhile
+			\State La complejidad de la operacion borrar depende de si hay o no indices
+			\State para el campo del crit pasado por parametro.
+			\State En caso de que exista dicho indice, en peor caso eliminar es O(Log(n)) u O(L)
+			\State siendo n la cantidad de registros de la tabla pasada por parametro y L
+			\State el valor string mas largo definido en la tabla.
+			\State En caso de no haber tal indice es O(n).			
+		\EndIf
+	\EndIf
+}{O(n)}
+\newpage
 \algoritmo{indexar}{in c: campo, in t: tab}{}{
 	\If{tipoCampo(c,t)}
 		\State t.IndiceN.EnUso $\larr$ True
@@ -397,10 +429,10 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 	\State	cr $\larr$ CrearItConj(t.registros)
 	\If{tipoCampo?(c,t)}
 			\While{HaySiguiente(cr)}
-						\State 	Dato	valor $\larr$ Obtener(Siguiente(cr), c)
+						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
 						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
 						\If{Definido?(t.IndiceN.Indice, valor)}
-									\State	regviejos $\larr$ Obtener(indC, valor)
+									\State	regviejos $\larr$ Significado(indC, valor)
 									\State	AgregarRapido(regviejos, itr)
 						\Else
 									\State 	conj(registro) nuevo $\larr$ Vacio()
@@ -412,10 +444,10 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 	\EndIf
 	\If{$\neg$tipoCampo?(c,t)}
 			\While{HaySiguiente(cr)}
-						\State 	Dato	valor $\larr$ Obtener(Siguiente(cr), c)
+						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
 						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
 						\If{Definido?(t.IndiceS.Indice, valor)}
-									\State	regviejos $\larr$ Obtener(indC, valor)
+									\State	regviejos $\larr$ Significado(indC, valor)
 									\State	AgregarRapido(regviejos, itr)
 						\Else
 									\State 	conj(registro)	 nuevo $\larr$ Vacio()
@@ -435,7 +467,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
   \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
   		\State bool valor $\larr$ True
  		\If{Cardinal(campos(r))=Cardinal(t.Campos.DiccClaves)}
-				  \State itcampos $\larr$ CrearItTrie(t.Campos.DiccClaves)
+				  \State itcampos $\larr$ CrearItString(t.Campos.DiccClaves)
 				  \While{valor $\land$ HaySiguiente(itcampos)} \complejidad{$\theta$(1)}
 				  			\State Campo c $\larr$ Siguiente(itcampos) \complejidad{$\theta$(1)}
 							\State valor $\larr$ Definido?(r, c) \complejidad{$\theta$(1)}
@@ -458,7 +490,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
  
 
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
-	\State	itcr1 $\larr$ CrearItConjTrie(cr1) \complejidad{$\theta$(1)}  
+	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{$\theta$(1)}  
 	\State	copiacr2 $\larr$ Copiar(cr2)		\complejidad{$\theta$(Cardinal(cr2))}  
   	\While{HaySiguiente(itcr1)}         \complejidad{$\theta$(Cardinal(cr1))}
 		\State	combinarTodos(c,Siguiente(itcr1),copiacr2) \complejidad{$\theta$(1)}	%combinarTodos deberia hacer por copia asi no afecta el original.
@@ -467,7 +499,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
   	\State	res $\larr$ copiacr2                      \complejidad{$\theta$(1)}
 }{O(Cardinal(cr1))}
  
-\algoritmo{hayCoincidencia}{in r:registro, in cc:ConjTrie(campo), in cr:Conj(registro)}{res:bool}{
+\algoritmo{hayCoincidencia}{in r:registro, in cc:ConjString(campo), in cr:Conj(registro)}{res:bool}{
   	\State	itcr $\larr$ CrearItConj(cr)   \complejidad{$\theta$(1)}  
     \State	res $\larr$ false                   \complejidad{$\theta$(1)}  
   	\While{HaySiguiente(itcr)}		\complejidad{$\theta$(Cardinal(cr))}  
@@ -481,8 +513,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 %	\If{Cardinal(Indices(t))$\geq$1}
 %	\State Si hay indice, obtengo los valores de crit para los campos de los indices que existan
 %		\If{t.IndiceS.EnUso}
-%				\State	vals $\larr$ Obtener(crit, t.IndiceS.CampoI)
-%				\State	Conj(registro) rind	$\larr$ Obtener(t.IndiceS.Indice, vals)
+%				\State	vals $\larr$ Significado(crit, t.IndiceS.CampoI)
+%				\State	Conj(registro) rind	$\larr$ Significado(t.IndiceS.Indice, vals)
 %				\State	itrind $\larr$ CrearItConj(rind)
 %				\While{HaySiguiente(itrind)}
 %						\State r1 $\larr$ Siguiente(Siguiente(itcr))
@@ -496,8 +528,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 %				\EndWhile
 %		\Else
 %				\If{t.IndiceN.EnUso}
-%						\State	valn $\larr$ Obtener(crit, t.IndiceN.CampoI)
-%						\State	Conj(registro) rind	$\larr$ Obtener(t.IndiceN.Indice, valn)
+%						\State	valn $\larr$ Significado(crit, t.IndiceN.CampoI)
+%						\State	Conj(registro) rind	$\larr$ Significado(t.IndiceN.Indice, valn)
 %						\State	itrind $\larr$ CrearItConj(rind)
 %						\While{HaySiguiente(itrind)}
 %								\State r1 $\larr$ Siguiente(Siguiente(itcr))
@@ -529,26 +561,47 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
  }{O(Cardinal(cr))}
  
   \algoritmo{minimo}{in c:campo, in t:tab}{res:dato}{
-  	\State 	res $\larr$ min( dameColumna(  c, t.registros  ))\complejidad{$\theta$(Cardinal(t.registros))}
- }{O(Cardinal(t.registros))}
+	\State	Si hay indice en el campo c, debe ser de complejidad O(1)
+	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
+		\State	Sabemos que hay un indice string para el campo c
+		\State	res $\larr$ t.IndiceS.Min \complejidad{$\theta$(Cardinal(t.registros))}
+	\Else
+		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
+			\State	Sabemos que hay un indice string para el campo c
+			\State	res $\larr$ t.IndiceN.Min\complejidad{$\theta$(Cardinal(t.registros))}
+%		\Else
+%			\State	Si no hay indice para este campo hay que buscar el valor en O(n)
+%			\State	ItConj(Registro) itr $\larr$ t.Registros
+%			\State	Dato min\_ $\larr$ Significado(Siguiente(itr), c)
+%			\While{HaySiguiente?(itr)}
+%				\State	Dato sig $\larr$ Significado(Siguiente(itr), c)
+%				\If{sig$\geq$min\_}
+%						\State	min\_$\larr$ Copiar(sig)
+%				\EndIf
+%				\State Avanzar(itr)
+%			\EndWhile
+		\EndIf
+	\EndIf
+%  	\State 	res $\larr$ min( dameColumna(  c, t.registros  ))\complejidad{$\theta$(Cardinal(t.registros))}
+ }{O(1)}
  
    \algoritmo{maximo}{in c:campo, in t:tab}{res:dato}{
   	\State 	res $\larr$ max( dameColumna(  c,  t.registros  ))\complejidad{$\theta$(Cardinal(t.registros))}
- }{O(Cardinal(t.registros))}
+ }{O(1)}
  
 \algoritmo{dameColumna}{in c:campo, in cr:Conj(registro)}{res:Conj(dato)}{
   	\State 	Conj(Dato)	cj $\larr$ vacio();				\complejidad{$\theta$(1)}
 	\If{Cardinal(cr)$\geq$1}\complejidad{$\theta$(1)}		
-			\State	Tvalor $\larr$ Tipo?(Obtener(DameUno(cr), c))\complejidad{$\theta$(1)}		
+			\State	Tvalor $\larr$ Tipo?(Significado(DameUno(cr), c))\complejidad{$\theta$(1)}		
 			\If{Tvalor}
 					\State	ConjLog(nat) cj $\larr$ Vacio()\complejidad{$\theta$(1)}		
 			\Else
-					\State	ConjTrie(string) cj $\larr$ Vacio()\complejidad{$\theta$(1)}		
+					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{$\theta$(1)}		
 			\EndIf
 			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{$\theta$(1)}		
 			\State	cjd $\larr$ Vacio()
 		  	\While{HaySiguiente(itcr)}						\complejidad{$\theta$(Cardinal(cr))}
-		  				\State Dato data $\larr$ Obtener(Siguiente(itcr), c)
+		  				\State Dato data $\larr$ Significado(Siguiente(itcr), c)
 		  				\If{Tvalor}
 		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{$\theta$(Log(n))}
 										\State 	AgregarRapido(cjd, data)\complejidad{$\theta$(1)}
@@ -575,7 +628,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
   	\State 	valor $\larr$ True										\complejidad{$\theta$(1)}
   	\State 	itconjClaves $\larr$ CrearItConj(r.ClavesDicc) \complejidad{$\theta$(1)}
   	\While{valor $\land$ HaySiguiente(itconjClaves)}				\complejidad{$\theta$(1)}
-  					\State	val1$\larr$ tipo?(Obtener(r,Siguiente(itconjClaves))) \complejidad{$\theta$(1)}
+  					\State	val1$\larr$ tipo?(Significado(r,Siguiente(itconjClaves))) \complejidad{$\theta$(1)}
   					\State	val2$\larr$ tipoCampo(Siguiente(itconjClaves),t)	\complejidad{$\theta$(1)}
 					\State	valor $\larr$ (val1 = val2)	\complejidad{$\theta$(1)}
 					\State	Avanzar(cr);								\complejidad{$\theta$(1)}
@@ -771,7 +824,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Obtener(s.Campos, c) \i
 %
 % \algoritmo{proxPosHippie}{in/out campus:campusSeguro, in nombre:string}{res:pos}{
 %    \State // PRE: El nombre es un hippie y el hippie no esta encerrado
-%    \State $posHippie \larr campus.hippies.obtener(nombre)$ \complejidad{O(long(nombre))}
+%    \State $posHippie \larr campus.hippies.Significado(nombre)$ \complejidad{O(long(nombre))}
 %    \If {$campus.estudiantes.tamanio()>0$}
 %      \State // Retorna de las posiciones mas cercanas, la que esta mas cerca del (0,0)
 %      \State $proxPos \larr aPosMasCercana(campus.campusEstatico,posHippie,campus.estudiantes.significados)$ \complejidad{O($N_e$)}
