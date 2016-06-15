@@ -151,9 +151,9 @@ $\textbf{usa}$
       								Rcambios: Cola(DatoCambio),
       								campoJ: campo, 
       								campoT: tipo,
-      								JoinS: ConjTrie(registro),
-      								ValoresS: ConjTrie(String),
-      								JoinN: ConjNat(registro),
+      								JoinS: DiccTrie(string, itConj(registro)),
+      								JoinN: DiccNat(nat, itConj(registro)),
+      								JoinC: Conj(registro),
       								ValoresN: ConjNat(Nat)}}
 		\donde{Tmax}{\tupla{NomTabla: NombreTabla, $\#$Modif: Nat}}
 		\donde{DatoCambio}{\tupla{Reg: Registro, NomOrigen: NombreTabla, Accion: Bool}}
@@ -370,14 +370,10 @@ $\textbf{usa}$
 % {O($calcular$)}
 % {Se retorna el nombre de la tabla por referencia.}
 \algoritmo{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(ItConj(registro))}{
-	\State
-	\If{Pertenece?(b.Joins, $\langle t1, t2\rangle$  )}
-			\State	Borrar(b.Joins, $\langle t1, t2\rangle$ )
-	\Else
-			\If{Pertenece?(b.Joins, $\langle t2, t1\rangle$ )}
-					\State	Borrar(b.Joins, $\langle t2, t1\rangle$)
-			\EndIf
-	\EndIf
+	\State	Busco los datos de la tabla.
+	\State	info_tabla infot $\larr$ Significado(b.tablas, t) \complejidad{O(1) por ref}
+	\State	Tabla tab $\larr$ infot.TActual \complejidad{O(1) por ref}
+	\State	BuscarEnTabla(criterio, tab) 
 }{O(1)}
 
 %\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{

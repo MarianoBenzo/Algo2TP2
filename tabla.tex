@@ -155,7 +155,7 @@ $\textbf{usa}$
  {Retorna res por referencia, no es modificable.} 
 
 
- \operacion{combinarRegistros}{in c: campo,in cj1: Conj(registro), in cj2: Conj(registro)}{$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$$\hfill$
+ \operacion{combinarRegistros}{in c: campo,in cj1: Conj(registro), in cj2: Conj(registro)}{$\hfill \hfill \hfill \hfill \hfill \hfill \hfill$
  res: conj(registro)}
  {$True$}
  {$res \igobs combinarRegistros(c,cj1,cj2)$}
@@ -176,6 +176,14 @@ $\textbf{usa}$
  {Compara los tipos correspondientes a los campos del registro y la tabla.}
  {O($1$)}
  {Retorna res por referencia, no es modificable.} 
+
+ %%%%%%% AUXILIARES
+ \operacion{BuscarEnTabla}{in c: campo,in t: tab}{res: Conj(ItConj(registro))}
+ {c$\subseteq$campos(t)}
+ {$res \igobs BuscarEnTabla(c, t)$}
+ {}
+ {O($xxxxx$)}
+ {Retorna res por referencia, es modificable.} 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -567,18 +575,23 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 % {O($L+Log(n)$)}
 % {Retorna res por referencia,.}
 
- \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(registro)}{
+\algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(ItConj(registro))}{
  	\State Conj(registro) salida	$\larr$ Vacio() \complejidad{$\theta$(1)}
 	\State Debemos comparar todos los registros de cr.
 	\State y agregarlos al conjunto de registros salida
   	\State 	itcr $\larr$ CrearItConj(cr)						
-  	\While{HaySiguiente(cr)}							\complejidad{$\theta$(Cardinal(cr))}
-				\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
-								\State	AgregarRapido(salida,Siguiente(itcr)) 						\complejidad{$\theta$(1)}
-				\EndIf				
-				\State	Avanzar(itcr);																\complejidad{$\theta$(1)}
+  	\While{HaySiguiente?(cr)}							\complejidad{$\theta$(Cardinal(cr))}
+		\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
+				\State	AgregarRapido(salida, CrearIt(Siguiente(itcr))) \complejidad{$\theta$(1)}
+				
+				\State	AgregarRapido(salida, itcr) \complejidad{$\theta$(1)}
+
+		\EndIf				
+		\State	Avanzar(itcr) \complejidad{$\theta$(1)}
 	\EndWhile   
- }{O(Cardinal(cr))}
+	\State res $\larr$ salida\complejidad{$\theta$(1)por ref}
+}{O(Cardinal(cr))}
+ 
 %	\If{Cardinal(Indices(t))$\geq$1}
 %	\State Si hay indice, obtengo los valores de crit para los campos de los indices que existan
 %		\If{t.IndiceS.EnUso}
@@ -723,3 +736,52 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Algoritmos operaciones auxiliares}
+
+ %\operacion{BuscarEnTabla}{in c: campo,in t: tab}{res: Conj(ItConj(registro))}
+ %{c$\subseteq$campos(t)}
+ %{$res \igobs BuscarEnTabla(c, t)$}
+ %{completar con lo que hace.}
+ %{O($xxxxx$)}
+ %{Retorna res por referencia, es modificable.} 
+ 
+\algoritmo{BuscarEnTabla}{in criterio: registro, in t: tab}{res: Conj(ItConj(registro))}{
+	\State 	Primero busco que campos de r, estan en los campos de t y son del mismo tipo
+	\State	itcampos $\larr$ CrearIt(DiccClaves(t.campos))
+	\State	Bool Encontrado $\larr$ false
+	\State	campo EncontradoC 	
+	\State	Conj(campo) cj $\larr$ vacio()
+	\State	Vemos si algun campo de criterio esta en los indices
+	\While{HaySiguiente?(itcampos) $\land$ $\neg$Encontrado}
+		\State Campo c $\larr$ Siguiente(itcampos)
+		\If{Definido?(criterio, c)}
+			\State bool valorD $\larr$ (Tipo?(Significado(criterio, c))=Significado(t.campos, c))
+			\If{valorD}
+				\State	AgregarRapido(cj, c)
+				\State	Encontrado $\larr$ (t.IndiceS.EnUso $\yluego$ t.IndiceS.CampoI=c)
+				\If{Encontrado}
+					\State	EncontradoC $\larr$ c
+				\EndIf
+			\EndIf
+		\EndIf
+		\State	Avanzar(itcri)
+	\EndWhile	
+	\State	Si encontrado es true entonces uso indice, sino recorro todo los registros
+	\If{Encontrado}
+		\State Entonces hay un indice para EncontradoC
+		\If{Significado(t.campos, EncontradoC)}
+			\State	Caso Natural
+			\State	Obtengo el valor nat del registro criterio
+			\State	Nat valor $\larr$ ValorNat(Significado(t.campos, EncontradoC))
+			\State	res $\larr$ Significado(t.IndiceN.Indice, valor)
+		\EndIf
+		\If{$\neg$Significado(t.campos, EncontradoC)}
+			\State	Caso String
+			\State	Obtengo el valor nat del registro criterio
+			\State	String valor $\larr$ ValorString(Significado(t.campos, EncontradoC))
+			\State	res $\larr$ Significado(t.IndiceS.Indice, valor)
+		\EndIf
+	\Else
+		res $\larr$ Coincidencias(criterio, t.registros)
+	\EndIf
+ }{O(1)}
+ 
