@@ -4,86 +4,105 @@
 
 \subsection{Interfaz}
 
-\sexc{Diccionario(\kappa, \sigma)}
+\sexc{Diccionario(nat, \sigma)}
 $\textbf{usa}$ Bool
-\generos{diccNat(\kappa, \sigma)}
+\generos{diccNat(nat, \sigma)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Operaciones}
 
 
-\operacion{Vacio}{}{res : diccNat(\kappa, \sigma)}
+\operacion{Vacio}{}{res : diccNat(nat, \sigma)}
  {$true$}
  {$res \igobs vacio()$}
  {Crea un nuevo diccionario}
  {$O(1)$}
  {}
  
- \operacion{Definido?}{in d:diccNat(\kappa, \sigma) in n:\kappa}{res:Bool}
+ \operacion{Definido?}{in d:diccNat(nat, \sigma) in n:nat}{res:Bool}
   {$true$}
   {$res \igobs def?(n,d)$}
   {Indica si la clave esta definida}
   {$O(m)$}
   {}
 
- \operacion{Definir}{in/out d:diccNat(\kappa, \sigma)\, in n:\kappa, in s:\sigma}{}
+ \operacion{Definir}{in/out d:diccNat(nat, \sigma)\, in n:nat, in s:\sigma}{}
   {$\neg def?(n,d) \land d=d_0$}
   {$d \igobs Definir(n, s, d_0)$}
   {Se define s en el diccionario}
   {$O(m)$}
   {}
 
- \operacion{Borrar}{in/out d:diccNat(\kappa, \sigma) in n:\kappa}{}
+ \operacion{Borrar}{in/out d:diccNat(nat, \sigma) in n:nat}{}
  {$d \igobs d_0 \land def?(n,d)$}
  {$d \igobs Borrar(n,d_0)$}
  {Elimina el elemento n}
  {$O(m)$}
  {}
 
- \operacion{Significado}{in d:diccNat(\kappa, \sigma) in n:\kappa}{res:\sigma}
+ \operacion{Significado}{in d:diccNat(nat, \sigma) in n:nat}{res:\sigma}
  {$def?(n,d)$}
  {$res \igobs obtener(n,d)$}
  {Se retornan los significados}
  {$O(m)$}
- {}
+ {Devuelve res por referencia.}
 
- \operacion{Claves}{in d:diccNat(\kappa \sigma)}{res:conjLog(\kappa)}
+ \operacion{diccClaves}{in d:diccNat(nat \sigma)}{res:itLista(nat)}
  {$true$}
  {$res \igobs claves(d)$}
- {Se retornan el conjunto de claves del diccionario}
+ {Se retorna un iterador al primer elemento de la lista de claves del diccionario}
  {$O(1)$}
+ {}
+ 
+ \operacion{maximo}{in d:diccNat(nat \sigma)}{res:nat}
+ {$true$}
+ {$res \igobs max(claves(d))$}
+ {Se retorna la clave maxima en forma de dato}
+ {$O(m)$}
+ {}
+ 
+\operacion{minimo}{in d:diccNat(nat \sigma)}{res:nat}
+ {$true$}
+ {$res \igobs min(claves(d))$}
+ {Se retorna la clave minima en forma de dato}
+ {$O(m)$}
  {}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Representación}
 
 diccNat
-\serc{raiz: puntero(estr(\kappa\, \sigma))}{
+\serc{\tupla{raiz: puntero(estr(nat\, \sigma)), claves: lista(nat)}}{
 	\\
-	\donde{estr(\kappa, \sigma)}{\tupla{ clave: \kappa, significado:\sigma, hijoDer: puntero(estr(\kappa \sigma)), hijoIzq: puntero(estr(\kappa \sigma)), diccClaves: conjLog(\kappa)}}}
+	\donde{estr(nat, \sigma)}{\tupla{ clave: nat, significado:\sigma, hijoDer: puntero(estr(nat \sigma)), hijoIzq: puntero(estr(nat \sigma)), itClaves: itLista(nat)}}
+	\\
+	\donde{claves}{Lista Enlazada del apunte de modulos basicos que contiene todas \\las claves del diccionario.}
+	\\
+	\donde{itClaves}{Iterador bidireccional de lista claves que apunta al elemento \\correspondiente con su clave.}}
 
 \subsubsection*{Invariante de representación}
 
 \rep{estr}{e}
-$true \iff ((\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
-(n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(\kappa, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$
-(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL) \land $\\$ 
-((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(e)) \impluego  Pertenece?(e.diccClaves, n.clave) \land $\\$
-(\paratodo{\kappa}{k})(k \in e.diccClaves) \implies (\exists n: estr(\kappa, \sigma))(n \in arbol(e) \land n.clave = k)))$
+$true \iff ((\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
+(n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$
+(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL) \land $\\
+%$ 
+%((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(e)) \impluego  Pertenece?(e.claves, n.clave) \land $\\$
+%(\paratodo{nat}{k})(k \in e.claves) \implies (\exists n: estr(nat, \sigma))(n \in arbol(e) \land n.clave = k)))$
 \begin{enumerate}
 \item Para todo hijoDer de un estr, si no es NULL, su clave es mayor a la clave de su padre.
 \item Para todo hijoIzq de un estr, si no es NULL, su clave es menor a la clave de su padre.
 \item No hay ciclos, ni nodos con dos padres.
-\item Todos las claves de los elementos del arbos estan en diccClaves y viceversa.
+\item Todos las claves de los elementos del arbos estan en la lista claves y viceversa.
 \end{enumerate}
 
 
 \subsubsection*{Función de abstracción}
-\abs{diccNat(\kappa, \sigma)}{dicc(\kappa, \sigma)}{d}{c}
-$((\paratodo{\kappa}{k})( k \in claves(c) \implies $\\$(\exists n: estr(\kappa, \sigma))(n \in arbol(d) \land n.clave = k) \land (k \in d.diccClaves)) \land $\\$((\paratodo{\kappa}{k})(k \in d.diccClaves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(\kappa, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
+\abs{diccNat(nat, \sigma)}{dicc(nat, \sigma)}{d}{c}
+$((\paratodo{nat}{k})( k \in claves(c) \implies $\\$(\exists n: estr(nat, \sigma))(n \in arbol(d) \land n.clave = k) \land (k \in d.diccClaves)) \land $\\$((\paratodo{nat}{k})(k \in d.diccClaves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
   
-$arbol: puntero(estr(\kappa, \sigma)) \larr conj(puntero(estr(\kappa, \sigma)))$
+$arbol: puntero(estr(nat, \sigma)) \larr conj(puntero(estr(nat, \sigma)))$
 
 $arbol(n) \equiv $
 \begin{algorithmic}
@@ -111,25 +130,39 @@ $arbol(n) \equiv $
   \State $res \larr NULL$
 }{O(1)}
 
-\algoritmo{iDefinir}{in/out d:estr, in n:\kappa, in s:\sigma}{}{
+\algoritmo{iDefinir}{in/out d:diccNat, in n:nat, in s:\sigma}{}{
+  
+  
+  
+    \State $auxDefinir(\pi_1(d), \pi_2(d), n, s)$ 				\complejidad{O(m)}
+  
+  
+}{O(m)}
+
+\algoritmo{auxDefinir}{in/out d:estr, in l:lista(nat) ,in n:nat, in s:\sigma}{}{
   
   
   \If {$d == NULL$}
-    \State $res \larr <n,s,NULL,NULL>$ 				\complejidad{O(1)}
+    \State $res \larr <n,s,NULL,NULL, AgregarAtras(l, n)>$ 				\complejidad{O(1)}
   \EndIf
   
   \If {$d \neq NULL \land n < d.clave$}
-    \State $d.hijoIzq \larr iDefinir(d.hijoIzq,n,s)$ 	\complejidad{O(log(m))}
+    \State $d.hijoIzq \larr iDefinir(d.hijoIzq,n,s)$ 	\complejidad{O(m)}
   \EndIf
   
   \If {$d \neq NULL \land n > d.clave$}
     \State $d.hijoDer \larr iDefinir(d.hijoDer,n,s)$ 	\complejidad{O(m)}
   \EndIf
   
-  \State $AgregarRapido(d.diccClaves, n)$ \complejidad{O(m)}
 }{O(m)}
 
-\algoritmo{iBorrar}{in/out d:estr, in n:\kappa}{}{
+\algoritmo{iBorrar}{in/out d:diccNat, in n:nat}{}{
+ 
+ \State $auxBorrar(\pi_1(d), \pi_2(d), n, s)$ 				\complejidad{O(m)}
+
+}{O(m)}
+
+\algoritmo{auxBorrar}{in/out d:estr, in n:nat}{}{
   \If {$d == NULL$}
     \State $Fin Funcion$
     \complejidad{O(1)}
@@ -143,6 +176,10 @@ $arbol(n) \equiv $
     \complejidad{O(m)}
     
     \ElsIf {$d.hijoIzq == NULL \land d.hijoDer == NULL$}
+    \State $d.itClaves.Anterior.Siguiente \larr d.itClaves.Siguiente$
+    \complejidad{O(1)}
+    \State $d.itClaves.Siguiente.Anterior \larr d.itClaves.Anterior$
+    \complejidad{O(1)}
     \State $Borrar(d)$
     \complejidad{O(1)}
     \State $d \larr NULL$
@@ -163,7 +200,9 @@ $arbol(n) \equiv $
     \complejidad{O(1)} 
     \State $d.significado \larr aux.significado$
     \complejidad{O(1)} 
-	
+	\State $d.itClaves \larr aux.itClaves$
+    \complejidad{O(1)} 
+    
 	\Else
     
 	\State $aux \larr d.hijoIzq$
@@ -179,15 +218,20 @@ $arbol(n) \equiv $
     \State $d.clave \larr aux.clave$
     \complejidad{O(1)} 
     \State $d.significado \larr aux.significado$
-    \complejidad{O(1)}     
+    \complejidad{O(1)}
+    \State $d.itClaves \larr aux.itClaves$
+    \complejidad{O(1)}      
     
   \EndIf
-  \State $Eliminar(d.diccClaves, n)$ \complejidad{O(m)}
+  
 
 }{O(m)}
 
+\algoritmo{iSignificado}{in/out d:diccNat, in n:nat}{res:\sigma}{
+  \State $res \larr auxSignificado(\pi_1(d), n)$ 		\complejidad{O(m)}
+}{O(m)}
 
-\algoritmo{iSignificado}{in/out d:estr, in n:\kappa}{res:\sigma}{
+\algoritmo{auxSignificado}{in/out d:estr, in n:nat}{res:\sigma}{
   \State $nodoActual \larr d$ 
   \complejidad{O(1)}
   \While {$\neg(nodoActual == NULL) \land \neg res$}
@@ -205,11 +249,17 @@ $arbol(n) \equiv $
  	\EndIf
   \EndIf
   	
-  
   \EndWhile
 }{O(m)}
 
-\algoritmo{iDefinido?}{in/out d:estr, in n:\kappa}{res:bool}{
+
+\algoritmo{iDefinido?}{in/out d:diccNat, in n:nat}{res:bool}{
+ 
+  \State $res \larr auxDefinido?(\pi_1(d), n)$ 		\complejidad{O(m)}
+ 
+}{O(m)}
+
+\algoritmo{auxDefinido?}{in/out d:estr, in n:nat}{res:bool}{
   \State $nodoActual \larr d$ 
   \complejidad{O(1)}
   \State $res \larr FALSE$ 
@@ -231,4 +281,63 @@ $arbol(n) \equiv $
   \EndWhile
 }{O(m)}
 
+
+\algoritmo{iDiccClaves}{in/out d:diccNat, in n:nat}{res:itLista(nat)}{
+  \State $res \larr CrearIt(\pi_2(d))$ 
+  
+}{O(m)}
+
+\algoritmo{iMaximo}{in/out d:diccNat}{res:nat}{
+ 	
+ 	\If {$\pi_1(d).hijoDer \neq NULL$}
+ 	
+	 	\State $aux \larr \pi_1(d).hijoDer$
+    		\complejidad{O(1)}
+    	
+    		\While{$aux.hijoDer \neq NULL$}
+    		\complejidad{O(m)}
+    
+   		\State $aux \larr aux.hijoDer$
+    		\complejidad{O(1)}   
+
+    		\EndWhile 
+	
+		\State $res \larr aux.clave$
+		\complejidad{O(1)}
+	
+	\Else
+	
+		\State $res \larr \pi_1(d).clave$
+		\complejidad{O(1)}
+		
+	\EndIf
+	
+}{O(m)}
+
+\algoritmo{iMinimo}{in/out d:diccNat}{res:nat}{
+ 	
+ 	\If {$\pi_1(d).hijoIzq \neq NULL$}
+ 	
+	 	\State $aux \larr \pi_1(d).hijoIzq$
+    		\complejidad{O(1)}
+    	
+    		\While{$aux.hijoIzq \neq NULL$}
+    		\complejidad{O(m)}
+    
+   		\State $aux \larr aux.hijoIzq$
+    		\complejidad{O(1)}   
+
+    		\EndWhile 
+	
+		\State $res \larr aux.clave$
+		\complejidad{O(1)}
+	
+	\Else
+	
+		\State $res \larr \pi_1(d).clave$
+		\complejidad{O(1)}
+		
+	\EndIf
+	
+}{O(m)}
 m: En peor caso es igual a la cantidad de elementos del arbol. En promedio es log(cantidad de elementos del arbol).
