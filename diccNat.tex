@@ -73,7 +73,7 @@ $\textbf{usa}$ Bool
 \subsection{Representación}
 
 diccNat
-\serc{\tupla{raiz: puntero(estr(nat\, \sigma)), claves: lista(nat)}}{
+\serc{\tupla{dicc: puntero(estr(nat\, \sigma)), claves: lista(nat)}}{
 	\\
 	\donde{estr(nat, \sigma)}{\tupla{ clave: nat, significado:\sigma, hijoDer: puntero(estr(nat \sigma)), hijoIzq: puntero(estr(nat \sigma)), itClaves: itLista(nat)}}
 	\\
@@ -83,13 +83,12 @@ diccNat
 
 \subsubsection*{Invariante de representación}
 
-\rep{estr}{e}
-$true \iff ((\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \impluego $\\$
+\rep{diccNat}{e}
+$true \iff ((\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e.dicc) \land n_2 \in arbol(e.dicc) \impluego $\\$
 (n_1.clave < n_2.clave \implies n_1 \in arbol(n_2.hijoIzq)) \land (n_1.clave > n_2.clave \implies n_1 \in arbol(n_2.hijoDer)) \land (\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 \in arbol(e) \in n_1.clave \neq n_2.clave \impluego $\\$ (n_1.hijoIzq = n_2.hijoIzq \lor n_1.hijoIzq = n_2.hijoDer \implies n_1.hijoIzq = NULL) \land $\\$
-(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL) \land $\\
-%$ 
-%((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(e)) \impluego  Pertenece?(e.claves, n.clave) \land $\\$
-%(\paratodo{nat}{k})(k \in e.claves) \implies (\exists n: estr(nat, \sigma))(n \in arbol(e) \land n.clave = k)))$
+(n_1.hijoDer = n_2.hijoIzq \lor n_1.hijoDer = n_2.hijoDer \implies n_1.hijoDer = NULL) \land $\\$ 
+((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(e.dicc)) \impluego  Esta?(e.claves, n.clave)) \land $\\$
+((\paratodo{nat}{k})(k \in e.claves) \implies (\exists n: estr(nat, \sigma))(n \in arbol(e) \land n.clave = k)))$
 \begin{enumerate}
 \item Para todo hijoDer de un estr, si no es NULL, su clave es mayor a la clave de su padre.
 \item Para todo hijoIzq de un estr, si no es NULL, su clave es menor a la clave de su padre.
@@ -100,7 +99,7 @@ $true \iff ((\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e) \land n_2 
 
 \subsubsection*{Función de abstracción}
 \abs{diccNat(nat, \sigma)}{dicc(nat, \sigma)}{d}{c}
-$((\paratodo{nat}{k})( k \in claves(c) \implies $\\$(\exists n: estr(nat, \sigma))(n \in arbol(d) \land n.clave = k) \land (k \in d.diccClaves)) \land $\\$((\paratodo{nat}{k})(k \in d.diccClaves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d) \implies obtener(c,n.clave) \igobs n.significado)$
+$((\paratodo{nat}{k})( k \in claves(c) \implies $\\$(\exists n: estr(nat, \sigma))(n \in arbol(d.dicc) \land n.clave = k) \land (k \in d.Claves)) \land $\\$((\paratodo{nat}{k})(k \in d.Claves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d.dicc) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d.dicc) \implies obtener(c,n.clave) \igobs n.significado)$
   
 $arbol: puntero(estr(nat, \sigma)) \larr conj(puntero(estr(nat, \sigma)))$
 
