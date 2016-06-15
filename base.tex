@@ -20,7 +20,7 @@ $\textbf{usa}$
 
 %%%%%% observadores basicos %%%%%%
 
-\operacion{tablas}{in b: base }{res : conj(string)}
+\operacion{tablas}{in b: base }{res : ItConjString(NombreTabla)}
  {true}
  {$res \igobs nombre(t)$}
  {Devuelve el nombre de la tabla ingresada por parametro.}
@@ -363,6 +363,22 @@ $\textbf{usa}$
 }{O(1)}
 
 
+% \operacion{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(registro)}
+% {t$\in$tablas(b)}
+% {$res \igobs tablaMaxima(t\,b)$}
+% {Retorna ...}
+% {O($calcular$)}
+% {Se retorna el nombre de la tabla por referencia.}
+\algoritmo{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(ItConj(registro))}{
+	\State
+	\If{Pertenece?(b.Joins, $\langle t1, t2\rangle$  )}
+			\State	Borrar(b.Joins, $\langle t1, t2\rangle$ )
+	\Else
+			\If{Pertenece?(b.Joins, $\langle t2, t1\rangle$ )}
+					\State	Borrar(b.Joins, $\langle t2, t1\rangle$)
+			\EndIf
+	\EndIf
+}{O(1)}
 
 %\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{
 %  \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}

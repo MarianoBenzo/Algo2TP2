@@ -387,7 +387,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 					\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceS))
 				\EndIf
 				\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
-				t.\#Accesos++
+				\State t.\#Accesos++
 		\EndIf
 	\Else
 		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
@@ -404,7 +404,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 							\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceN))\complejidad{$\theta$(Log(n))}
 						\EndIf
 						\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
-						t.\#Accesos++
+						\State t.\#Accesos++
 				\EndIf
 						%ya tengo el indice ahora pregunto si ese valor de dato esta definido
 		\Else
@@ -415,8 +415,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 					\If{valorR=valor}
 						\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
 						\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
-						t.\#Accesos++
-					
+						\State t.\#Accesos++
 					\EndIf
 					\State Avanzar(cr)													\complejidad{$\theta$(1)}
 			\EndWhile
@@ -429,6 +428,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 		\EndIf
 	\EndIf
 }{O(n)}
+
 \newpage
 \algoritmo{indexar}{in c: campo, in/out t: tab}{}{
 	\If{tipoCampo(c,t)}
@@ -568,7 +568,17 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 % {Retorna res por referencia,.}
 
  \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(registro)}{
- 	\State Conj(registro) salida	$\larr$ Vacio()
+ 	\State Conj(registro) salida	$\larr$ Vacio() \complejidad{$\theta$(1)}
+	\State Debemos comparar todos los registros de cr.
+	\State y agregarlos al conjunto de registros salida
+  	\State 	itcr $\larr$ CrearItConj(cr)						
+  	\While{HaySiguiente(cr)}							\complejidad{$\theta$(Cardinal(cr))}
+				\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
+								\State	AgregarRapido(salida,Siguiente(itcr)) 						\complejidad{$\theta$(1)}
+				\EndIf				
+				\State	Avanzar(itcr);																\complejidad{$\theta$(1)}
+	\EndWhile   
+ }{O(Cardinal(cr))}
 %	\If{Cardinal(Indices(t))$\geq$1}
 %	\State Si hay indice, obtengo los valores de crit para los campos de los indices que existan
 %		\If{t.IndiceS.EnUso}
@@ -608,26 +618,57 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %		\State los registros que tienen los mismos datos para los campos de los indices
 %		\State correspondientes.
 %	\EndIf
-	\State Debemos comparar todos los registros de cr.
-	\State y agregarlos al conjunto de registros salida
-  	\State 	itcr $\larr$ CrearItConj(cr)						
-  	\While{HaySiguiente(cr)}							\complejidad{$\theta$(Cardinal(cr))}
-				\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
-								\State	AgregarRapido(salida,Siguiente(itcr)) 						\complejidad{$\theta$(1)}
-				\EndIf				
-				\State	Avanzar(itcr);																\complejidad{$\theta$(1)}
-	\EndWhile   
- }{O(Cardinal(cr))}
 
-
+\newpage
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
 	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{$\theta$(1)}  
-	\State	copiacr2 $\larr$ Copiar(cr2)		\complejidad{$\theta$(Cardinal(cr2))}  
-  	\While{HaySiguiente(itcr1)}         \complejidad{$\theta$(Cardinal(cr1))}
-		\State	combinarTodos(c,Siguiente(itcr1),copiacr2) \complejidad{$\theta$(1)}	%combinarTodos deberia hacer por copia asi no afecta el original.
-				\State	Avanzar(itcr1) 					\complejidad{$\theta$(1)}  
-	\EndWhile   
-  	\State	res $\larr$ copiacr2                      \complejidad{$\theta$(1)}
+	\State	Se me ocurre hacer un DiccString o DiccNat, dependiendo de tipo sea el campo c, de manera que combinar todos sea complejidad O(Log(Cardinal(cr2))).
+	\State	Lo malo es que combinarRegistros sera O(Cardinal(cr2)*Log(Cardinal(cr2)))
+	\If{Cardinal(cr2)$\geq$1}\complejidad{$\theta$(1)}  
+		Registro rtemp $\larr$ Siguiente(CrearIt(cr2))\complejidad{$\theta$(1)}  
+		Tipo rac $\larr$ Tipo?(Significado(rtemp, c))\complejidad{$\theta$(1)}  
+		\If{rac} \complejidad{$\theta$(1)}  
+			\State	Caso Natural
+			\State	DiccNat(Nat, Conj(registro)) d $\larr$ vacio() \complejidad{$\theta$(1)}  
+			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{$\theta$(1)}  
+			\While{HaySiguiente?(itcr2)}\complejidad{$\theta$(1)}  
+					\State Dato valor $\larr$ Obtener(Siguiente(itcr2), c) \complejidad{O(1)}
+					\If{Definido?(d, ValorNat(valor))}  \complejidad{O(Cardinal(cr2))}
+						\State	cjViejo $\larr$ Significado(d, ValorNat(valor)) \complejidad{O(Cardinal(cr2))}
+						\State	AgregarRapido(d, Siguiente(itcr2)) \complejidad{O(1)}
+					\Else
+						\State	ConjNat(registro) cjNuevo $\larr$ vacio() \complejidad{O(1)}
+						\State	AgregarRapido(d, Siguiente(itcr2)) \complejidad{O(1)}
+						\State	Definir(d, ValorNat(valor), cjNuevo)\complejidad{O(Cardinal(cr2))}
+					\EndIf
+					\State	Avanzar(itcr2)\complejidad{O(1)}
+			\EndWhile
+		\Else
+			\State	Caso String
+			\State	DiccString(String, Conj(registro)) d $\larr$ vacio() \complejidad{$\theta$(1)}  
+			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{$\theta$(1)}  
+			\While{HaySiguiente?(itcr2)}\complejidad{$\theta$(1)}  
+					\State Dato valor $\larr$ Obtener(Siguiente(itcr2), c) \complejidad{O(1)}
+					\If{Definido?(d, ValorString(valor))}  \complejidad{O(Cardinal(cr2))}
+						\State	cjViejo $\larr$ Significado(d, ValorString(valor)) \complejidad{O(Cardinal(cr2))}
+						\State	AgregarRapido(d, Siguiente(itcr2)) \complejidad{O(1)}
+					\Else
+						\State	ConjString(registro) cjNuevo $\larr$ vacio() \complejidad{O(1)}
+						\State	AgregarRapido(d, Siguiente(itcr2)) \complejidad{O(1)}
+						\State	Definir(d, ValorString(valor), cjNuevo)\complejidad{O(Cardinal(cr2))}
+					\EndIf
+					\State	Avanzar(itcr2)\complejidad{O(1)}
+			\EndWhile
+		\EndIf	
+		\State itcr1 $\larr$ CrearIt(cr1) \complejidad{O(1)} 
+		\State res $\larr$ vacio()
+	  	\While{HaySiguiente(itcr1)}         \complejidad{$\theta$(Cardinal(cr1))}
+			\State	AgregarRapido(res, combinarTodos(c,Siguiente(itcr1),cr2)) \complejidad{$\theta$(vvv)}	
+			\State	Avanzar(itcr1) 					\complejidad{O(1)}  
+		\EndWhile   
+	\Else
+		\State res $\larr$ vacio()
+	\EndIf
 }{O(Cardinal(cr1))}
 
  
@@ -663,7 +704,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 	\State res $\larr$ cjd
 	\State Si la columna es de tipo String, la complejidad es O(n), en caso de ser
 	\State de tipo Nat la complejidad es O(nlog(n)).
-	\State El cardinal de res es la cantidad de datos distintos.
+	\State Donde n es el cardinal de cr	.
 }{O(nlog(n))}
  
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
