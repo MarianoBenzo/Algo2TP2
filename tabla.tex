@@ -262,25 +262,25 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 \subsection{Algoritmos}
 
 \algoritmo{nombre}{in t:tab}{res:string}{
-  \State $res \larr t.Nombre$ \complejidad{O(1)}
+  \State $res \larr t.Nombre$ \complejidad{O(1) por ref}
 }{O(1)}
 
 \algoritmo{claves}{in t:tab}{res:ConjString(campo)}{
-  \State res $\larr$ t.Claves \complejidad{O(1)}
+  \State res $\larr$ t.Claves \complejidad{O(1) por ref}
 }{O(1)}
 
 \algoritmo{indices}{in t:tab}{res:ConjString(campo)}{
-  \State	ConjString(campo)res $\larr$ vacio();
-  \If{t.IndiceS.EnUso}
-		\State AgregarRapido(res, t.IndiceS.CampoI) \complejidad{O(1)}
+  \State	ConjString(campo) res $\larr$ vacio();\complejidad{O(1)}
+  \If{t.IndiceS.EnUso}\complejidad{O(1)}
+		\State AgregarRapido(res, t.IndiceS.CampoI) \complejidad{O(1) por ref}
   \EndIf
-  \If{t.IndiceN.EnUso}
-		\State AgregarRapido(res, t.IndiceN.CampoI) \complejidad{O(1)}
+  \If{t.IndiceN.EnUso}\complejidad{O(1)}
+		\State AgregarRapido(res, t.IndiceN.CampoI) \complejidad{O(1) por ref}
   \EndIf
 }{O(1)}
 
 \algoritmo{campos}{in t:tab}{res:ConjString(campo)}{
-  \State $res \larr Claves(t.Campos)$ \complejidad{O(1)}
+  \State $res \larr DiccClaves(t.Campos)$ \complejidad{O(\# de campos)}
 }{O(1)} % en otras operaciones tiene q figurar ese conjunto
 
 \algoritmo{tipoCampo}{in c:campo, in t:tab}{res:Tipo}{
@@ -288,13 +288,13 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 }{O(1)}
 
  \algoritmo{registros}{in t:tab}{res:Conj(registro)}{
-    \State $res \larr t.registros $ \complejidad{$\theta$(1)}
+    \State $res \larr t.registros $ \complejidad{O(1)}
 	\State Se retorna el conjunto por referencia
- }{$\theta$(1) }
+ }{O(1) }
 
   \algoritmo{cantDeAccesos}{in t:tab}{res:nat}{
-    \State $res \larr t.cantDeAccesos$ \complejidad{$\theta$(1)}
- }{$\theta$(1)}
+    \State $res \larr t.cantDeAccesos$ \complejidad{O(1) por ref}
+ }{O(1)}
  
  %%%%%%%%%%%%% generadores
  
@@ -309,133 +309,219 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 	\State \#Acessos $\larr$ 0 \complejidad{O(1)}
 	\State res $   \larr <  nombre, Registros, Campos, Claves\_, IndiceS, IndiceN, 0  >$ 		\complejidad{O(1)}
 	%Agrego los campos al diccString
-	\State itcampos $\larr$ crearItConj(Campos(columnas)) 				\complejidad{O(1)}
-	\While{HaySiguiente(itcampos)}										\complejidad{O(1)}
+	\State itcampos $\larr$ crearIt(Campos(columnas)) 				\complejidad{O(\# de campos)}
+	\While{HaySiguiente(itcampos)}										\complejidad{O(\# de campos)}
 	\State Este while es O(1) y se debe a que el cardinal de campos a iterar es acotado.			
-					\State	valor $\larr$ Significado(columnas, Siguiente(itcampos)) \complejidad{O(1)}
-					\State	DefinirRapido(res.Campos, Siguiente(itcampos), Tipo?(valor)) \complejidad{O(1)}
+					\State	Dato valor $\larr$ Significado(columnas, Siguiente(itcampos)) \complejidad{O(L)}
+					\State	Definir(res.Campos, Siguiente(itcampos), Tipo?(valor)) \complejidad{O(1)}
 					\State	Avanzar(itcampos) \complejidad{O(1)}
 	\EndWhile \\
 	\State itclaves $\larr$ crearItConj(claves) 				\complejidad{O(1)}
 	\State Paso los campos claves de un conj al conjString
-	\While{HaySiguiente(itclaves)}										\complejidad{O(1)}
-	\State Esto se debe a que \# de campos a iterar es acotada.			
+	\While{HaySiguiente(itclaves)}										\complejidad{O(\# de campos)}	
 					\State	AgregarRapido(res.Claves, Siguiente(itclaves)) \complejidad{O(L)}
 					\State	Avanzar(itcampos) \complejidad{O(1)}
 	\EndWhile
-	\State Donde L es la longitud de la cadena string mas larga y acotada del parametro claves.
-									
- }{$\theta$(1) }
+	\State Donde L es la longitud del valor string mas largo.
+ }{O((\#(campos(columnas))*L) }
  
 \newpage
 \algoritmo{agregarRegistro}{in r: registro, in/out t: tab}{}{
-	\State Para poder acceder al registro, guardo el iterador al elemento
-    \State itConj(Registro) nuevo $\larr$ AgregarRapido(t.Registros,r)	\complejidad{$\theta$(1)}
-    \State t.\#Accesos++																	\complejidad{$\theta$(1)}
-	\State Este registro debe ser indexado, si estos indices existieran.
-	\If{t.IndiceS.EnUso}
-					\State Para el indice traigo el valor del campo con el que se creo.
-					\State valor	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{$\theta$(L)}
-					\If{Definido?(t.IndiceS.Indice, valor)} \complejidad{$\theta$(L)}
-							\State viejo $\larr$ Significado(t.IndiceS.Indice, valor)\complejidad{$\theta$(L)}
-							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(L)}
-					\Else
-							\State viejo $\larr$ Vacio() \complejidad{$\theta$(1)}
-							\State AgregarRapido(viejo, nuevo)\complejidad{$\theta$(L)}
-							\State Definir(t.IndiceS.Indice, ValorString(valor), viejo) \complejidad{$\theta$(L)}
-							\State Como ingresamos un nuevo valor, actualizamos el min y max
-							\If{t.IndiceS.Min$\geq$valor} \complejidad{$\theta$(L)}
-								\State t.IndiceS.Min $\larr$ Copiar(valor)\complejidad{$\theta$(L)}
-							\EndIf
-							\If{valor$\geq$t.IndiceS.Max}\complejidad{$\theta$(L)}
-								\State t.IndiceS.Max $\larr$ Copiar(valor)\complejidad{$\theta$(L)}
-							\EndIf
-					\EndIf
-	\State Donde L es la longitud del valor string agregado a t.IndiceS						
+	\State Para poder acceder al registro en el conj en O(1), guardo el iterador al elemento
+    \State itConj(Registro) nuevo $\larr$ AgregarRapido(t.Registros,r)	\complejidad{O(1)}
+    \State t.\#Accesos++																	\complejidad{O(1)}
+	\State Este registro debe ser indexado, si algun indice esta en uso.
+%	\State $<$itConj(registro), itConj(registro) $>$ IndS $\larr$$<$nuevo, CrearIt(vacio())$>$
+	\State IndS $\larr$$<$nuevo, CrearIt(vacio()), CrearIt(vacio())$>$
+	\State IndN $\larr$$<$nuevo, CrearIt(vacio()), CrearIt(vacio())$>$
+	\If{t.IndiceS.EnUso $\land$ t.IndiceN.EnUso}
+		\State Dato valorS	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{O(L)}
+		\State Dato valorN	$\larr$	Significado(r, t.IndiceN.CampoI) \complejidad{O(L)}		
+		\State EsClaveS $\larr$ Pertenece?(t.claves, t.IndiceS.campoI)
+		\State EsClaveN $\larr$ Pertenece?(t.claves, t.IndiceN.campoI)
+		\State Bool DefinidoS $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
+		\State Bool DefinidoN $\larr$Definido?(t.IndiceN.Indice, ValorNat(valor))
+		\If{$\neg$DefinidoS $\land$ $\neg$DefinidoN}
+			\State Ambos no estan definidos
+			\State cjS $\larr$ vacio()
+			\State cjN $\larr$ vacio()
+			\State newS $\larr$AgregarRapido(cjS, IndS)			
+			\State newN $\larr$AgregarRapido(cjN, IndN)			
+			\State $\pi_2$(Siguiente(newS)) $\larr$ newN
+			\State $\pi_3$(Siguiente(newS)) $\larr$ newS
+			\State $\pi_2$(Siguiente(newN)) $\larr$ newS
+			\State $\pi_3$(Siguiente(newN)) $\larr$ newN
+		\Else
+			\If{DefinidoS $\land$ $\neg$DefinidoN}
+				\State
+			\EndIf
+%			\State Bool DefinidoS $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
+%			\State Bool DefinidoN $\larr$Definido?(t.IndiceN.Indice, ValorNat(valor))
+			
+		\EndIf	
+	\Else
 	\EndIf
-	\If{t.IndiceN.EnUso}
-					\State Para el indice traigo el valor del campo con el que se creo.
-					\State valor	$\larr$	Significado(r, t.IndiceN.CampoI) \complejidad{$\theta$(Log(n)}
-					\If{Definido?(t.IndiceN.Indice, valor)} \complejidad{$\theta$(log(n))}
-							\State viejo $\larr$ Significado(t.IndiceN.Indice, valor)\complejidad{$\theta$(1)}
-							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
-					\Else
-							\State viejo $\larr$ Vacio() \complejidad{$\theta$(1)}
-							\State AgregarRapido(viejo, nuevo) \complejidad{$\theta$(1)}
-							\State Definir(t.IndiceN.Indice, valor, viejo) \complejidad{$\theta$(Log(n))}
-							\State Como ingresamos un nuevo valor, actualizamos el min y max
-							\If{t.IndiceN.Min$\geq$valor} \complejidad{$\theta$(1)}
-								\State t.IndiceS.Min $\larr$ Copiar(valor)\complejidad{$\theta$(1)}
-							\EndIf
-							\If{valor$\geq$t.IndiceS.Max}\complejidad{$\theta$(1)}
-								\State t.IndiceN.Max $\larr$ Copiar(valor)\complejidad{$\theta$(1)}
-							\EndIf
-					\EndIf
-	\EndIf
-	\State Donde n es la cantidad de registros y L es la longitudad maxima de un valor String.						
-}{$\theta$(Log(n))}
+}{O(L+Log(n))}
+%	\If{t.IndiceS.EnUso}
+%					\State Obtengo de r el valor del campo con el que se creo el indice.
+%					\State Dato valor	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{O(L)}
+%					\State Bool Def $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
+%					\If{Def} \complejidad{O(1)}
+%							\State	Si esta definido, entonces hay varios registros que cumplen
+%							\State	agrego el iterador al conjunto de que ya estaban.
+%							\State Conj($<$itConj(registro), itConj(registro)$>$) viejo
+%							\State viejo $\larr$ Significado(t.IndiceS.Indice, valor)\complejidad{O(L)}
+%							\State itConj(registro)AgregarRapido(viejo, nuevo) \complejidad{O(L)}
+%					\Else
+%							\State Conj(Registro) viejo $\larr$ Vacio() \complejidad{O(1)}
+%							\State AgregarRapido(viejo, nuevo)\complejidad{O(1)}
+%							\State Definir(t.IndiceS.Indice, ValorString(valor), viejo) \complejidad{O(L)}
+%							\State Como ingresamos un nuevo valor, actualizamos el min y max
+%							\If{t.IndiceS.Min $>$ valor} \complejidad{O(L)}
+%								\State t.IndiceS.Min $\larr$ valor\complejidad{O(L)}
+%							\EndIf
+%							\If{valor $>$ t.IndiceS.Max}\complejidad{O(L)}
+%								\State t.IndiceS.Max $\larr$ valor\complejidad{O(L)}
+%							\EndIf
+%					\EndIf
+%	\State Donde L es la longitud del valor string agregado a t.IndiceS						
+%	\EndIf
+%	\If{t.IndiceN.EnUso}
+%					\State Obtengo de r el valor del campo con el que se creo el indice.
+%					\State Dato valor $\larr$ Significado(r, t.IndiceN.CampoI) \complejidad{O(L)}
+%					\State Bool Def $\larr$ Definido?(t.IndiceN.Indice, ValorNat(valor))\complejidad{O(log(n))}
+%					\If{Def} 
+%							\State Conj(Registro) viejo $\larr$ Significado(t.IndiceN.Indice, ValorNat(valor))\complejidad{O(log(n))}									
+%							\State AgregarRapido(viejo, nuevo) \complejidad{O(1)}
+%					\Else
+%							\State Conj(Registro) viejo $\larr$ Vacio() \complejidad{O(1)}
+%							\State AgregarRapido(viejo, nuevo) \complejidad{O(1)}
+%							\State Definir(t.IndiceN.Indice, ValorNat(valor), viejo) \complejidad{O(Log(n))}
+%							\State Como ingresamos un nuevo valor, actualizamos el min y max
+%							\If{t.IndiceN.Min $>$ valor} \complejidad{O(1)}
+%								\State t.IndiceS.Min $\larr$ valor\complejidad{O(1)}
+%							\EndIf
+%							\If{valor $>$ t.IndiceS.Max}\complejidad{O(1)}
+%								\State t.IndiceN.Max $\larr$ valor\complejidad{O(1)}
+%							\EndIf
+%					\EndIf
+%	\EndIf
+%	\State Donde n es la cantidad de registros y L es la longitud maxima de un valor String.						
+%	\State La complejidad depende del si hay o no indices, si ambos estan en uso. Si solo el
+%	\State indice String esta en uso es O(L), si en cambio solo esta en uso el indice Natural
+%	\State es O(Log(n)). Si ambos estan en uso es O(L+Log(n)) en peor caso.
+%}{O(L+Log(n))}
 
 \newpage
-\algoritmo{borrarRegistro}{in crit: registro,in/out t: tab}{}{
-	\State	Campo c $\larr$ Siguiente(CrearIt(Campos(crit)))	\complejidad{$\theta$(1)} %chequear
-	\State 	Dato valor $\larr$	Copiar(Significado(crit, c))			\complejidad{$\theta$(L)}
-	\State Sabemos que c esta incluido en claves(t)
-	\State si hay un indice de un campo clave borrar es O(log(n)) u O(L) en peor caso
-	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
-		\State String S $\larr$ ValorString(valor) 
-		\If{Definido?(t.IndiceS.Indice, S)}				\State	itConj(registro) itr $\larr$ Significado(t.IndiceS.Indice, S) 																																\complejidad{$\theta$(1)}
-				\State Borro el registro del conjunto de registros
-				\State EliminarSiguiente(itr) \complejidad{$\theta$(1)}
-				\State Borro el registro del indice,
-				\State Borrar(t.IndiceS.Indice, S) \complejidad{$\theta$(1)}
-				\If{t.IndiceS.Min=valor}
-					\State t.IndiceS.Min$\larr$ Minimo(Claves(t.IndiceS))
-				\EndIf
-				\If{t.IndiceS.Max=valor}
-					\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceS))
-				\EndIf
-				\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
-				\State t.\#Accesos++
-		\EndIf
-	\Else
-		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
-				\State N $\larr$ ValorNat(valor)
-				\If{Definido?(t.IndiceN.Indice, valor)}
-						\State	itConj(registro) itr $\larr$ Significado(t.IndiceN.Indice, valor) 		                        																									\complejidad{$\theta$(1)}
-						% Borro el registro del indice,
-						\State	EliminarSiguiente(itr) \complejidad{$\theta$(1)}
-						\State	Borrar(t.IndiceN.Indice, valor) \complejidad{$\theta$(1)}
-						\If{t.IndiceN.Min=valor} \complejidad{$\theta$(1)}
-							\State t.IndiceS.Min$\larr$ Minimo(Claves(t.IndiceN)) \complejidad{$\theta$(Log(n))}
-						\EndIf
-						\If{t.IndiceN.Max=valor} \complejidad{$\theta$(1)}
-							\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceN))\complejidad{$\theta$(Log(n))}
-						\EndIf
-						\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
-						\State t.\#Accesos++
-				\EndIf
-						%ya tengo el indice ahora pregunto si ese valor de dato esta definido
-		\Else
-			\State No hay indice para el campo clave de criterio pasado por parametro
-			\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{$\theta$(1)}
-			\While{HaySiguiente(cr)}\complejidad{$\theta$(Cardinal(t.registros))}
-					\State valorR $\larr$ Significado(Siguiente(cr), c)		\complejidad{$\theta$(1)}
-					\If{valorR=valor}
-						\State EliminarSiguiente(cr);									\complejidad{$\theta$(1)}
-						\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
-						\State t.\#Accesos++
-					\EndIf
-					\State Avanzar(cr)													\complejidad{$\theta$(1)}
-			\EndWhile
-			\State La complejidad de la operacion borrar depende de si hay o no indices
-			\State para el campo del crit pasado por parametro.
-			\State En caso de que exista dicho indice, en peor caso eliminar es O(Log(n)) u O(L)
-			\State siendo n la cantidad de registros de la tabla pasada por parametro y L
-			\State el valor string mas largo definido en la tabla.
-			\State En caso de no haber tal indice es O(n).			
-		\EndIf
-	\EndIf
-}{O(n)}
+\algoritmo{borrarRegistro}{in crit: registro,in/out t: tab}{}{}{O(n)}
+%	\State	Campo c $\larr$ Siguiente(CrearIt(Campos(crit)))	\complejidad{O(1)} %chequear
+%	\State 	Dato valor $\larr$	Copiar(Significado(crit, c))			\complejidad{O(L)}
+%	\State Sabemos que c esta incluido en claves(t) y crit tiene solo un campo.
+%	\State Si hay un indice para el campo clave c, borrarRegistro es O(log(n)) u O(L) en peor caso.
+%	\State Tenemos en cuenta que se borra en base a un campo clave, se borra solo un registro.
+%	\If{t.IndiceS.EnUso $\lor$t.IndiceN.EnUso}
+%	\State Caso: Hay algun indice en uso.
+%		\If{t.IndiceS.CampoI=c $\lor$ t.IndiceN.CampoI=c}
+%		\State Caso: Hay algun indice basado en el campo c de crit.
+%			\If{t.IndiceS.CampoI=c}
+%			\State Sabemos que c es un campo clave. Entonces eliminamos solo un reg.
+%				\State ItConj(registro) itr Significado(t.IndiceS.Indice, ValorString(valor))
+%				\State Registro r $\larr$ Siguiente(itr)
+%				\State Borro el registro del conj(registro)
+%				\State EliminarSiguiente(itr)
+%				\State Borro la clave ValorString(valor) del indice
+%				\State Borrar(t.IndiceS.Indice, ValorString(valor))
+%				\State Hecho todo esto puede suceder que el Indice de Nat este en uso
+%				\If{t.IndiceN.EnUso}
+%				\State Si esta en uso, el campo del indice no es c,
+%				\State t.IndiceN.CampoI puede ser clave o no.
+%					\State Dato valorN  $\larr$ Obtener(r, t.IndiceN.CampoI)
+%					\If{Pertenece?(t.claves, t.IndiceN.CampoI)}
+%						\State El campo es clave, entonces elimino solo un registro
+%						\State o sea elimino la entrada del diccionario.
+%						\State Borrar(t.IndiceN.Indice, ValorNat(valor))
+%					\Else
+%						\State El campo no es clave, tengo que recorrer el conj(itConj(registro)),
+%						\State sabemos que los valores Nat se insertan 
+%						\State y borran con distribucion uniforme.
+%					\EndIf
+%				\Else
+%				\EndIf
+%			\Else
+%			\EndIf
+%		\Else
+%		\EndIf	
+%	\Else
+%	\EndIf
+%	
+%	
+%	\If{t.IndiceS.EnUso $\yluego$ t.IndiceS.CampoI=c}
+%		\State Caso en el que hay un indice String en uso
+%		\State String S $\larr$ ValorString(valor) 
+%		\If{Definido?(t.IndiceS.Indice, S)}				
+%			\State Conj(itConj(registro)) cj $\larr$ Significado(t.IndiceS.Indice, S) \complejidad{O(L)}
+%			\State ItConj(Conj(itConj(registro))) itcj $\larr$ CrearIt(cj) \complejidad{O(1)}
+%			\State itConj(registro) elem $\larr$ Siguiente(itcj)
+%			\State Borro el registro del conjunto de t.registros
+%			\State EliminarSiguiente(elem) \complejidad{O(1)}
+%			\State Borro la clave S que contiene el conjunto con el iterador al registro.
+%			\State Borrar(t.IndiceS.Indice, S) \complejidad{O(L)}
+%			\If{t.IndiceS.Min=valor}
+%				\State t.IndiceS.Min$\larr$ Minimo(Claves(t.IndiceS))
+%			\EndIf
+%			\If{t.IndiceS.Max=valor}
+%				\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceS))
+%			\EndIf
+%			\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
+%			\State t.\#Accesos++
+%		\EndIf
+%	\EndIf
+%	\State Caso en el que hay un indice de Naturales
+%	\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
+%		\State Nat N $\larr$ ValorNat(valor)
+%		\If{Definido?(t.IndiceN.Indice, valor)}
+%				\State Conj(itConj(registro)) cj $\larr$ Significado(t.IndiceS.Indice, S) \complejidad{O(L)}
+%				\State ItConj(Conj(itConj(registro))) itcj $\larr$ CrearIt(cj) \complejidad{O(1)}
+%				\State itConj(registro) elem $\larr$ Siguiente(itcj)
+%				\State Borro el registro del conjunto de t.registros
+%				\State EliminarSiguiente(elem) \complejidad{O(1)}
+%				\State Borro la clave S que contiene el conjunto con el iterador al registro.
+%
+%				\State	itConj(registro) itr $\larr$ Significado(t.IndiceN.Indice, valor)\complejidad{O(1)}
+%				% Borro el registro del indice,
+%				\State	EliminarSiguiente(itr) \complejidad{O(1)}
+%				\State	Borrar(t.IndiceN.Indice, valor) \complejidad{O(1)}
+%				\If{t.IndiceN.Min=valor} \complejidad{O(1)}
+%					\State t.IndiceS.Min$\larr$ Minimo(Claves(t.IndiceN)) \complejidad{O(Log(n))}
+%				\EndIf
+%				\If{t.IndiceN.Max=valor} \complejidad{O(1)}
+%					\State t.IndiceS.Max$\larr$ Maximo(Claves(t.IndiceN))\complejidad{O(Log(n))}
+%				\EndIf
+%				\State Dado que el crit solo tiene un campo clave, siempre elimino un registro.
+%				\State t.\#Accesos++
+%		\EndIf
+%	\EndIf
+%		\Else
+%			\State No hay indice para el campo clave de criterio pasado por parametro
+%			\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{O(1)}
+%			\While{HaySiguiente(cr)}\complejidad{O(Cardinal(t.registros))}
+%					\State valorR $\larr$ Significado(Siguiente(cr), c)		\complejidad{O(1)}
+%					\If{valorR=valor}
+%						\State EliminarSiguiente(cr);									\complejidad{O(1)}
+%						\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
+%						\State t.\#Accesos++
+%					\EndIf
+%					\State Avanzar(cr)													\complejidad{O(1)}
+%			\EndWhile
+%			\State La complejidad de la operacion borrar depende de si hay o no indices
+%			\State para el campo del crit pasado por parametro.
+%			\State En caso de que exista dicho indice, en peor caso eliminar es O(Log(n)) u O(L)
+%			\State siendo n la cantidad de registros de la tabla pasada por parametro y L
+%			\State el valor string mas largo definido en la tabla.
+%			\State En caso de no haber tal indice es O(n).			
+%		\EndIf
+%	\EndIf
+%}{O(n)}
 
 \newpage
 \algoritmo{indexar}{in c: campo, in/out t: tab}{}{
@@ -475,25 +561,25 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 						\State	Avanzar(cr)
 			\EndWhile	
 	\EndIf
-}{$\theta$(1)}
+}{O(1)}
 
   \algoritmo{puedoInsertar?}{in r:registro, in t:tab}{res:bool}{
-    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, r.ClavesDicc, registros(t)  )  \complejidad{$\theta$(calcular))}
- }{$\theta$(calcular)}
+    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, r.ClavesDicc, registros(t)  )  \complejidad{O(calcular))}
+ }{O(calcular)}
 
 
   \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
   		\State bool valor $\larr$ True
  		\If{Cardinal(campos(r))=Cardinal(t.Campos.DiccClaves)}
 				  \State itcampos $\larr$ CrearItString(t.Campos.DiccClaves)
-				  \While{valor $\land$ HaySiguiente(itcampos)} \complejidad{$\theta$(1)}
-				  			\State Campo c $\larr$ Siguiente(itcampos) \complejidad{$\theta$(1)}
-							\State valor $\larr$ Definido?(r, c) \complejidad{$\theta$(1)}
+				  \While{valor $\land$ HaySiguiente(itcampos)} \complejidad{O(1)}
+				  			\State Campo c $\larr$ Siguiente(itcampos) \complejidad{O(1)}
+							\State valor $\larr$ Definido?(r, c) \complejidad{O(1)}
 				  \EndWhile
 		\Else
-					\State valor $	\larr$ False  \complejidad{$\theta$(1)}
+					\State valor $	\larr$ False  \complejidad{O(1)}
  		\EndIf
- 		\State res $\larr$ valor  $\yluego$ mismosTipos(r,t)  \complejidad{$\theta$(1)}	
+ 		\State res $\larr$ valor  $\yluego$ mismosTipos(r,t)  \complejidad{O(1)}	
  		\State El costo del While es O(1) ya que la cantidad de campos de la tabla es acotado
  }{O($1$)}
 
@@ -504,11 +590,11 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 	\State	Si hay indice en el campo c, debe ser de complejidad O(1)
 	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
 		\State	Sabemos que hay un indice string para el campo c
-		\State	res $\larr$ t.IndiceS.Min \complejidad{$\theta$(Cardinal(t.registros))}
+		\State	res $\larr$ t.IndiceS.Min \complejidad{O(Cardinal(t.registros))}
 	\Else
 		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
 			\State	Sabemos que hay un indice string para el campo c
-			\State	res $\larr$ t.IndiceN.Min\complejidad{$\theta$(Cardinal(t.registros))}
+			\State	res $\larr$ t.IndiceN.Min\complejidad{O(Cardinal(t.registros))}
 %		\Else
 %			\State	Si no hay indice para este campo hay que buscar el valor en O(n)
 %			\State	ItConj(Registro) itr $\larr$ t.Registros
@@ -522,18 +608,18 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %			\EndWhile
 		\EndIf
 	\EndIf
-%  	\State 	res $\larr$ min( dameColumna(  c, t.registros  ))\complejidad{$\theta$(Cardinal(t.registros))}
+%  	\State 	res $\larr$ min( dameColumna(  c, t.registros  ))\complejidad{O(Cardinal(t.registros))}
  }{O(1)}
  
    \algoritmo{maximo}{in c:campo, in t:tab}{res:dato}{
 	\State	Si hay indice en el campo c, debe ser de complejidad O(1)
 	\If{t.IndiceS.EnUso $\land$ t.IndiceS.CampoI=c}
 		\State	Sabemos que hay un indice string para el campo c
-		\State	res $\larr$ t.IndiceS.Max \complejidad{$\theta$(Cardinal(t.registros))}
+		\State	res $\larr$ t.IndiceS.Max \complejidad{O(Cardinal(t.registros))}
 	\Else
 		\If{t.IndiceN.EnUso $\land$ t.IndiceN.CampoI=c}
 			\State	Sabemos que hay un indice string para el campo c
-			\State	res $\larr$ t.IndiceN.Max\complejidad{$\theta$(Cardinal(t.registros))}
+			\State	res $\larr$ t.IndiceN.Max\complejidad{O(Cardinal(t.registros))}
 %		\Else
 %			\State	Si no hay indice para este campo hay que buscar el valor en O(n)
 %			\State	ItConj(Registro) itr $\larr$ t.Registros
@@ -559,11 +645,11 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
 
 \algoritmo{hayCoincidencia}{in r:registro, in cc:ConjString(campo), in cr:Conj(registro)}{res:bool}{
-  	\State	itcr $\larr$ CrearItConj(cr)   \complejidad{$\theta$(1)}  
-    \State	res $\larr$ false                   \complejidad{$\theta$(1)}  
-  	\While{HaySiguiente(itcr)}		\complejidad{$\theta$(Cardinal(cr))}  
-				\State	res $\larr$ 	coincideAlguno(r,cc,Siguiente(itcr)) $\lor$res \complejidad{$\theta$(1)}  
-				\State	Avanzar(itcr) 			\complejidad{$\theta$(1)}  
+  	\State	itcr $\larr$ CrearItConj(cr)   \complejidad{O(1)}  
+    \State	res $\larr$ false                   \complejidad{O(1)}  
+  	\While{HaySiguiente(itcr)}		\complejidad{O(Cardinal(cr))}  
+				\State	res $\larr$ 	coincideAlguno(r,cc,Siguiente(itcr)) $\lor$res \complejidad{O(1)}  
+				\State	Avanzar(itcr) 			\complejidad{O(1)}  
 	\EndWhile   
 }{O(Cardinal(cr))}
 
@@ -576,20 +662,20 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 % {Retorna res por referencia,.}
 
 \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(ItConj(registro))}{
- 	\State Conj(registro) salida	$\larr$ Vacio() \complejidad{$\theta$(1)}
+ 	\State Conj(registro) salida	$\larr$ Vacio() \complejidad{O(1)}
 	\State Debemos comparar todos los registros de cr.
 	\State y agregarlos al conjunto de registros salida
   	\State 	itcr $\larr$ CrearItConj(cr)						
-  	\While{HaySiguiente?(cr)}							\complejidad{$\theta$(Cardinal(cr))}
-		\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{$\theta$(1)}
-				\State	AgregarRapido(salida, CrearIt(Siguiente(itcr))) \complejidad{$\theta$(1)}
+  	\While{HaySiguiente?(cr)}							\complejidad{O(Cardinal(cr))}
+		\If {coincidenTodos(crit,campos(crit),Siguiente(itcr))}  \complejidad{O(1)}
+				\State	AgregarRapido(salida, CrearIt(Siguiente(itcr))) \complejidad{O(1)}
 				
-				\State	AgregarRapido(salida, itcr) \complejidad{$\theta$(1)}
+				\State	AgregarRapido(salida, itcr) \complejidad{O(1)}
 
 		\EndIf				
-		\State	Avanzar(itcr) \complejidad{$\theta$(1)}
+		\State	Avanzar(itcr) \complejidad{O(1)}
 	\EndWhile   
-	\State res $\larr$ salida\complejidad{$\theta$(1)por ref}
+	\State res $\larr$ salida\complejidad{O(1)por ref}
 }{O(Cardinal(cr))}
  
 %	\If{Cardinal(Indices(t))$\geq$1}
@@ -634,17 +720,17 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
 \newpage
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
-	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{$\theta$(1)}  
+	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{O(1)}  
 	\State	Se me ocurre hacer un DiccString o DiccNat, dependiendo de tipo sea el campo c, de manera que combinar todos sea complejidad O(Log(Cardinal(cr2))).
 	\State	Lo malo es que combinarRegistros sera O(Cardinal(cr2)*Log(Cardinal(cr2)))
-	\If{Cardinal(cr2)$\geq$1}\complejidad{$\theta$(1)}  
-		Registro rtemp $\larr$ Siguiente(CrearIt(cr2))\complejidad{$\theta$(1)}  
-		Tipo rac $\larr$ Tipo?(Significado(rtemp, c))\complejidad{$\theta$(1)}  
-		\If{rac} \complejidad{$\theta$(1)}  
+	\If{Cardinal(cr2)$\geq$1}\complejidad{O(1)}  
+		Registro rtemp $\larr$ Siguiente(CrearIt(cr2))\complejidad{O(1)}  
+		Tipo rac $\larr$ Tipo?(Significado(rtemp, c))\complejidad{O(1)}  
+		\If{rac} \complejidad{O(1)}  
 			\State	Caso Natural
-			\State	DiccNat(Nat, Conj(registro)) d $\larr$ vacio() \complejidad{$\theta$(1)}  
-			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{$\theta$(1)}  
-			\While{HaySiguiente?(itcr2)}\complejidad{$\theta$(1)}  
+			\State	DiccNat(Nat, Conj(registro)) d $\larr$ vacio() \complejidad{O(1)}  
+			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{O(1)}  
+			\While{HaySiguiente?(itcr2)}\complejidad{O(1)}  
 					\State Dato valor $\larr$ Obtener(Siguiente(itcr2), c) \complejidad{O(1)}
 					\If{Definido?(d, ValorNat(valor))}  \complejidad{O(Cardinal(cr2))}
 						\State	cjViejo $\larr$ Significado(d, ValorNat(valor)) \complejidad{O(Cardinal(cr2))}
@@ -658,9 +744,9 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 			\EndWhile
 		\Else
 			\State	Caso String
-			\State	DiccString(String, Conj(registro)) d $\larr$ vacio() \complejidad{$\theta$(1)}  
-			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{$\theta$(1)}  
-			\While{HaySiguiente?(itcr2)}\complejidad{$\theta$(1)}  
+			\State	DiccString(String, Conj(registro)) d $\larr$ vacio() \complejidad{O(1)}  
+			\State	itcr2 $\larr$ CrearIt(cr2)\complejidad{O(1)}  
+			\While{HaySiguiente?(itcr2)}\complejidad{O(1)}  
 					\State Dato valor $\larr$ Obtener(Siguiente(itcr2), c) \complejidad{O(1)}
 					\If{Definido?(d, ValorString(valor))}  \complejidad{O(Cardinal(cr2))}
 						\State	cjViejo $\larr$ Significado(d, ValorString(valor)) \complejidad{O(Cardinal(cr2))}
@@ -675,8 +761,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 		\EndIf	
 		\State itcr1 $\larr$ CrearIt(cr1) \complejidad{O(1)} 
 		\State res $\larr$ vacio()
-	  	\While{HaySiguiente(itcr1)}         \complejidad{$\theta$(Cardinal(cr1))}
-			\State	AgregarRapido(res, combinarTodos(c,Siguiente(itcr1),cr2)) \complejidad{$\theta$(vvv)}	
+	  	\While{HaySiguiente(itcr1)}         \complejidad{O(Cardinal(cr1))}
+			\State	AgregarRapido(res, combinarTodos(c,Siguiente(itcr1),cr2)) \complejidad{O(vvv)}	
 			\State	Avanzar(itcr1) 					\complejidad{O(1)}  
 		\EndWhile   
 	\Else
@@ -686,32 +772,32 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
  
 \algoritmo{dameColumna}{in c:campo, in cr:Conj(registro)}{res:Conj(dato)}{
-  	\State 	Conj(Dato)	cj $\larr$ vacio();				\complejidad{$\theta$(1)}
+  	\State 	Conj(Dato)	cj $\larr$ vacio();				\complejidad{O(1)}
 	\State	La idea es no agregar el mismo dato dos veces, para eso uso un conj
 	\State	del tipo de dato de la columna para hacer consulta.
-	\If{Cardinal(cr)$\geq$1}\complejidad{$\theta$(1)}		
-			\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(CrearIt(cr))), c)\complejidad{$\theta$(1)}		
+	\If{Cardinal(cr)$\geq$1}\complejidad{O(1)}		
+			\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(CrearIt(cr))), c)\complejidad{O(1)}		
 			\If{Tvalor}
-					\State	ConjLog(nat) cj $\larr$ Vacio()\complejidad{$\theta$(1)}		
+					\State	ConjLog(nat) cj $\larr$ Vacio()\complejidad{O(1)}		
 			\Else
-					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{$\theta$(1)}		
+					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{O(1)}		
 			\EndIf
-			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{$\theta$(1)}		
+			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{O(1)}		
 			\State	cjd $\larr$ Vacio()
-		  	\While{HaySiguiente(itcr)}						\complejidad{$\theta$(Cardinal(cr))}
+		  	\While{HaySiguiente(itcr)}						\complejidad{O(Cardinal(cr))}
 		  				\State Dato data $\larr$ Significado(Siguiente(itcr), c)
 		  				\If{Tvalor}
-		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{$\theta$(Log(n))}
-										\State 	AgregarRapido(cjd, data)\complejidad{$\theta$(1)}
-										\State	AgregarRapido(cj, valorNat(data))\complejidad{$\theta$(1)}
+		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{O(Log(n))}
+										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
+										\State	AgregarRapido(cj, valorNat(data))\complejidad{O(1)}
 								\EndIf	
 						\Else
-		  						\If {$\neg$Pertenece?(cj, valorString(data))}\complejidad{$\theta$(1)}
-										\State 	AgregarRapido(cjd, data)\complejidad{$\theta$(1)}
-										\State	AgregarRapido(cj, valorString(data))\complejidad{$\theta$(1)}
+		  						\If {$\neg$Pertenece?(cj, valorString(data))}\complejidad{O(1)}
+										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
+										\State	AgregarRapido(cj, valorString(data))\complejidad{O(1)}
 								\EndIf	
 						\EndIf
-				\State	Avanzar(itcr);							\complejidad{$\theta$(1)}
+				\State	Avanzar(itcr);							\complejidad{O(1)}
 			\EndWhile     	
 	\EndIf
 	\State res $\larr$ cjd
@@ -721,13 +807,13 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 }{O(nlog(n))}
  
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
-  	\State 	valor $\larr$ True										\complejidad{$\theta$(1)}
-  	\State 	itconjClaves $\larr$ CrearItConj(r.ClavesDicc) \complejidad{$\theta$(1)}
-  	\While{valor $\land$ HaySiguiente(itconjClaves)}				\complejidad{$\theta$(1)}
-  					\State	val1$\larr$ tipo?(Significado(r,Siguiente(itconjClaves))) \complejidad{$\theta$(1)}
-  					\State	val2$\larr$ tipoCampo(Siguiente(itconjClaves),t)	\complejidad{$\theta$(1)}
-					\State	valor $\larr$ (val1 = val2)	\complejidad{$\theta$(1)}
-					\State	Avanzar(cr);								\complejidad{$\theta$(1)}
+  	\State 	valor $\larr$ True										\complejidad{O(1)}
+  	\State 	itconjClaves $\larr$ CrearItConj(r.ClavesDicc) \complejidad{O(1)}
+  	\While{valor $\land$ HaySiguiente(itconjClaves)}				\complejidad{O(1)}
+  					\State	val1$\larr$ tipo?(Significado(r,Siguiente(itconjClaves))) \complejidad{O(1)}
+  					\State	val2$\larr$ tipoCampo(Siguiente(itconjClaves),t)	\complejidad{O(1)}
+					\State	valor $\larr$ (val1 = val2)	\complejidad{O(1)}
+					\State	Avanzar(cr);								\complejidad{O(1)}
 	\EndWhile     	
 	\State	res $\larr$ valor
  }{O(1)}

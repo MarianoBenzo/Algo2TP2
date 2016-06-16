@@ -3,7 +3,7 @@
 
 %\section{Tipo es Bool}
 
-%\section{Nombre es String}
+\section{NombreTabla es String}
 
 \section{Base de Datos}
 
@@ -151,16 +151,9 @@ $\textbf{usa}$
       								Rcambios: Cola(DatoCambio),
       								campoJ: campo, 
       								campoT: tipo,
-<<<<<<< .mine
-      								JoinS: DiccTrie(string, itConj(registro)),
-      								JoinN: DiccNat(nat, itConj(registro)),
+      								JoinS: DiccTrie(string; itConj(registro)),
+      								JoinN: DiccNat(nat; itConj(registro)),
       								JoinC: Conj(registro)}}
-=======
-      								JoinS: DiccTrie(string, itConj(registro)),
-      								JoinN: DiccNat(nat, itConj(registro)),
-      								JoinC: Conj(registro),
-      								ValoresN: ConjNat(Nat)}}
->>>>>>> .r40
 		\donde{Tmax}{\tupla{NomTabla: NombreTabla, $\#$Modif: Nat}}
 		\donde{DatoCambio}{\tupla{Reg: Registro, NomOrigen: NombreTabla, Accion: Bool}}
 }
@@ -376,12 +369,12 @@ $\textbf{usa}$
 % {O($calcular$)}
 % {Se retorna el nombre de la tabla por referencia.}
 \algoritmo{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(ItConj(registro))}{
-<<<<<<< .mine
 	\State	Busco los datos de la tabla.
-	\State	info_tabla infot $\larr$ Significado(b.tablas, t) \complejidad{O(1) por ref}
+	\State	info\_tabla infot $\larr$ Significado(b.tablas, t) \complejidad{O(1) por ref}
 	\State	Tabla tab $\larr$ infot.TActual \complejidad{O(1) por ref}
 	\State	res $\larr$ BuscarEnTabla(criterio, tab) 
 }{O(1)}
+
 \newpage
 \algoritmo{vistaJoin}{in t1: string, in t2: string, in/out b: estr}{}{
 	\State	info$\_$tabla	infot1 $\larr$ Significado(b.Tablas, t1)\complejidad{O(1) por ref}
@@ -390,95 +383,158 @@ $\textbf{usa}$
 	\State	Tabla	tab2 $\larr$ infot2.TActual	\complejidad{O(1) por ref}
 	\State	info$\_$join	infoj $\larr$ Significado(infot1.Joins, t2) \complejidad{O(1) por ref}
 	\State	Campo c $\larr$ infoj.campoJ \complejidad{O(1) por ref}
-	\If{Pertenece?(Indices(tab1), c) $\land$ Pertenece?(Indices(tab2), c)} \complejidad{O(1)}
-		\If{infoj.campoT} 
-			\State	Caso Natural
-			\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
-				\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
+	\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
+		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
+		\While{$\neg$EsVacia?(infoj.Rcambios)}
 				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
 				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
 				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
-				\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
-				\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
-				\State	Si data.Accion es True entonces es un agregado de reg,
-				\State	caso contrario si data.Accion es False es un borrado de reg.
-				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
-				\State	Nat key $\larr$ ValorNat(Obtener(r, c))\complejidad{O(Log(n)) por ref}
-				\If{valAccion}
-					\State	Caso agrego un registro que no figura en el join
-					\State	Entonces como se que hay un Indice por ambas tablas,
-					\State	tengo que buscar el registro con el mismo valor de campo clave
-					\State	en la otra tabla.
-					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
-					\State	Armo un registro auxiliar regAux con el campo
+				\If{data.Accion}
+					\State 	Si es True entonces la accion es agregar un registro al join
+					\State 	Para hacer esto necesito saber a que tabla se agrego el registro
+					\State 	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
+					\State 	Sabiendo la tabla de origen, necesito identificar la otra tabla para ver si
+					\State 	hay un registro con el mismo valor para el campo del join.
+					\State	Armo un registro auxiliar regModelo con el campo
 					\State	Dicc(campo,dato) regModelo $\larr$ vacio()
 					\State	Definir(regModelo, c, Significado(r, c))
+					\State	Si hay indice en la tabla para el campo c y ademas es campo clave
+					\State	BuscarEnTabla(tab2, regModelo) tiene complejidad O(L) u O(Log(n))
+					\State	dependiendo del tipo del campo c.
+					\State	Si no hay indice para el campo c entonces BuscarEnTabla(tab2, regModelo)
+					\State	tiene complejidad O(n+m)
 					\If{NomTorigen=t1}
 						\State	Entonces el otro registro lo tengo que buscar en t2
-						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo)
-						\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
+						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
+					\Else
+						\State	Entonces el otro registro lo tengo que buscar en t1
+						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo))
+					\EndIf
+					\State	Registro rnuevo $\larr$ UnirRegistros(r, rotro)
+					\If{info$\_$join.campoT}
+						\State	El tipo del campo es Natural.
 						\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
 						\State	Definir(info$\_$join.JoinN, key, itnew)
 					\Else
-							\State	Entonces el otro registro lo tengo que buscar en t1
-							\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
-							\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
-							\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-							\State	Definir(info$\_$join.JoinN, key, itnew)
-						\EndIf
-					\EndIf
-				\EndIf
-			\EndIf
-		\Else
-			\State	Caso String
-			\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
-				\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
-				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
-				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
-				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
-				\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
-				\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
-				\State	Si data.Accion es True entonces es un agregado de reg,
-				\State	caso contrario si data.Accion es False es un borrado de reg.
-				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
-				\State	String key $\larr$ ValorString(Obtener(r, c))\complejidad{O(Log(n)) por ref}
-				\If{valAccion}
-					\State	Caso agrego un registro que no figura en el join
-					\State	Entonces como se que hay un Indice por ambas tablas,
-					\State	tengo que buscar el registro con el mismo valor de campo clave
-					\State	en la otra tabla.
-					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
-					\State	Armo un registro auxiliar regAux con el campo
-					\State	Registro regModelo $\larr$ vacio()
-					\State	Definir(regModelo, c, Significado(r, c))
-					\If{NomTorigen=t1}
-						\State	Entonces el otro registro lo tengo que buscar en t2
-						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo)
-						\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
+						\State	El tipo del campo es String.
 						\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
 						\State	Definir(info$\_$join.JoinS, key, itnew)
+					\EndIf
+				\Else	CasoBorrado
+					\If{info$\_$join.campoT}
+						\State	El tipo del campo es Natural.
+						\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinN, key)
+						\State	Borrar(info$\_$join.JoinN, key)
+						\State	EliminarSiguiente(itcjr)
 					\Else
-						\State	Entonces el otro registro lo tengo que buscar en t1
-						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
-						\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
-						\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-						\State	Definir(info$\_$join.JoinS, key, itnew)											
+						\State	El tipo del campo es String.
+						\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinN, key)
+						\State	Borrar(info$\_$join.JoinS, key)
+						\State	EliminarSiguiente(itcjr)
 					\EndIf
 				\EndIf
-			\EndIf
-		\EndIf
-	\Else
-		\State Caso: No se cuenta con la existencia de indices en ambas tablas, en base al campo del join
-		\State
-		
+		\EndWhile
 	\EndIf
-=======
-	\State	Busco los datos de la tabla.
-	\State	info_tabla infot $\larr$ Significado(b.tablas, t) \complejidad{O(1) por ref}
-	\State	Tabla tab $\larr$ infot.TActual \complejidad{O(1) por ref}
-	\State	BuscarEnTabla(criterio, tab) 
->>>>>>> .r40
+	\State res $\larr$ info$\_$join.JoinC
 }{O(1)}
+%	
+%	
+%	
+%	
+%		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
+%		\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
+%		\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
+%		\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
+%		\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
+%		\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
+%		\State	Si data.Accion es True entonces es un agregado de reg,
+%		\State	caso contrario si data.Accion es False es un borrado de reg.
+%		\If{infoj.campoT} 
+%			\State	Caso Natural
+%				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
+%				\State	Nat key $\larr$ ValorNat(Obtener(r, c))\complejidad{O(Log(n)) por ref}
+%				\If{valAccion}
+%					\State	Caso agrego un registro que no figura en el join
+%					\State	Entonces como se que hay un Indice por ambas tablas,
+%					\State	tengo que buscar el registro con el mismo valor de campo clave
+%					\State	en la otra tabla.
+%					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
+%					\State	Armo un registro auxiliar regAux con el campo
+%					\State	Dicc(campo,dato) regModelo $\larr$ vacio()
+%					\State	Definir(regModelo, c, Significado(r, c))
+%						\If{NomTorigen=t1}
+%							\State	Entonces el otro registro lo tengo que buscar en t2
+%							\If{Pertenece?(Indices(tab1), c) $\land$ Pertenece?(Indices(tab2), c)} \complejidad{O(1)}
+%									\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
+%						\Else
+%								\State	Entonces el otro registro lo tengo que buscar en t1
+%								\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
+%						\EndIf
+%					\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
+%					\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
+%					\State	Definir(info$\_$join.JoinN, key, itnew)
+%				\Else	CasoBorrado
+%					\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinN, key)
+%					\State	Borrar(info$\_$join.JoinN, key)
+%					\State	EliminarSiguiente(itcjr)
+%				\EndIf
+%			\EndIf
+%		\Else
+%			\State	Caso String
+%			\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
+%				\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
+%				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
+%				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
+%				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
+%				\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
+%				\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
+%				\State	Si data.Accion es True entonces es un agregado de reg,
+%				\State	caso contrario si data.Accion es False es un borrado de reg.
+%				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
+%				\State	String key $\larr$ ValorString(Obtener(r, c))\complejidad{O(L) por ref}
+%				\If{valAccion} Caso Agregar
+%					\State	Caso agrego un registro que no figura en el join
+%					\State	Entonces como se que hay un Indice por ambas tablas,
+%					\State	tengo que buscar el registro con el mismo valor de campo clave
+%					\State	en la otra tabla.
+%					\State	Armo un registro auxiliar regAux con el campo
+%					\State	Registro regModelo $\larr$ vacio()
+%					\State	Definir(regModelo, c, Significado(r, c))
+%					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
+%					\If{NomTorigen=t1}
+%						\State	Entonces el otro registro lo tengo que buscar en t2
+%						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
+%					\Else
+%						\State	Entonces el otro registro lo tengo que buscar en t1
+%						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
+%					\EndIf
+%					\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
+%					\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
+%					\State	Definir(info$\_$join.JoinS, key, itnew)
+%				\Else	CasoBorrado
+%					\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinS, key)
+%					\State	Borrar(info$\_$join.JoinS, key)
+%					\State	EliminarSiguiente(itcjr)
+%				\EndIf
+%			\EndIf
+%		\EndIf
+%	\Else
+%		\State	Caso: No se cuenta con la existencia de indices en ambas tablas, en base al campo del join
+%		\State	Entonces hay que recorrer todo el 
+%		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
+%		\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
+%		\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
+%		\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
+%		\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
+%		\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
+%		\State	Si data.Accion es True entonces es un agregado de reg,
+%		\State	caso contrario si data.Accion es False es un borrado de reg.
+%		\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
+%		\State	String key $\larr$ ValorString(Obtener(r, c))\complejidad{O(Log(n)) por ref}
+%		\If{valAccion}
+%		
+%	\EndIf
+
 
 %\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{
 %  \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}
