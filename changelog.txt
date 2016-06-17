@@ -1,0 +1,3 @@
+ᔕ DiccString Terminado, compila
+ᔖ DiccString ahora incluye DiccClaves(DiccString) que devuelve el conjunto (lineal, no pidan magia) de claves en O(1). No le puse un iterador acá porque no valía la pena.
+ᔗ Registro en modificación, voy a estar preguntando qué esperan ustedes arriba todo el día para no hacerlo dos veces todo.

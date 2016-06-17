@@ -1,5 +1,8 @@
 \select@language {spanish}
-\contentsline {section}{\numberline {1}Registro}{2}{section.1}
+\contentsline {section}{\numberline {1}Modulo Diccionario Lexicografico($String$, $\ensuremath {\mathsigma \xspace }$)}{2}{section.1}
 \contentsline {subsection}{\numberline {1.1}Interfaz}{2}{subsection.1.1}
-\contentsline {subsection}{\numberline {1.2}Representaci\IeC {\'o}n}{4}{subsection.1.2}
-\contentsline {subsection}{\numberline {1.3}Algoritmos}{5}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.2}Operaciones del iterador}{3}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.3}Representacion}{4}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}Algoritmos}{5}{subsection.1.4}
+\contentsline {subsubsection}{\numberline {1.4.1}Algoritmos del Diccionario}{5}{subsubsection.1.4.1}
+\contentsline {subsubsection}{\numberline {1.4.2}Algoritmos del iterador}{8}{subsubsection.1.4.2}

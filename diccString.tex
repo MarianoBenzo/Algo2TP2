@@ -3,10 +3,9 @@
 \subsection{Interfaz}
 
 \sexc{Diccionario(String, \sigma)}
-$\textbf{usa}$ Bool, Nat
-\generos{diccString(String, \sigma)}
+\generos{diccString(String, \sigma), itDiccString(String, \sigma), itClavesString}
 
-  \subsection{Operaciones basicas de diccionario}
+  \subsection*{Operaciones del diccionario}
 
 \operacion{Vacio}{}{res : diccString(String, \sigma)}
  {$true$}
@@ -28,7 +27,7 @@ $\textbf{usa}$ Bool, Nat
   {$d \igobs Definir(n, s, d_0)$}
   {Se define s en el diccionario}
   {$O(Longitud(n)+copy(s))$}
-  {$s$ se define por copia}
+  {$s$ se define por referencia}
 
  \operacion{Borrar}{in/out d:diccString(String, \sigma) in n:String}{}
  {$d \igobs d_0 \land def?(n,d)$}
@@ -42,6 +41,27 @@ $\textbf{usa}$ Bool, Nat
  {$res \igobs obtener(n,d)$}
  {Se retorna el significado de n}
  {$O(Longitud(n))$}
+ {}
+ 
+ \operacion{DiccClaves}{in d:diccString(String \sigma) }{res: conj}
+ {$TRUE$}
+ {$res \igobs claves(d)$}
+ {Se retorna el conjunto de claves del diccionario}
+ {$O(1)$}
+ {Res un conjunto devuelto por referencia no modificable. }
+ 
+ \operacion{Maximo}{in d:diccString(String \sigma)}{res:String}
+ {$true$}
+ {$res \igobs max(claves(d))$}
+ {Se retorna la clave maxima en orden lexicográfico}
+ {$O(longitud(k))$ donde k es la aplabra más larga del diccionario}
+ {}
+ 
+\operacion{Minimo}{in d:diccString (String \sigma)}{res:String}
+ {$true$}
+ {$res \igobs min(claves(d))$}
+ {Se retorna la clave minima en orden lexicográfico}
+ {$O(longitud(k))$ donde k es la aplabra más larga del diccionario}
  {}
 
  
@@ -78,7 +98,7 @@ $\textbf{usa}$ Bool, Nat
   {alias($res$ $\igobs$ Siguiente($it$))}
   {devuelve el elemento siguiente del iterador.}
   {$O(1)$}
-  {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
+  {$res$.significado es modificable si y solo si $it$ es modificable, por aliasing.  En cambio, $res$.clave no es modificable.}
   
   \operacion{SiguienteClave}{in it: itDiccString(String,\sigma) in n:String}{res:String}
   {HaySiguiente?($it$)}
@@ -92,14 +112,14 @@ $\textbf{usa}$ Bool, Nat
   {alias($res$ $\igobs$ Siguiente($it$).significado)}
   {devuelve el significado del elemento siguiente del iterador.}
   {$O(1)$}
-  {$res$ es modificable si y solo si $it$ es modficable.}
+  {$res$ es modificable si y solo si $it$ es modficable, por aliasing.}
 
   \operacion{Anterior}{in it: itDiccString(String,\sigma) in n:String}{tupla(clave: $String$, significado: $\sigma$)}
   {HayAnterior?($it$)}
   {alias($res$ $\igobs$ Anterior($it$))}
   {devuelve el elemento anterior del iterador.}
   {$O(1)$}
-  {$res$.significado es modificable si y solo si $it$ es modificable.  En cambio, $res$.clave no es modificable.}
+  {$res$.significado es modificable si y solo si $it$ es modificable, por aliasing. En cambio, $res$.clave no es modificable.}
 
   \operacion{AnteriorClave}{in it: itDiccString(String,\sigma) in n:String}{res:$String$}
   {HayAnterior?($it$)}
@@ -113,7 +133,7 @@ $\textbf{usa}$ Bool, Nat
   {alias($res$ $\igobs$ Anterior($it$).significado)}
   {devuelve el significado del elemento anterior del iterador.}
   {$O(1)$}
-  {$res$ es modificable si y solo si $it$ es modficable.}
+  {$res$ es modificable si y solo si $it$ es modficable, por aliasing.}
 
 
   \operacion{Avanzar}{inout it: itDiccString(String,\sigma) in n:String}{}
@@ -135,13 +155,17 @@ $\textbf{usa}$ Bool, Nat
 \subsection{Representacion}
 diccString\serc{dLex)}{
 	\\
-	\donde{dLex}{\tupla{raiz: puntero(nodo)}}
+	\donde{dLex}{\tupla{raiz: puntero(nodo), claves: conj(string}}
 }
 nodo\serc{enodo)}{
 	\\
-	\donde{enodo}{\tupla{dato: \sigma, esSig?: Bool, continuaciones: puntero(char) $\sqsubset 256 \sqsupset$  }}
+	\donde{enodo}{\tupla{dato: \sigma, esSig?: Bool,  claveEnConj: itConj(String), continuaciones: puntero(char) $\sqsubset 256 \sqsupset$  }}
 }
 
+\begin{enumerate}
+\item conj(string) esel Conjunto Lineal de los modulos Básicos. itConj(string) es el iterador del mismo
+
+\end{enumerate}
 
 \subsubsection*{Invariante de representación}
 
@@ -149,18 +173,19 @@ nodo\serc{enodo)}{
 \begin{enumerate}
 \item Todo Nodo, si sus continuaciones son todos punteros a null, es porque es significado.
 \item No hay ciclos, ni nodos con dos padres.
+\item En el conjunto claves sólo se encuentran definidas las claves del diccionario y se encuentran todas ellas
 \end{enumerate}
 
 \subsubsection*{Función de abstracción}
+%\AbsFc[dicc]{dicc($\kappa,\sigma$)}[d]{\IF vacío?($d$.claves) THEN vacío ELSE definir(prim($d$.claves), significado(prim($d$.claves)), Abs(fin($d$))) FI}
 
 \subsubsection*{Respresentación del iterador}
 
-  El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.
+  El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.Se explica con el iterador bidireccional no modificable.
 itDiccString($String$, $\sigma$)\serc{itdLex)}{
 	\\
 	\donde{dLex}{\tupla{claves: Lista($String$), significados: Lista($\sigma$)}}
 }
-
 
   
 
@@ -172,17 +197,17 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
 
 
 \subsection{Algoritmos}
-
+\subsubsection{Algoritmos del Diccionario}
 \algoritmo{iVacio}{}{res:diccString}{
   \State $res.raiz \larr NULL$ \complejidad{O(1)}
+  \State $res.claves \larr Vacio$ \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{iDefinir}{in/out d:diccString, in n:String, in s:\sigma}{}{
   
   \State $aux \larr d.raiz$     \complejidad{O(1)}   
   \State $i \larr 0$    \complejidad{O(1)}   
-  \While{$i<Longitud(n)$}
-    \complejidad{O(Longitud(n))}
+  \While{$i<Longitud(n)$}    \complejidad{O(Longitud(n))}
     	\If {$aux==NULL$}
     		\State $nNodo.esSig? \larr false$     \complejidad{O(1)}   
 	    	\State$j \larr 0$
@@ -193,9 +218,13 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
     	\EndIf
     \State $aux \larr aux.continuaciones[ord(n[i])]$    \complejidad{O(1)}   
     \EndWhile 
+    \State $aux*.esSig? \larr True$    \complejidad{O(1)}  
+    \If {$aux*.esSig? \neq True$}
+    		\State $aux*.claveEnConj \larr AgregarRapido(d.claves, n)$  \complejidad{O(long(n))}
+    	\EndIf
     \State $aux*.esSig? \larr True$    \complejidad{O(1)}   
-    \State $aux*.dato \larr s$    \complejidad{O(copy(s)) el costo de la copia de \sigma}   
-}{O(Longitud(n)+copy(s))}
+    \State $aux*.dato \larr s$    \complejidad{O(1))}   
+}{O(Longitud(n)), el último paso se realiza por referencia}
 
 
 
@@ -235,13 +264,14 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
   \State $aux \larr d.raiz$     \complejidad{O(1)}   
   \State $i \larr 0$    \complejidad{O(1)}
   \State $pila(puntero(nodo)) p \larr Vacia()$    \complejidad{O(1)}   
-  \While{$i < Longitud(n)$}
-    \complejidad{O(Longitud(n))}
+  \While{$i < Longitud(n)$}    \complejidad{O(Longitud(n))}
     \State Apilar(p,aux)   \complejidad{O(1)}
     \State $aux \larr aux.continuaciones[ord(n[i])]$    \complejidad{O(1)}
     \State $i \larr i+1$  
   \EndWhile
-  \State $aux*esSig? \larr false$ 
+  \State $aux*.esSig? \larr false$
+  \State $BorrarSiguiente(aux*.claveEnConj)$
+  \State $aux*esSig? \larr false$
   \State $i \larr i-1$
   \State $j \larr 0$
   \While{$aux*.continuaciones[j] = NULL \land j<256$} \complejidad{O(256)=O(1)}
@@ -266,34 +296,79 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
    		
 }{O(Longitud(n))}
 
+\algoritmo{iDiccClaves}{in/out d:diccString(String \sigma)}{res: $conj(String)$}{
+  \State $res \larr d.claves$
+}{O(1), d.claves se pasa por referencia}
+
+\algoritmo{Maximo}{in/out d:diccString(String \sigma)}{res: $String$}{
+  \State $aux \larr d.raiz$     \complejidad{O(1)}   
+  \State $res \larr Vacia()$
+  \State $Bool f \larr True$
+  \While{$f$}
+  	\State $nat i \larr 256$
+  	\While{$aux*.continuaciones[i-1] = NULL \land i>0$}
+  		\State $i \larr i+1$
+  	\EndWhile
+  	\If{$i=0$}
+  		\State $f \larr false$
+  	\Else
+  		\State $AgregarAtras(res, ord^-1 (i-1))$
+  		\State $i \larr 0$
+  	\EndIf
+  \EndWhile
+  		
+}{O(1) d.claves se pasa por referencia}
+
+\algoritmo{Minimo}{in/out d:diccString(String \sigma)}{res: $String$}{
+  \State $aux \larr d.raiz$     \complejidad{O(1)}   
+  \State $res \larr Vacia()$
+  \State $Bool f \larr True$
+  \While{$f$}
+  	\State $nat i \larr 0$
+  	\While{$aux*.continuaciones[i] = NULL \land i<256$}
+  		\State $i \larr i+1$
+  	\EndWhile
+  	\If{$i=256$}
+  		\State $f \larr false$
+  	\Else
+  		\State $AgregarAtras(res, ord^-1 (i))$
+  		\State $i \larr 0$
+  	\EndIf
+  \EndWhile
+  		
+}{O(1) d.claves se pasa por referencia}
 
 
+\subsubsection{Algoritmos del iterador}
 \algoritmo{iCrearIt}{in/out d:diccString, in n:String}{res:itDiccString}{
   \State$lista(String) cs\larr Vacia()$
   \State$lista(\sigma) ss\larr Vacia()$
   \State$String n \larr Vacio()$
-  \State $auxXrIt(cs,ss,n, d.raiz)$  \complejidad{O(Longitud(k)*tam(d)}
+  \State $auxXrIt(cs,ss,n, d.raiz)$  \complejidad{O(Longitud(k)*tam(d))}
   \State$res.claves \larr cs$
   \State$res.significados \larr ss$
 
-}{O(Longitud(k)*tam(d)) Donde k es la palabra más larga definida en d y tam(d) es la cantidad de palabras definidas que hay}
+}{O(Longitud(k)*tam(d))}
 
+\begin{enumerate}
+\item  k es la palabra más larga definida en d y tam(d) es la cantidad de palabras definidas que hay \footnote{Si bien no nos fue posible realizar el calculo de complejidad correspondiente, el algoritmo recursivo recorre una vez cada nodo, y el total de nodos esta acotado por la sumatoria del largo de cada palabra, que a su vez está acotada por la cantidad de palabras multiplicada por la longitud de la palabra más larga, por lo que la cota propuesta a la complejidad es razonable}.
 
+\end{enumerate}
 
-\algoritmo{auxCrIt}{in/out cs:Lista(string), in/out ss:Lista(\sigma), in/out n:String, in p:puntero(nodo)}{}{
+\algoritmo{auxCrIt}{in/out cs:Lista(string) in/out ss:Lista(\sigma) in/out n:String in p:puntero(nodo)}{}{
 	\If{$p \neq NULL$}
-		\If{$p*.esSig?$)
+		\If{$p*.esSig?$}
 			\State $AgregarAtras(cs,n)$
-			\State $AgregarAtras(ss,p*.dato)$
+			\State $AgregarAtras(ss,p*.dato)$  \complejidad{O(1)}
 		\EndIf
 		\State $i \larr 0$
 		\While{$i<256$}
-			\State $AgregarAtras(n,ord^-1 (i))$
-			\State $auxXrIt(cs,ss,n, p*.continuaciones[i])$
-			\State $TirarUltimos(n,1)$
+			\State $AgregarAtras(n, ord^-1 (i))$
+			\State $auxCrIt(cs,ss,n, p*.continuaciones[i])$
+			\State $TirarUltimos(n, 1)$
 		\EndWhile
 	\EndIf
-}{O(?)}
+}{Tn desconocido}
 
 
 \algoritmo{iHaySiguiente}{in/out it:itDiccString, in n:String}{res: $bool$}{
@@ -305,7 +380,7 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
   \State $res \larr it.claves.anterior \neq NULL$
 }{O(1)}
 
-
+%
 \algoritmo{iSiguiente}{in/out it:itDiccString, in n:String}{res: tupla(string,\sigma)}{
   \State $res.clave \larr it.claves.siguiente*.dato$ \complejidad{O(1)(es una referencia)}
   \State $res.significado \larr it.dignificados.siguiente*.dato$ \complejidad{O(1)(es una referencia)}
