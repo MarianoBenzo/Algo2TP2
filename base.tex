@@ -138,7 +138,7 @@ $\textbf{usa}$
  {Se retorna el nombre de la tabla por referencia.}
   
  
- 
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
@@ -212,7 +212,7 @@ $\textbf{usa}$
 }{O(1)}
 
 \algoritmo{agregarTabla}{in t: tabla, in/out b: estr}{}{
-	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t, vacio()\rangle$  \complejidad{O(1) por ref}
+	\State	info\_tabla $\larr$ $\langle cantidadDeAccesos(t), t, vacio()\rangle$  \complejidad{O(1) por ref}
 	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
 }{O(1)}
 
@@ -244,7 +244,6 @@ $\textbf{usa}$
 	\State info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por ref}
 	\State	 Tabla T $\larr$ infoT.TActual \complejidad{O(1) por ref}
 	\State NombreTabla NomTab $\larr$ NombreTabla(T)
-
 	\State La eliminacion en primera etapa depende de si hay
 	\State	 joins con la tabla pasada por parametro
 	\If{$\neg\emptyset$?(Claves(infoT.Joins))} \complejidad{O(1)}
@@ -287,7 +286,13 @@ $\textbf{usa}$
 }{O(T + Log(n))}
 
 \algoritmo{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in/out b: estr}{}{
-	\State	Join $\larr$ vacio() \complejidad{O(1)}
+	\State	Cola(DatoCambio) Rcambio $vacia()$
+	\State	Campo campoJ $\larr$
+	\State	Tipo campoT $\larr$ tipoCampo(c, Ta1)
+	\State	DiccTrie(string; itConj(registro))  JoinS $\larr$ Vacio()
+	\State	DiccNat(nat; itConj(registro)) JoinN  $\larr$ Vacio()
+	\State	Conj(Registro) JoinC $\larr$ vacio() \complejidad{O(1)}
+      								
 	\State	Tabla Ta1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
 	\State	Tabla Ta2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
 	\State	Nat n $\larr$Cardinal(Registros(Ta1))\complejidad{O(1)}
@@ -298,10 +303,9 @@ $\textbf{usa}$
 	\State	ItConj(dato) itcjd1 $\larr$ CrearIt(cjd1) \complejidad{O(1)}
 	\State	DiccString(String, bool) ds $\larr$ vacio() \complejidad{O(1)}
 	\State	DiccNat(Nat, bool) dn $\larr$ vacio()\complejidad{O(1)}
-	\State	Conj(Dato) cjs $\larr$ vacio()
-	\State	Conj(Dato) cjn $\larr$ vacio()
+	\State	Conj(Dato) cjD $\larr$ vacio()
 	\State	Cargo los valores de t1 en un dicc que depende del tipo del campo c
-	\If{$\neg$tipoCampo(c, Ta1)} \complejidad{O(1)}
+	\If{$\neg$campoT} \complejidad{O(1)}
 		\State El tipo del campo es string
 		\While{HaySiguiente?(itcjd1)} \complejidad{O(n)}
 			\State Sabemos que el dameColumna no tiene valores repetidos
@@ -314,7 +318,7 @@ $\textbf{usa}$
 			\State Sabemos que el dameColumna no tiene valores repetidos
 			\State Bool Def $\larr$ Definido?(ds, ValorString(Siguiente(itcjd2)))\complejidad{O(1)}
 			\If{Def}
-				AgregarRapido(cjs, Siguiente(itcjd2))\complejidad{O(1)}
+				AgregarRapido(cjD, Siguiente(itcjd2))\complejidad{O(1)}
 		     \EndIf
 			\State	Avanzar(itcjd1)\complejidad{O(1)}
 		\EndWhile	
@@ -331,21 +335,37 @@ $\textbf{usa}$
 			\State Sabemos que el dameColumna no tiene valores repetidos
 			\State Bool Def $\larr$ Definido?(dn, ValorString(Siguiente(itcjd2)))\complejidad{O(log(n))}
 			\If{Def}
-				AgregarRapido(cjn,Siguiente(itcjd2))\complejidad{O(1)}
+				AgregarRapido(cjD,Siguiente(itcjd2))\complejidad{O(1)}
 		     \EndIf
 			\State	Avanzar(itcjd2)\complejidad{O(1)}
 		\EndWhile
 	\EndIf
 	\State Si hay algun valor en la interseccion, con esos valores hago el join.
-	\If{$\neg$Vacio?(cjs) $\lor$ $\neg$Vacio?(cjn)}
-		\If{$\neg$Vacio?(cjs)}
-			\State its $\larr$ CrearIt(cjs)
-			\While{HaySiguiente?(its)}
-				\State	Registro regModelo $\larr$ Definir(vacio(), c, Siguiente(its))
-				
-			\EndWhile
-		\EndIf
+	\If{$\neg$Vacio?(cjD)}\complejidad{O(1)}
+		\State Caso Strings
+		\State its $\larr$ CrearIt(cjD) \complejidad{O(1)}
+		\While{HaySiguiente?(its)} \complejidad{O((n+m)*(L+Log(n*m)))}
+			\State	Registro regModelo $\larr$ Definir(vacio(), c, Siguiente(its))
+			\State	Como el campo es clave en ambas tablas
+			\State	Si en ambas tablas hay indice en base a c y la complejidad es 
+			\State	O(L+Log(n*m)) sino es O(cardinal de registros de la tabla)
+			\State	Asumimos que es el mejor caso para la complejidad.
+			\State Registro r1 Siguiente(cj1) $\larr$ BuscarEnTabla(regModelo, ta1)\complejidad{O(L+Log(n*m))}
+			\State Registro r2 Siguiente(cj1) $\larr$ BuscarEnTabla(regModelo, ta1)\complejidad{O(L+Log(n*m))}
+			\If{$\neg$campoT}
+				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1)}
+				\State Definir(JoinS, ValorString(Siguiente(its)), itnuevo)\complejidad{O(1)}
+			\Else
+				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1)}
+				\State Definir(JoinN, ValorNat(Siguiente(its), itnuevo)\complejidad{O(Log(n+m))}
+			\EndIf
+			\State Avanzar(its)\complejidad{O(1)}
+		\EndWhile
 	\EndIf
+	\State info\_join $\larr$ $<Rcambios, campoJ, campoT, JoinS, JoinN, JoinC>$\complejidad{O(1)}
+	\State Definir(Ta1.Joins, t2, info\_join)\complejidad{O(1)}
+	\State Definir(Ta2.Joins, t1, info\_join)\complejidad{O(1)}
+}{O(1)}
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%
@@ -402,16 +422,13 @@ $\textbf{usa}$
 %	\EndIf
 %	\State info\_join $\larr$ $\langle 0, vacio(), vacio(), c, tipoCampo(T\_actual1, c), Join\rangle$
 %	\State Definir(b.Joins,	$\langle t1, t2\rangle$ , info\_join)
-}{O(1)}
+
 
 \algoritmo{borrarJoin}{in t1: string, in t2: string, in/out b: estr}{}{
-	\If{Pertenece?(b.Joins, $\langle t1, t2\rangle$  )}
-			\State	Borrar(b.Joins, $\langle t1, t2\rangle$ )
-	\Else
-			\If{Pertenece?(b.Joins, $\langle t2, t1\rangle$ )}
-					\State	Borrar(b.Joins, $\langle t2, t1\rangle$)
-			\EndIf
-	\EndIf
+	\State Tabla tab1 $\larr$ DameTabla(t1, b)
+	\State Tabla tab2 $\larr$ DameTabla(t2, b)
+	\State Borrar(tab1.Joins, t2)
+	\State Borrar(tab2.Joins, t1)
 }{O(1)}
 
 
@@ -428,7 +445,7 @@ $\textbf{usa}$
 	\State	res $\larr$ BuscarEnTabla(criterio, tab) 
 }{O(1)}
 
-\newpage
+
 
 
 
@@ -512,454 +529,5 @@ $\textbf{usa}$
 }{O(1)}
 
 \algoritmo{tablaMaxima}{in b: base}{res: string}{
-  \State $res \larr b.TablaMaxima.NomTabla $ \complejidad{O(1)}
-  
+  \State $res \larr b.TablaMaxima.NomTabla $ \complejidad{O(1)}  
 }{O(1)}
-
-%	
-%	
-%	
-%	
-%		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
-%		\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
-%		\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
-%		\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
-%		\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
-%		\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
-%		\State	Si data.Accion es True entonces es un agregado de reg,
-%		\State	caso contrario si data.Accion es False es un borrado de reg.
-%		\If{infoj.campoT} 
-%			\State	Caso Natural
-%				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
-%				\State	Nat key $\larr$ ValorNat(Obtener(r, c))\complejidad{O(Log(n)) por ref}
-%				\If{valAccion}
-%					\State	Caso agrego un registro que no figura en el join
-%					\State	Entonces como se que hay un Indice por ambas tablas,
-%					\State	tengo que buscar el registro con el mismo valor de campo clave
-%					\State	en la otra tabla.
-%					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
-%					\State	Armo un registro auxiliar regAux con el campo
-%					\State	Dicc(campo,dato) regModelo $\larr$ vacio()
-%					\State	Definir(regModelo, c, Significado(r, c))
-%						\If{NomTorigen=t1}
-%							\State	Entonces el otro registro lo tengo que buscar en t2
-%							\If{Pertenece?(Indices(tab1), c) $\land$ Pertenece?(Indices(tab2), c)} \complejidad{O(1)}
-%									\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
-%						\Else
-%								\State	Entonces el otro registro lo tengo que buscar en t1
-%								\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
-%						\EndIf
-%					\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
-%					\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-%					\State	Definir(info$\_$join.JoinN, key, itnew)
-%				\Else	CasoBorrado
-%					\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinN, key)
-%					\State	Borrar(info$\_$join.JoinN, key)
-%					\State	EliminarSiguiente(itcjr)
-%				\EndIf
-%			\EndIf
-%		\Else
-%			\State	Caso String
-%			\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
-%				\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
-%				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
-%				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
-%				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
-%				\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
-%				\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
-%				\State	Si data.Accion es True entonces es un agregado de reg,
-%				\State	caso contrario si data.Accion es False es un borrado de reg.
-%				\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
-%				\State	String key $\larr$ ValorString(Obtener(r, c))\complejidad{O(L) por ref}
-%				\If{valAccion} Caso Agregar
-%					\State	Caso agrego un registro que no figura en el join
-%					\State	Entonces como se que hay un Indice por ambas tablas,
-%					\State	tengo que buscar el registro con el mismo valor de campo clave
-%					\State	en la otra tabla.
-%					\State	Armo un registro auxiliar regAux con el campo
-%					\State	Registro regModelo $\larr$ vacio()
-%					\State	Definir(regModelo, c, Significado(r, c))
-%					\State	Pregunto que en que tabla tengo que hacer la busqueda. 
-%					\If{NomTorigen=t1}
-%						\State	Entonces el otro registro lo tengo que buscar en t2
-%						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
-%					\Else
-%						\State	Entonces el otro registro lo tengo que buscar en t1
-%						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo)
-%					\EndIf
-%					\State	Registro rnuevo $\larr$ UnirRegistros(r, regModelo)
-%					\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-%					\State	Definir(info$\_$join.JoinS, key, itnew)
-%				\Else	CasoBorrado
-%					\State	itConj(registro) itcjr $\larr$ Significado(info$\_$join.JoinS, key)
-%					\State	Borrar(info$\_$join.JoinS, key)
-%					\State	EliminarSiguiente(itcjr)
-%				\EndIf
-%			\EndIf
-%		\EndIf
-%	\Else
-%		\State	Caso: No se cuenta con la existencia de indices en ambas tablas, en base al campo del join
-%		\State	Entonces hay que recorrer todo el 
-%		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
-%		\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
-%		\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
-%		\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
-%		\State	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
-%		\State	Bool valAccion $\larr$ data.Accion \complejidad{O(1) por ref}
-%		\State	Si data.Accion es True entonces es un agregado de reg,
-%		\State	caso contrario si data.Accion es False es un borrado de reg.
-%		\State	Dicc(Nat, itConj(registro)) d $\larr$ info$\_$join.JoinN\complejidad{O(1) por ref}
-%		\State	String key $\larr$ ValorString(Obtener(r, c))\complejidad{O(Log(n)) por ref}
-%		\If{valAccion}
-%		
-%	\EndIf
-
-
-%\algoritmo{campos}{in t:tab}{res:itConjTrie(campo)}{
-%  \State $res \larr CrearItConjTrie(t.Campos.ClavesDicc)$ \complejidad{O(1)}
-%}{O(1)} % en otras operaciones tiene q figurar ese conjunto
-%
-%\algoritmo{tipoCampo}{in c:campo, in t:tab}{res:Tipo}{
-%  \State $res \larr Significado(t.Campos,c)$ \complejidad{O(1)}
-%}{O(1)}
-%
-% \algoritmo{registros}{in t:tab}{res:itConj(registro)}{
-%    \State $res \larr CrearItConj( t.registros )$ \complejidad{$\theta$(L+ log(n))}
-% }{$\theta$(L+ log(n))}
-%
-%  \algoritmo{cantDeAccesos}{in t:tab}{res:nat}{
-%    \State $res \larr t.cantDeAccesos$ \complejidad{$\theta$(1)}
-% }{$\theta$(1)}
-%
-%  \algoritmo{puedoInsertar?}{in r:registro, in t:tab}{res:bool}{
-%    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia(r,claves(r),registros(t))  \complejidad{$\theta$(L+log(n))}
-% }{$\theta$(L+log(n))}
-%
-%
-%  \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
-%      \State res $\larr$ campatible(r,t) $\yluego$ mismosTipos(r,t)  \complejidad{$\theta$(1)}
-% }{O($1$)}
-%
-%
-%  \algoritmo{puedeIndexar}{in c:campo, in t:tab}{res:bool}{
-%      \State res  $\larr $ Definido?(t.campos,c) $\yluego \neg$ Esta?(c,t.Indices.IndicesL) $\land$ \\ (long(t.Indices.IndicesL)=0 $\lor$ (long(t.Indices.IndicesL)$<$2 $\land$ \\ (tipoCampo(c,t)!=tipoCampo(t.Indices.IndicesL.primero,t))))    \complejidad{$\theta$(1)} %funcion axuliar hayIndiceC?(c,t)
-% }{O(calcular)}
-% 
-%
-%  \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
-%  	\State	res $\larr$ vacio();
-%	\State	itcr1 $\larr$ CrearItConjTrie(cr1)
-%  	\State 	\While{HaySiguiente(itcr1)}
-%				\State	AgregarRapido(res, combinarTodos(c,Siguiente(itcr1),cr2));	%combinarTodos deberia hacer por copia asi no afecta el original.
-%				\State	Avanzar(itcr1);
-%	\State 	\EndWhile   
-% }{O(calcular)}
-% 
-%   \algoritmo{hayCoincidencia}{in r:registro, in cc:ConjTrie(campo), in cr:Conj(registro)}{res:bool}{
-%  	\State	itcr $\larr$ CrearItConj(cr);
-%    \State	res $\larr$ false;
-%  	\State 	\While{HaySiguiente(itcr)}
-%				\State	res $\larr$ 	coincideAlguno(r,cc,Siguiente(itcr)) $\lor$res;
-%				\State	Avanzar(itcr);
-%	\State 	\EndWhile   
-% }{O(calcular)}
-%
-% \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:itConj(registro)}{
-%  	\State 	res $\larr$ CrearItConj(vacio());
-%  	\State 	\While{HaySiguiente(cr)}
-%				\State	\If {coincidenTodos(crit,campos(crit),Siguiente(cr))} 
-%								\State	AgregarAtras(res,Siguiente) 
-%				\State	\EndIf				
-%				\State	Avanzar(cr);
-%	\State	\EndWhile   
-% }{O(calcular)}
-% 
-%  \algoritmo{minimo}{in c:campo, in t:tab}{res:dato}{
-%  	\State 	res $\larr$ min( dameColumna(  c, t.registros  );
-% }{O(calcular)}
-% 
-%   \algoritmo{maximo}{in c:campo, in t:tab}{res:dato}{
-%  	\State 	res $\larr$ max( dameColumna(  c,  t.registros  );
-% }{O(calcular)}
-% 
-%    \algoritmo{dameColumna}{in c:campo, in cr:Conj(registro)}{res:itConj(dato)}{
-%  	\State 	itcr $\larr$ CrearItConj(cr);
-%  	\State 	res $\larr$ CrearItConj(vacio());
-%  	\State 	\While{HaySiguiente(itcr)}
-%				\State	\If {Definido?(Siguiente(itcr),c)} 
-%								\State	AgregarAtras(res,Obtener(Siguiente(itcr), c)) ;
-%				\State	\EndIf				
-%				\State	Avanzar(itcr);
-%	\State	\EndWhile     	
-% }{O(calcular)}
-% 
-%    \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
-%  	\State 	res $\larr$ True;
-%  	\State 	itconjClaves $\larr$ CrearItConj(claves(r)); 
-%  	\State 	\While{HaySiguiente(itconjClaves)}
-%					\State	res $\larr$ res$\land$(tipo?(Obtener(r,Siguiente(itconjClaves))) = tipoCampo(Siguiente(itconjClaves)),t)	;
-%					\State	Avanzar(cr);
-%	\State	\EndWhile     	
-% }{O(calcular)}
-%
-%
-%  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\subsection{Algoritmos operaciones auxiliares}
-%\algoritmo{agregarEstudiante}{in/out campus:campusSeguro, in pos:pos, in nombre:nombre}{}{
-%    \State $campus.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
-%    \State $campus.campus[pos.x][pos.y].estudiante \larr definir(campus.estudiantes, nombre, pos)$ \complejidad{O(long(nombre))}
-%}{O(long(nombre))}
-%
-%\algoritmo{agregarHippie}{in/out campus:campusSeguro, in pos:pos, in nombre:nombre}{}{
-%    \State $campus.campus[pos.x][pos.y].hayHippie \larr True$ \complejidad{O(1)}
-%    \State $campus.campus[pos.x][pos.y].hippie \larr definir(campus.hippies, nombre, pos)$ \complejidad{O(long(nombre))}
-%}{O(long(nombre))}
-%
-%
-% \algoritmo{sancionarAgentesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
-%    % Sancionar VECINOS
-%    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%    \If {$campus.atrapadoPorAgente?(pos)$} 
-%       \While {$i < vecinos.tamanio()$}  \complejidad{O(1)}
-%           \If {$campus.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
-%               \State $campus.sancionarAgente(vecinos[i].agente)$ \complejidad{O(1)}
-%           \EndIf
-%           \State $i++$
-%       \EndWhile
-%    \EndIf
-% }{O(1)}
-%
-%\algoritmo{sancionarAgentesEncerrandoEstVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
-%   \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%   \State $i \larr 0$
-%   \While {$i < vecinos.tamanio$} \complejidad{O(1)}
-%      \If {$campus.campus[vecinos[i].x][vecinos[i].y].hayEst$ $\land$ $atrapadoPorAgente?(campus,pos)$}  \complejidad{O(1)}
-%          \State $sancionarAgentesVecinos(campus,pos)$ \complejidad{O(1)}
-%      \EndIf
-%      \State $i++$
-%    \EndWhile
-%}{O(1)}
-%
-%\algoritmo{sancionarAgente}{in/out campus:campusSeguro, in/out agente:itDiccRapido}{}{
-%    \State $campus.conKSanciones.ocurrioSancion \larr True$ \complejidad{O(1)}
-%    \State $agente.siguiente.cantSanciones + 1$ \complejidad{O(1)}
-%    \State $agente.siguiente.miUbicacion.eliminarSiguiente()$ \complejidad{O(1)}
-%    \State // El iterador mismas apunta a la posicion correspondiente del agente dentro de la lista ordenada por cantSanciones
-%    \State // Como la lista en el peor caso puede contener a todos los agentes con igual cant de sanciones
-%    \State // la mayor cantidad posible de iteraciones del ciclo es 4
-%    \While {$agente.siguiente.mismcampus.haySiguiente()$ \\$\land$ $agente.siguiente.mismas.siguiente.cantSanciones < agente.siguiente.cantSanciones$}
-%      \State $agente.siguiente.mismas.avanzar()$ \complejidad{O(1)}
-%    \EndWhile
-%    \State // Si no hay siguiente o  si la cantidad de sanciones del siguiente es menor que la del agente, entonces, 
-%    \State // creo un conMismasBucket, lo inserto como siguiente y me guardo el iterador en miUbicacion
-%    \State // Sino, agrego el agente al conj de agentes del siguiente y me guardo el iterador en miUbicacion
-%    \If {$\neg(agente.siguiente.mismas.haySiguiente)$ $\lor$
-%        \\$(agente.siguiente.mismas.haySiguiente \land$\\$agente.siguiente.cantSanciones=agente.siguiente.mismas.cantSanciones)$} \complejidad{O(1)}
-%      \State $nConMismasB \larr nuevaTupla(CrearNuevoDiccLineal(), agente.siguiente.cantSanciones)$
-%      \State $agente.siguiente.mismas \larr agente.siguiente.mismas.agregarComoSiguiente(nConMismasB)$ \complejidad{O(1)}
-%      \State $agente.siguiente.miUbicacion$ $\larr$
-%      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
-%    \Else 
-%      \State $agente.siguiente.mismas.siguiente.agentes.agregarComoSiguiente(agente.siguiente.pl)$ \complejidad{O(1)}
-%    \EndIf
-%}{O(1)}
-%
-% \algoritmo{atrapadoPorAgente?}{in campus:campusSeguro, in pos:pos}{res:bool}{
-%    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$
-%    \State $alMenos1Agente \larr False$ \complejidad{O(1)}
-%    \State $i \larr 0$
-%    \If {$\neg(encerrado?(pos, campus.campusEstatico.vecinos(pos)))$}
-%      \State $return$ $false$
-%    \EndIf
-%    \State // Veo si hay algun agente alrededor
-%     \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
-%       \If {$as.campus[vecinos[i].x][vecinos[i].y].hayAgente?$}
-%          \State $return$ $true$            
-%        \EndIf
-%        \State $i++$ \complejidad{O(1)}
-%    \EndWhile
-% }{O(1)}
-%
-% \algoritmo{hippificarEstudiantesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
-%    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%    \State $i \larr 0$ \complejidad{O(1)}
-%    \While {$i<vecinos.tamanio()$} \complejidad{O(long(nombre))}
-%        \If {$estAHippie?(campus,vecinos[i])$}
-%            \State $hippificar(campus,vecinos[i])$ \complejidad{O(long(nombre))}
-%        \EndIf
-%        \State $i++$ \complejidad{O(1)}
-%    \EndWhile
-% }{O(long(nombre))}
-%
-%\algoritmo{hippificar}{in/out campus:campusSeguro, in pos:pos}{}{
-%    \State // PRE: La posicion esta en el tablero y hay estudiante en la posicion
-%    \State $as.campus[pos.x][pos.y].hayHippie \larr True$ \complejidad{O(1)}
-%    \State $as.campus[pos.x][pos.y].hippie.agregarComoSiguiente(nombre, pos)$ \complejidad{O(long(nombreEstudiante))}
-%    \State $as.campus[pos.x][pos.y].hayEst \larr False$ \complejidad{O(1)}
-%    \State $as.campus[pos.x][pos.y].estudiante.eliminarSiguiente()$ \complejidad{O(long(nombreEstudiante))}
-%}{O(long(nombre))}
-%
-% \algoritmo{estAHippie?}{in campus:campusSeguro, in pos:pos}{res:bool}{
-%    \If {$\neg(encerrado?(pos,vecinos))$}
-%      \State $return$ $false$ \complejidad{O(1)}
-%    \EndIf
-%    \State $i$ $\larr$ $0$ \complejidad{O(1)}
-%    \State $cantHippies$ $\larr$ $0$ \complejidad{O(1)}
-%    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%    \While {$i < vecinos.tamanio()$}
-%      \If {$campus[vecinos[i].x][vecinos[i].y].hayHippie$}
-%        \State $cantHippies++$ \complejidad{O(1)}
-%      \EndIf
-%      \State $i++$
-%    \EndWhile
-%    \State $return$ $cantHippies \ge 2$ \complejidad{O(1)}
-% }{O(1)}
-%
-%\algoritmo{hippieAEst?}{in campus:campusSeguro, in pos:pos}{res:bool}{
-%  \State $i$ $\larr$ $0$ \complejidad{O(1)}
-%  \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%  \While {$i < vecinos.tamanio()$} \complejidad{O(1)}
-%      \If {$\neg(as.campus[vecinos[i].x][vecinos[i].y].hayEst?)$}
-%        \State $return$ $False$ \complejidad{O(1)}
-%      \EndIf
-%  \EndWhile
-%  \State $return$ $True$
-%}{O(1)}
-%
-% \algoritmo{encerrado?}{in campus:campusSeguro, in pos:pos}{}{
-%    \State $vecinos \larr vecinos(as.campusEstatico, pos)$ \complejidad{O(1)}
-%    \State $i \larr vecinos.tamanio()$ \complejidad{O(1)}
-%    \While {$i<vecinos.tamanio()$} \complejidad{O(1)}
-%       \If {$\neg(campus.campus[vecinos[i].x][vecinos[i].y].hayAgente?$ $\lor$
-%             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayEst?$ $\lor$
-%             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayHippie?$ $\lor$
-%             \\$campus.campus[vecinos[i].x][vecinos[i].y].hayObst?)$} \complejidad{O(1)}
-%              \State $return$ $false$ \complejidad{O(1)}
-%        \EndIf
-%        \State $i++$ \complejidad{O(1)}
-%    \EndWhile
-%    \State $return true$
-% }{O(1)}
-%
-% \algoritmo{aplicarHippiesVecinos}{in/out campus:campusSeguro, in pos:pos}{}{
-%    \State $vecinos \larr campus.campusEstatico.vecinos(pos)$ \complejidad{O(1)}
-%    \State $i \larr 0$ \complejidad{O(1)}
-%    \While {$i < vecinos.tamanio()$} \complejidad{O(long(nombre))}
-%       \State aplicarHippie(campus, pos) \complejidad{O(long(nombre))}
-%    \EndWhile
-% }{O(long(nombre))}
-%
-% \algoritmo{aplicarHippie}{in/out campus:campusSeguro, in pos:pos}{}{
-%    \State // PRE: pos valida y hayHippie en campus.campus[pos.x][pos.y]
-%    \If {$campus.campus[pos.x][pos.y].hayHippie$}
-%      \If {$as.hippieAEst(pos)$} \complejidad{O(1)}
-%          \State $campus:campusSeguro.campus[pos.x][pos.y].hayHippie \larr False$ \complejidad{O(1)}
-%          \State $campus:campusSeguro.campus[pos.x][pos.y].hayEst \larr True$ \complejidad{O(1)}
-%          \State $as.campus[pos.x][pos.y].estudiante \larr CrearIt(campus.hippies)$ \complejidad{O(1)}
-%          \State $campus.campus[pos.x][pos.y].estudiante.$
-%          \State $agregarComoSiguiente(campus.campus[pos.x][pos.y].estudiante.nombre)$ \complejidad{O(long(nombre))}
-%          \State $campus.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
-%      \Else
-%        \If {$campus.campus[pos.x][pos.y].hayHippie?$ $\land$ $atrapadoPorAgente(pos)$}
-%            \State $vecinos \larr campus.campusSeguro.vecinos(pos)$ \complejidad{O(1)}
-%            \State $i \larr 0$ \complejidad{O(1)}
-%            \While {$i < vecinos.tamanio()$} \complejidad{O(1)}
-%                \State $posAct \larr vecinos[pos.x][pos.y]$ \complejidad{O(1)}
-%                \State $info$ $\larr$ $campus.campus[vecinos[i].x][vecinos[i].y]$ \complejidad{O(1)}
-%                \If {$posAct.hayAgente$}
-%                    \State $info.agente.siguiente.cantCapturas++$ \complejidad{O(1)}
-%                    \State // Actualizar mas vigilante
-%                    \If {$campus.masVigilante.siguienteSignificado().cantCapturas < $\\$info.agente.siguienteSignificado().cantCapturas$}
-%                        \State $campus.masVigilante \larr info.agente$ \complejidad{O(1)}
-%                    \Else
-%                        \If{$campus.masVigilante.siguienteSignificado().cantCapturas = $\\$info.agente.siguienteSignificado().cantCapturas$\\
-%                            $\land campus.masVigilante.siguienteClave() < info.agente.siguienteClave()$} \complejidad{O(1)}
-%                              \State $campus.masVigilante \larr info.agente$ \complejidad{O(1)}
-%                        \EndIf
-%                    \EndIf
-%                \EndIf
-%                \State $i++$
-%            \EndWhile
-%            \State $campus.campus[pos.x][pos.y].hayHippie? = False$ \complejidad{O(1)}
-%            \State $campus.campus[pos.x][pos.y].hippie.eliminarSiguiente()$ \complejidad{O(long(nombre))}
-%        \EndIf
-%      \EndIf
-%    \EndIf
-% }{O(long(nombre))}
-%
-% \algoritmo{proxPosHippie}{in/out campus:campusSeguro, in nombre:string}{res:pos}{
-%    \State // PRE: El nombre es un hippie y el hippie no esta encerrado
-%    \State $posHippie \larr campus.hippies.obtener(nombre)$ \complejidad{O(long(nombre))}
-%    \If {$campus.estudiantes.tamanio()>0$}
-%      \State // Retorna de las posiciones mas cercanas, la que esta mas cerca del (0,0)
-%      \State $proxPos \larr aPosMasCercana(campus.campusEstatico,posHippie,campus.estudiantes.significados)$ \complejidad{O($N_e$)}
-%    \Else
-%        \State // Retorna el ingreso mas cercan, en caso de empate, el de abajo
-%        \State $proxPos \larr aIngresoMasCercano(campus.campusEstatico,posHippie)$ \complejidad{$O(1)$}
-%    \EndIf
-%    \State $res \larr proxPos$ \complejidad{O(1)}
-% }{O($N_e$)}
-%
-%  \algoritmo{proxPosAgente}{in/out campus:campusSeguro, in posAgente:pos}{res:pos}{
-%    \State // PRE: En la posicion hay un agente que se puede mover
-%    \If {$campus.hippies.tamanio()>0$}
-%      \State // Retorna de las posiciones mas cercanas, la que esta mas cerca del (0,0)
-%      \State $proxPos \larr aPosMasCercana(campus.campusEstatico,posAgente,campus.hippies.significados)$ \complejidad{O($N_h$)}
-%    \Else
-%        \State // Retorna el ingreso mas cercano, en caso de empate, el de abajo
-%        \State $proxPos \larr aIngresoMasCercano(campus.campusEstatico,posAgente)$ \complejidad{$O(1)$}
-%    \EndIf
-%    \State $res \larr proxPos$ \complejidad{O(1)}
-% }{O($N_h$)}
-%
-%
-% \algoritmo{aIngresoMasCercano}{in p:pos, cs: campusSeguro}{res:pos}{
-%	\If{$p.Y\leq c.alto/2$}
-%		\If{$PosValida(cs.campus,<p.X,p.Y-1>)\land \lnot HayAlgo(cs,<p.X,p.Y-1>)$}
-%			\State $res \larr <p.X,p.Y-1>$
-%		\Else
-%			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
-%				\State $res \larr <p.X+1,p.Y>$
-%			\Else
-%				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
-%					\State $res \larr <p.X-1,p.Y>$
-%				\Else
-%					\State $res \larr <p.X,p.Y+1>$
-%				\EndIf
-%			\EndIf
-%		\EndIf
-%	\Else
-%		\If{$PosValida(cs.campus,<p.X,p.Y+1>)\land \lnot HayAlgo(cs,<p.X,p.Y+1>)$}
-%			\State $res \larr <p.X,p.Y-1>$
-%		\Else
-%			\If{$PosValida/c,<p.X+1,p.Y>)\land \lnot HayAlgo(c,<p.X+1,p.Y>)$}
-%				\State $res \larr <p.X+1,p.Y>$
-%			\Else
-%				\If{$PosValida/c,<p.X-1,p.Y>)\land \lnot HayAlgo(c,<p.X-1,p.Y>)$}
-%					\State $res \larr <p.X-1,p.Y>$
-%				\Else
-%					\State $res \larr <p.X,p.Y-1>$
-%				\EndIf
-%			\EndIf
-%		\EndIf
-%	\EndIf
-%}
-%{O($1$)}
-%
-% \algoritmo{ibusquedaBinariaPorSanciones}{in ar:arreglo(val:nat otr: $\alpha$>), in sanc:nat}{res:$<\alpha , bool>$)}{
-% 	\State $res.\pi_2 \larr false$
-%	\State $min \larr 0$
-%	\State $max \larr |ar|$
-%    \While {$max-min>1$} \complejidad{O(log($|ar|$))}
-%       \State $med \larr (max-min)/2$
-%       \If {$ar[med].val \leq sanc$}
-%       		\State $min \larr med$
-%       \Else
-%       		\State $max \larr med$
-%       	\EndIf
-%    \EndWhile
-%    \If {$ar[min].val = sanc$}
-%    	\State $res \larr <ar[min].otr, true>$
-%    \EndIf
-% }{O(log($|ar|$)}
