@@ -166,7 +166,7 @@
  {$True$}
  {$res \igobs dameColumna(c,cj1,cj2)$}
  {Reune en un conjunto los valores del campo pasado por parametro.}
- {O($Cardinal(cj)*Log(Cardinal(cj))$)}
+ {O($\#cr *log(\#cr) + (\#cr *long(k)) $)}
  {Retorna res por referencia, no es modificable.} 
 
   \operacion{mismosTipos}{in r: registro,in t: tab}{res: bool}
@@ -1080,40 +1080,42 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
  
 \algoritmo{dameColumna}{in c:campo, in cr:Conj(registro)}{res:Conj(dato)}{
-  	\State 	Conj(Dato)	cj $\larr$ vacio();				\complejidad{O(1) por ref}
-%	\State	La idea es no agregar el mismo dato dos veces, para eso uso un Dicc
-%	\State	del tipo de dato de la columna para hacer consulta.
-%	\If{Cardinal(cr)$\geq$1}\complejidad{O(1) por ref}		
-%			\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(CrearIt(cr))), c)\complejidad{O(1) por ref}		
-%			\If{Tvalor}
-%					\State	DiccNat(nat,bool) cj $\larr$ Vacio()\complejidad{O(1) por ref}		
-%			\Else
-%					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{O(1) por ref}		
-%			\EndIf
-%			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{O(1) por ref}		
-%			\State	cjd $\larr$ Vacio()
-%		  	\While{HaySiguiente(itcr)}						\complejidad{O(Cardinal(cr))}
-%		  				\State Dato data $\larr$ Significado(Siguiente(itcr), c)
-%		  				\If{Tvalor}
-%		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{O(Log(n))}
-%										\State 	AgregarRapido(cjd, data)\complejidad{O(1) por ref}
-%										\State	AgregarRapido(cj, valorNat(data))\complejidad{O(1) por ref}
-%								\EndIf	
-%						\Else
-%		  						\If {$\neg$Pertenece?(cj, valorString(data))}\complejidad{O(1) por ref}
-%										\State 	AgregarRapido(cjd, data)\complejidad{O(1) por ref}
-%										\State	AgregarRapido(cj, valorString(data))\complejidad{O(1) por ref}
-%								\EndIf	
-%						\EndIf
-%				\State	Avanzar(itcr);							\complejidad{O(1) por ref}
-%			\EndWhile     	
-%	\EndIf
-%	\State res $\larr$ cjd
-%	\State Si la columna es de tipo String, la complejidad es O(n), en caso de ser
-%	\State de tipo Nat la complejidad es O(nlog(n)).
-	\State Donde n es el cardinal de cr	.
-}{O(n)}
- 
+  	\State 	res $\larr$ vacio()				\complejidad{O(1)}
+  	\State it $\larr$ CrearIt(cr) \complejidad{O(1)}
+	\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(it), c)) \complejidad{O(1)}		
+	\If{Tvalor}
+		\State DiccNat(nat,dato) bolsaN $\larr$ vacio \complejidad{O(1)}
+		\While{haySiguiente(it)} \complejidad{O($\#cr$)}
+			\State Definir(bolsaN, valorNat(Significado(Siguiente(it),c)), Significado(Siguiente(it),c)) \complejidad{O($log(\#cr)$)}
+			
+			\State avanzar(it) \complejidad{O(1)}
+		\EndWhile
+		\State itN $\larr$ diccClaves(bolsaN) \complejidad{O(1) por ref}
+		\While{haySiguiente(itN)} \complejidad{O($\#cr$)}
+			\State AgregarRapido(res, Significado(bolsaN, siguiente(itN)))  \complejidad{O($log(\#cr)$)}
+			\State avanzar(itN)
+		\EndWhile
+	\Else
+		\State DiccString(String,dato) bolsaS $\larr$ vacio() \complejidad{O(1)}
+		\While{haySiguiente(it)} \complejidad{O($\#cr$)}
+			\State Definir(bolsaS, valorString(Significado(Siguiente(it),c)), Significado(Siguiente(it),c)) \complejidad{O($long(k)$)}
+			
+			\State avanzar(it) \complejidad{O(1)}
+		\EndWhile
+		\State itS $\larr$ CrearIt(diccClaves(bolsaS)) \complejidad{O(1) por ref}
+		\While{haySiguiente(itS)} \complejidad{O($\#cr$)}
+			\State AgregarRapido(res, Significado(bolsaS, siguiente(itS)))  \complejidad{O($long(siguiente(itS))$)}
+			\State avanzar(itS) \complejidad{O(1)}
+		\EndWhile
+	\EndIf
+	
+}{O($\#cr *log(\#cr) + (\#cr *long(k)) $)}
+%\\
+%\bullet En Particular, si el tipo asociado a c es Nat, entonces toma $O(\#cr *log(\#cr))$ mientras que si es String toma
+%$O(\#cr *long(k))$ siendo k la palabra mas larga de la columna
+%\\
+%\bullet Al agregar a res es seguro que no hay repetidos por haber sido volcados al diccionario previamente, que en ambos casos no permiten claves repetidas. 
+%\\
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
   	\State 	valor $\larr$ True										\complejidad{O(1) por ref}
   	\State 	itconjClaves $\larr$ CrearIt(Campo(r)) \complejidad{O(1) por ref}
