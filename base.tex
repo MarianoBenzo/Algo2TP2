@@ -173,7 +173,11 @@
   \item para todo info$\_$tabla, el nombre de TActual pertenece al conjunto de claves del Joins de las claves de su Joins.
   \item Para todo info$\_$join, el tipo de campoJ es igual a campoT.
   \item Para todo DatoCambio, NomOrigen es igual a TActual o a la clave que le corresponde en Joins.
-  \item Si campoT es true JoinS esta vacio, y si es false JoinN esta vacio.
+  \item Si campoT es true JoinS esta vacio, y si es false JoinN esta vacio.	
+  \item En el caso campoT es false, en JoinS todas las claves, ese diccionario estan relacionadas cada una\\
+  string S con solo iterador de conjunto a registro it, que apunta al registro r $\larr$Siguiente(it). Al cual si\\
+  buscamos el dato d $\larr$Significado(r, campoJ), y hacemos ValorString(d) es igual a S
+    
   \item En DatoCambio, si Accion es true entonces Reg pertence al conjunto de registros de NomOrigen.
   \item En DatoCambio, si Accion es false entonces Reg no pertence al conjunto de registros de NomOrigen.
 
