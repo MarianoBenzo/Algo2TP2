@@ -177,7 +177,22 @@
   \item En el caso campoT es false, en JoinS todas las claves, ese diccionario estan relacionadas cada una\\
   string S con solo iterador de conjunto a registro it, que apunta al registro r $\larr$Siguiente(it). Al cual si\\
   buscamos el dato d $\larr$Significado(r, campoJ), y hacemos ValorString(d) es igual a S
-    
+  
+  
+  \item Para toda string t1, t2, si Pertenece?(Tablas(b), t1) y Pertenece?(Tablas(b), t1) entonces\\
+  si HayJoin?(t1,t2, b) y luego si infojoin $\larr$ Significado(Significado(b.Tablas, t1).Joins, t2).\\
+  Si infojoin.CampoT es true entonces para todo nat n, si Definido?(infoJoin.JoinN, n) entonces\\
+  el registro r $\larr$Siguiente(Significado(infoJoin.JoinN, n)) es tal que \\
+  ValorNat(Significado(r, infojoin.CampoJ))=n.
+
+  \item Para toda string t1, t2, si Pertenece?(Tablas(b), t1) y Pertenece?(Tablas(b), t1) entonces\\
+  si HayJoin?(t1,t2, b) y luego si infojoin $\larr$ Significado(Significado(b.Tablas, t1).Joins, t2).\\
+  Si infojoin.CampoT es false entonces para todo String s, si Definido?(infoJoin.JoinS, s) entonces\\
+  el registro r $\larr$Siguiente(Significado(infoJoin.JoinS, s)) es tal que \\
+  ValorNat(Significado(r, infojoin.CampoJ))=s.
+  
+  
+  
   \item En DatoCambio, si Accion es true entonces Reg pertence al conjunto de registros de NomOrigen.
   \item En DatoCambio, si Accion es false entonces Reg no pertence al conjunto de registros de NomOrigen.
 
