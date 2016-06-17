@@ -10,8 +10,8 @@
 \subsection{Interfaz}
 
 \sexc{tabla}
-\generos{}{DiccString(string, alfha),} {DiccNat(nat, beta),}{Nat, String, Dato, Campo, Tipo, Registro, ConjString, ConjNat.}
-
+$\textbf{usa}${ DiccString(string, alfha),} {DiccNat(nat, beta),}{Nat, String, Dato, Campo, Tipo, Registro, ConjString, ConjNat.}
+\generos{tabla}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,7 +28,7 @@
  {O($1$)}
  {Se retorna res por copia, por ser un tipo basico.}
 
-\operacion{claves}{in t: tab }{res : ConjString(campo)}
+\operacion{claves}{in t: tab }{res : Conj(campo)}
  {true}
  {$res \igobs claves(t)$}
  {Devuelve un conjunto de campos clave en la tabla ingresada por parametro.}
@@ -192,35 +192,83 @@
 {\donde{tab}
 { 
 \tupla{
-  		Nombre: String,
+  		Nombre: NombreTabla,
 		Registros: Conj(Registro),
 		Campos: \mbox{DiccString(Campo,Tipo)},
-		Claves: \mbox{ConjString(Campo)},
+		Claves: \mbox{Conj(Campo)},
 		IndiceS: \tupla{CampoI: campo, EnUso: bool, Indice: DiccString(\mbox{string, Conj(ItConj(Registro)))}, Min: Dato, Max: Dato},
 		IndiceN: \tupla{CampoI: campo, EnUso: bool, Indice: DiccNat(\mbox{nat, Conj(ItConj(Registro)))}, Min: Dato, Max: Dato},
-		\#Accesos: Nat}
+		RelacionInd: \tupla{CampoR: campo, ConsultaN: DiccNat(\mbox{nat, Acceso)}), ConsultaS: DiccString(\mbox{string, Acceso)})}
+		,\#Accesos: Nat}
+		\donde{Acesso}{$<$S: ItConj(ItConj(Registro)),N: ItConj(ItConj(Registro))$>$}
 }
 }
 
-  
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-% Las claves estan en los campos.
+% $Las claves estan en los campos.$
 \item	t.Claves esta inclido o es igual a t.Campos.
 % 
 \item	t.Nombre es un string acotado.
 % Los campos de cada registro es igual a los campos de la tabla.
 \item	Para todo registro r de t.Registros, entonces Campos(r) es igual al t.Campos.
 % Los campos de cada registro, tienen el mismo tipo que los campos de la tabla.
-\item	Para todo registro r de t.Registros y para todo campo c de Campos(r), entonces Tipo?(Significado(r,c)) es igual Significado(t.Campos, c).
+\item	Para todo registro r de t.Registros y para todo campo c de Campos(r), entonces \\
+Tipo?(Significado(r,c)) es igual Significado(t.Campos, c).
+
 % Si el indice esta EnUso y tiene un campo que pertenece a t.Campos, para toda clave c de t.IndiceS.Indice, el significado de Significado(t.IndiceS.Indice, c) esta incluido en t.Registro.
-\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo Dato d, si Definido?(t.IndiceS.Indice, d) es true, entonces Significado(t.IndiceS.Indice, d) esta incluido o es igual a t.Registros.
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, para todo string d, \\
+si Definido?(t.IndiceS.Indice, d) es true, entonces para todo itConj(registro) it que pertenece a \\
+el conj(ItConj(registro)) cj Significado(t.IndiceS.Indice, d), registro r $\larr$Siguiente(it), \\
+r pertenece a t.Registros.
+
 % Todo registro de la tabla pertenece a algun significado de t.IndiceS.Indice
-\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, entonces para todo registro r de t.Registros entonces Definido?(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)) es true y r pertenece a Significado(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)).
-%
-\item	Lo anterior tambien aplica para t.IndiceN.Indice
-  \item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados
+\item	Si t.IndiceS.EnUso es true y t.IndiceS.CampoI pertenece a t.Campos, \\
+entonces para todo registro R de t.Registros entonces \\
+Definido?(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)) es true, \\
+entonces algun ItConj(registro) it que pertenece a \\
+Conj(itConj()) cj Significado(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)) entonces Siguiente(it)=R.
+
+% Si el indice esta EnUso y tiene un campo que pertenece a t.Campos, para toda clave c de t.IndiceS.Indice, el significado de Significado(t.IndiceS.Indice, c) esta incluido en t.Registro.
+\item	Si t.IndiceN.EnUso es true y t.IndiceN.CampoI pertenece a t.Campos, para todo string d, \\
+si Definido?(t.IndiceN.Indice, d) es true, entonces para todo itConj(registro) it que pertenece a \\
+el conj(ItConj(registro)) cj Significado(t.IndiceS.Indice, d), registro r $\larr$Siguiente(it), \\
+r pertenece a t.Registros.
+\newpage
+% Todo registro de la tabla pertenece a algun significado de t.IndiceS.Indice
+\item	Si t.IndiceN.EnUso es true y t.IndiceN.CampoI pertenece a t.Campos, \\
+entonces para todo registro R de t.Registros entonces \\
+Definido?(t.IndiceN.Indice, Significado(r, t.IndiceN.CampoI)) es true, \\
+entonces algun ItConj(registro) it que pertenece a \\
+Conj(itConj()) cj Significado(t.IndiceN.Indice, Significado(r, t.IndiceN.CampoI)) entonces Siguiente(it)=R.
+
+
+%		RelacionInd: \tupla{CampoR: campo, ConsultaN: DiccNat(\mbox{nat, Acceso)}),
+%														  ConsultaS:DiccString(\mbox{string, Acceso)})}
+%		\donde{Acesso}{< S: ItConj(ItConj(Registro)),N: ItConj(ItConj(Registro)) >}
+\item El campo de e.RelacionInd.CampoR pertenece a t.claves
+%		Caso String
+\item Si t.IndiceS.EnUso es true y para todo string X, $\neg$tipoCampo(t.campo, e.RelacionInd.CampoR) \\y 
+Definido?(t.RelacionInd.ConsultaS, X), tal que \\Acceso dataInd $\larr$Significado(t.RelacionInd.ConsultaN, Y), \\
+y el registro R $\larr$Siguiente(Siguiente(dataInd.S)), entonces R pertenece a t.registros $\yluego$ \\
+ValorString(Significado(R, t.RelacionInd.campoR))=Y
+\item Si t.IndiceN.EnUso es true y para todo nat Y, $\neg$tipoCampo(t.campo, e.RelacionInd.CampoR) \\y Definido?(t.RelacionInd.ConsultaN, Y), tal que el
+\\Acceso dataInd $\larr$Significado(t.RelacionInd.ConsultaN, Y), \\
+y el registro R $\larr$Siguiente(Siguiente(dataInd.N)), entonces R pertenece a t.registros $\yluego$ \\
+ValorString(Significado(R, t.RelacionInd.campoR))=Y
+%		Caso Natural
+\item Si t.IndiceS.EnUso es true y para todo nat Y, tipoCampo(t.campo, e.RelacionInd.CampoR) \\y Definido?(t.RelacionInd.ConsultaN, Y), tal que el\\
+ Acceso dataInd $\larr$Significado(t.RelacionInd.ConsultaN, Y), \\
+ y el registro R $\larr$Siguiente(Siguiente(dataInd.S)), entonces R pertenece a t.registros $\yluego$ \\
+ ValorString(Significado(R, t.RelacionInd.campoR))=Y
+\item Si t.IndiceN.EnUso es true y para todo nat Y, tipoCampo(t.campo, e.RelacionInd.CampoR) \\y Definido?(t.RelacionInd.ConsultaN, Y), tal que el\\
+ Acceso dataInd $\larr$Significado(t.RelacionInd.ConsultaN, Y), \\
+ y el registro R $\larr$Siguiente(Siguiente(dataInd.N)), entonces R pertenece a t.registros $\yluego$ \\
+ ValorString(Significado(R, t.RelacionInd.campoR))=Y
+
+%		Cantidad de accesos
+\item El valor de e.\#Accesos debe ser la cantidad de registros agregados, la cantidad de registros borrados
 \end{enumerate}
 
 %\rep{tab}{e}True $\iff$\\
@@ -251,7 +299,7 @@
 $s.Nombre \igobs nombre(t)$ $\land$ $s.Claves \igobs claves(t)$ $\land$ \\
 $s.Indices \igobs indices(t)$ $\land$ 
 $s.Registros \igobs registros(t)$ $\land$ 
-$s.Campos.DiccClaves \igobs campos(t)$ $\land$ 
+$DiccClaves(s.Campos) \igobs campos(t)$ $\land$ 
 $s.\#Accesos \igobs cantidadDeAccesos(t)$ $\land$ \\
 $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c) \igobs tipoCampo(c, t))$ \\
 
@@ -264,7 +312,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
   \State $res \larr t.Nombre$ \complejidad{O(1) por ref}
 }{O(1)}
 
-\algoritmo{claves}{in t:tab}{res:ConjString(campo)}{
+\algoritmo{claves}{in t:tab}{res:Conj(campo)}{
   \State res $\larr$ t.Claves \complejidad{O(1) por ref}
 }{O(1)}
 
@@ -279,7 +327,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 }{O(1)}
 
 \algoritmo{campos}{in t:tab}{res:ConjString(campo)}{
-  \State $res \larr DiccClaves(t.Campos)$ \complejidad{O(\# de campos)}
+  \State $res \larr DiccClaves(t.Campos)$ \complejidad{O(1)}
 }{O(1)} % en otras operaciones tiene q figurar ese conjunto
 
 \algoritmo{tipoCampo}{in c:campo, in t:tab}{res:Tipo}{
@@ -301,26 +349,20 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 \algoritmo{nuevaTabla}{in nombre: string, in claves: conj(campo), in columnas: registro}{res: tab}{
 	\State Conj(registro) Registros $\larr$ Vacio() \complejidad{O(1)}
 	\State DiccString(campo, tipo) Campos $\larr$ Vacio() \complejidad{O(1)}
-	\State ConjString(campo) Claves\_ $\larr$ Vacio() \complejidad{O(1)}
+	\State Campo c $\larr$Siguiente(CrearIt(claves))
 	\State Dato d $\larr$ Obtener(columnas, Siguiente(CrearIt(claves)))
-	\State IndiceS $\larr <  Siguiente(CrearIt(claves)), False, Vacio(), d, d  >$ 		\complejidad{O(1)}
-	\State IndiceN $\larr <  Siguiente(CrearIt(claves)), False, Vacio(), d, d  >$ 		\complejidad{O(1)}
+	\State IndiceS $\larr <  c, False, Vacio(), d, d  >$ 		\complejidad{O(1)}
+	\State IndiceN $\larr <  c, False, Vacio(), d, d  >$ 		\complejidad{O(1)}
 	\State \#Acessos $\larr$ 0 \complejidad{O(1)}
-	\State res $   \larr <  nombre, Registros, Campos, Claves\_, IndiceS, IndiceN, 0  >$ 		\complejidad{O(1)}
+	\State RelacionInd $\larr$ $< c, Vacio(), Vacio() >$
+	\State res $   \larr <  nombre, Registros, Campos, claves, IndiceS, IndiceN, RelacionInd, 0  >$\complejidad{O(1) por ref}
 	%Agrego los campos al diccString
 	\State itcampos $\larr$ crearIt(Campos(columnas)) 				\complejidad{O(\# de campos)}
 	\While{HaySiguiente(itcampos)}										\complejidad{O(\# de campos)}
-	\State Este while es O(1) y se debe a que el cardinal de campos a iterar es acotado.			
 					\State	Dato valor $\larr$ Significado(columnas, Siguiente(itcampos)) \complejidad{O(L)}
 					\State	Definir(res.Campos, Siguiente(itcampos), Tipo?(valor)) \complejidad{O(1)}
 					\State	Avanzar(itcampos) \complejidad{O(1)}
-	\EndWhile \\
-	\State itclaves $\larr$ crearItConj(claves) 				\complejidad{O(1)}
-	\State Paso los campos claves de un conj al conjString
-	\While{HaySiguiente(itclaves)}										\complejidad{O(\# de campos)}	
-					\State	AgregarRapido(res.Claves, Siguiente(itclaves)) \complejidad{O(L)}
-					\State	Avanzar(itcampos) \complejidad{O(1)}
-	\EndWhile
+	\EndWhile 
 	\State Donde L es la longitud del valor string mas largo.
  }{O((\#(campos(columnas))*L) }
  
@@ -330,35 +372,114 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
     \State itConj(Registro) nuevo $\larr$ AgregarRapido(t.Registros,r)	\complejidad{O(1)}
     \State t.\#Accesos++																	\complejidad{O(1)}
 	\State Este registro debe ser indexado, si algun indice esta en uso.
-%	\State $<$itConj(registro), itConj(registro) $>$ IndS $\larr$$<$nuevo, CrearIt(vacio())$>$
-	\State IndS $\larr$$<$nuevo, CrearIt(vacio()), CrearIt(vacio())$>$
-	\State IndN $\larr$$<$nuevo, CrearIt(vacio()), CrearIt(vacio())$>$
 	\If{t.IndiceS.EnUso $\land$ t.IndiceN.EnUso}
 		\State Dato valorS	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{O(L)}
-		\State Dato valorN	$\larr$	Significado(r, t.IndiceN.CampoI) \complejidad{O(L)}		
-		\State EsClaveS $\larr$ Pertenece?(t.claves, t.IndiceS.campoI)
-		\State EsClaveN $\larr$ Pertenece?(t.claves, t.IndiceN.campoI)
-		\State Bool DefinidoS $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
-		\State Bool DefinidoN $\larr$Definido?(t.IndiceN.Indice, ValorNat(valor))
+		\State Dato valorN	$\larr$	Significado(r, t.IndiceN.CampoI) \complejidad{O(Log(n))}		
+		\State Bool DefinidoS $\larr$Definido?(t.IndiceS.Indice, ValorString(valorS))
+		\State Bool DefinidoN $\larr$Definido?(t.IndiceN.Indice, ValorNat(valorN))
 		\If{$\neg$DefinidoS $\land$ $\neg$DefinidoN}
 			\State Ambos no estan definidos
 			\State cjS $\larr$ vacio()
 			\State cjN $\larr$ vacio()
-			\State newS $\larr$AgregarRapido(cjS, IndS)			
-			\State newN $\larr$AgregarRapido(cjN, IndN)			
-			\State $\pi_2$(Siguiente(newS)) $\larr$ newN
-			\State $\pi_3$(Siguiente(newS)) $\larr$ newS
-			\State $\pi_2$(Siguiente(newN)) $\larr$ newS
-			\State $\pi_3$(Siguiente(newN)) $\larr$ newN
+			\State newS $\larr$AgregarRapido(cjS, nuevo)			
+			\State newN $\larr$AgregarRapido(cjN, nuevo)			
+			\State Definir(t.IndiceS.Indice, ValorString(valorS), cjS)
+			\State Definir(t.IndiceN.Indice, ValorString(valorN), cjN)
 		\Else
 			\If{DefinidoS $\land$ $\neg$DefinidoN}
-				\State
+				\State cjS $\larr$ Significado(t.IndiceS.Indice, ValorString(valorS))
+				\State cjN $\larr$ vacio()
+				\State newS $\larr$AgregarRapido(cjS, nuevo)			
+				\State newN $\larr$AgregarRapido(cjN, nuevo)			
+				\State Definir(t.IndiceN.Indice, ValorNat(valorN), cjN)
+			\Else
+				\If{$\neg$DefinidoS $\land$ DefinidoN}
+					\State cjN $\larr$ Significado(t.IndiceN.Indice, ValorNat(valorN))
+					\State cjS $\larr$ vacio()
+					\State newS $\larr$AgregarRapido(cjS, nuevo)			
+					\State newN $\larr$AgregarRapido(cjN, nuevo)			
+					\State Definir(t.IndiceS.Indice, ValorString(valorS), cjS)
+				\Else
+					\State Caso en que esta definido en los dos indices
+					\State cjN $\larr$ Significado(t.IndiceN.Indice, ValorNat(valorN))
+					\State cjS $\larr$ Significado(t.IndiceS.Indice, ValorString(valorS))
+					\State newS $\larr$AgregarRapido(cjS, nuevo)			
+					\State newN $\larr$AgregarRapido(cjN, nuevo)			
+				\EndIf
 			\EndIf
-%			\State Bool DefinidoS $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
-%			\State Bool DefinidoN $\larr$Definido?(t.IndiceN.Indice, ValorNat(valor))
-			
+		\EndIf
+		\If{t.IndiceS.Min $>$ valorS} \complejidad{O(L)}
+			\State t.IndiceS.Min $\larr$ valorS\complejidad{O(1)}
+		\EndIf
+		\If{valorS $>$ t.IndiceS.Max}\complejidad{O(L)}
+			\State t.IndiceS.Max $\larr$ valorS\complejidad{O(1)}
+		\EndIf	
+		\If{t.IndiceN.Min $>$ valorN} \complejidad{O(1)}
+			\State t.IndiceN.Min $\larr$ valorN\complejidad{O(1)}
+		\EndIf
+		\If{valorN $>$ t.IndiceN.Max}\complejidad{O(1)}
+			\State t.IndiceN.Max $\larr$ valorN\complejidad{O(1)}
 		\EndIf	
 	\Else
+		\If{t.IndiceS.EnUso $\land$ $\neg$t.IndiceN.EnUso}
+			\State Obtengo de r el valor del campo con el que se creo el indice.
+			\State Dato valor	$\larr$	Significado(r, t.IndiceS.CampoI) \complejidad{O(L)}
+			\State Bool Def $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
+			\If{Def} \complejidad{O(1)}
+				\State	Si esta definido, entonces hay varios registros que cumplen
+				\State	agrego el iterador al conjunto de que ya estaban.
+				\State viejo $\larr$ Significado(t.IndiceS.Indice, ValorString(valor))\complejidad{O(L)}
+				\State itConj(registro) newS $\larr$AgregarRapido(viejo, nuevo) \complejidad{O(L)}
+				\State itConj(registro) newN $\larr$CrearIt(vacio())
+			\Else
+				\State Conj(Registro) viejo $\larr$ Vacio() \complejidad{O(1)}
+				\State itConj(registro) newS $\larr$AgregarRapido(viejo, nuevo)\complejidad{O(1)}
+				\State itConj(registro) newN $\larr$CrearIt(vacio())
+				\State Definir(t.IndiceS.Indice, ValorString(valor), viejo) \complejidad{O(L)}
+				\State Como ingresamos un nuevo valor, actualizamos el min y max
+				\If{t.IndiceS.Min $>$ valor} \complejidad{O(L)}
+					\State t.IndiceS.Min $\larr$ valor\complejidad{O(L)}
+				\EndIf
+				\If{valor $>$ t.IndiceS.Max}\complejidad{O(L)}
+					\State t.IndiceS.Max $\larr$ valor\complejidad{O(L)}
+				\EndIf
+			\EndIf			
+		\Else
+			\If{$\neg$t.IndiceS.EnUso $\land$ t.IndiceN.EnUso}
+				\State Obtengo de r el valor del campo con el que se creo el indice.
+				\State Dato valor $\larr$ Significado(r, t.IndiceN.CampoI) \complejidad{O(L)}
+				\State Bool Def $\larr$ Definido?(t.IndiceN.Indice, ValorNat(valor))\complejidad{O(log(n))}
+				\If{Def} \complejidad{O(1)}
+					\State	Si esta definido, entonces hay varios registros que cumplen
+					\State	agrego el iterador al conjunto de que ya estaban.
+					\State viejo $\larr$ Significado(t.IndiceN.Indice, ValorNat(valor))\complejidad{O(L)}
+					\State itConj(registro) newN $\larr$AgregarRapido(viejo, nuevo) \complejidad{O(L)}
+					\State itConj(registro) newS $\larr$CrearIt(vacio())
+				\Else
+					\State Conj(Registro) viejo $\larr$ Vacio() \complejidad{O(1)}
+					\State itConj(registro) newN $\larr$AgregarRapido(viejo, nuevo)\complejidad{O(1)}
+					\State itConj(registro) newS $\larr$CrearIt(vacio())
+					\State Definir(t.IndiceN.Indice, ValorNat(valor), viejo) \complejidad{O(L)}
+					\State Como ingresamos un nuevo valor, actualizamos el min y max
+					\If{t.IndiceN.Min $>$ valor} \complejidad{O(1)}
+						\State t.IndiceN.Min $\larr$ valor\complejidad{O(1)}
+					\EndIf
+					\If{valor $>$ t.IndiceN.Max}\complejidad{O(1)}
+						\State t.IndiceN.Max $\larr$ valor\complejidad{O(1)}
+					\EndIf
+				\EndIf
+			\EndIf
+		\EndIf
+	\EndIf
+	\State Bool BasadoEn $\larr$ Significado(t.campos, t.RelacionInd.CampoR)
+	\If{BasadoEn}
+		\State Es True entonces es un DiccNat
+		\State Nat elem $\larr$ValorNat(Significado(r, t.RelacionInd.CampoR))
+		\State Definir(t.RelacionInd.ConsultaN, elem, $< newS, newN >$)
+	\Else
+		\State Es False entonces es un DiccString
+		\State String elem $\larr$ValorString(Significado(r, t.RelacionInd.CampoR))
+		\State Definir(t.RelacionInd.ConsultaS, elem, $< newS, newN >$)
 	\EndIf
 }{O(L+Log(n))}
 %	\If{t.IndiceS.EnUso}
@@ -412,46 +533,179 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %}{O(L+Log(n))}
 
 \newpage
-\algoritmo{borrarRegistro}{in crit: registro,in/out t: tab}{}{}{O(n)}
-%	\State	Campo c $\larr$ Siguiente(CrearIt(Campos(crit)))	\complejidad{O(1)} %chequear
-%	\State 	Dato valor $\larr$	Copiar(Significado(crit, c))			\complejidad{O(L)}
-%	\State Sabemos que c esta incluido en claves(t) y crit tiene solo un campo.
-%	\State Si hay un indice para el campo clave c, borrarRegistro es O(log(n)) u O(L) en peor caso.
-%	\State Tenemos en cuenta que se borra en base a un campo clave, se borra solo un registro.
-%	\If{t.IndiceS.EnUso $\lor$t.IndiceN.EnUso}
-%	\State Caso: Hay algun indice en uso.
-%		\If{t.IndiceS.CampoI=c $\lor$ t.IndiceN.CampoI=c}
-%		\State Caso: Hay algun indice basado en el campo c de crit.
-%			\If{t.IndiceS.CampoI=c}
-%			\State Sabemos que c es un campo clave. Entonces eliminamos solo un reg.
-%				\State ItConj(registro) itr Significado(t.IndiceS.Indice, ValorString(valor))
-%				\State Registro r $\larr$ Siguiente(itr)
-%				\State Borro el registro del conj(registro)
-%				\State EliminarSiguiente(itr)
-%				\State Borro la clave ValorString(valor) del indice
-%				\State Borrar(t.IndiceS.Indice, ValorString(valor))
-%				\State Hecho todo esto puede suceder que el Indice de Nat este en uso
-%				\If{t.IndiceN.EnUso}
-%				\State Si esta en uso, el campo del indice no es c,
-%				\State t.IndiceN.CampoI puede ser clave o no.
-%					\State Dato valorN  $\larr$ Obtener(r, t.IndiceN.CampoI)
-%					\If{Pertenece?(t.claves, t.IndiceN.CampoI)}
-%						\State El campo es clave, entonces elimino solo un registro
-%						\State o sea elimino la entrada del diccionario.
-%						\State Borrar(t.IndiceN.Indice, ValorNat(valor))
-%					\Else
-%						\State El campo no es clave, tengo que recorrer el conj(itConj(registro)),
-%						\State sabemos que los valores Nat se insertan 
-%						\State y borran con distribucion uniforme.
-%					\EndIf
-%				\Else
-%				\EndIf
-%			\Else
-%			\EndIf
-%		\Else
-%		\EndIf	
-%	\Else
-%	\EndIf
+\algoritmo{borrarRegistro}{in crit: registro,in/out t: tab}{}{
+	\State	Campo c $\larr$ Siguiente(CrearIt(Campos(crit)))	\complejidad{O(1)} %chequear
+	\State 	Dato valor $\larr$	Copiar(Significado(crit, c))			\complejidad{O(L)}
+	\State Sabemos que c esta incluido en claves(t) y crit tiene solo un campo.
+	\State Si hay un indice para el campo clave c, borrarRegistro es O(log(n)) u O(L) en peor caso.
+	\State Tenemos en cuenta que se borra en base a un campo clave, se borra solo un registro.
+	\If{t.IndiceS.EnUso $\lor$ t.IndiceN.EnUso}
+	\State Caso: Hay algun indice en uso.
+		\State Buscamos en la Relacion de Indices segun su campo.
+		\State Primero necesito saber en base a que tipo de campo fue creado.
+		\State Tipo BasadoEn  $\larr$ Significado(t.campos, t.RelacionInd.CampoR)
+		\State Dato valorR $\larr$ Significado(r, t.RelacionInd.CampoR)
+		\If{t.IndiceS.CampoI=c $\lor$ t.IndiceN.CampoI=c}
+		\State Caso: Hay algun indice basado en el campo c de crit.
+			\If{t.IndiceS.CampoI=c $\yluego$ Definido?(t.IndiceS.Indice, ValorString(valor))}
+			\State Sabemos que c es un campo clave. Entonces eliminamos solo un reg.
+				\State ItConj(ItConj(registro)) itr $\larr$ CrearIt(Significado(t.IndiceS.Indice, ValorString(valor)))
+				\State Registro r $\larr$ Siguiente(Siguiente(itr))
+				\State Borro el registro de t.registro
+				\State EliminarSiguiente(Siguiente(itr))
+				\State	t.\#Accesos++
+				\State Borro la clave ValorString(valor) del indice
+				\State Borrar(t.IndiceS.Indice, ValorString(valor))
+				\State Hecho todo esto puede suceder que el Indice de Nat este en uso
+				\State Si esta en uso, el campo del indice no es c.
+				\If{t.IndiceN.EnUso}
+					\If{BasadoEn}
+						\State Caso Basado en un Nat
+						\State ItConj(ItConj(registro)) sig$\larr$CreaIt(CrearIt(vacio()))
+						\State sig $\larr$ Significado(t.RelacionInd.ConsultaN, ValorNat(valorR))
+						\State Elimino en el dicc de relacion de indice, la clave del registro.
+						\State Borrar(t.RelacionInd.ConsultaN, ValorNat(valorR))
+					\Else
+						\State Caso Basado en un String
+						\State ItConj(ItConj(registro)) sig$\larr$CreaIt(CrearIt(vacio()))
+						\State sig $\larr$ Significado(t.RelacionInd.ConsultaS, ValorString(valorR))
+						\State Elimino en el dicc de relacion de indice, la clave del registro.
+						\State Borrar(t.RelacionInd.ConsultaS, ValorString(valorR))
+					\EndIf
+					\State EliminarSiguiente(sig.N)
+					\If{$\neg$HaySiguiente?(sig.N)}
+						\State No hay otro registro para este valorR en el Indice
+						\State entonces lo elimino.
+						\State Dato valorInd $\larr$ Significado(r, t.IndiceN.campoI)
+						\State Borrar(t.IndiceN.Indice, ValorNat(valorInd))
+					\EndIf
+				\Else
+					\State Si no esta en uso, solo tengo que eliminar la relacion de indices.
+					\If{BasadoEn}
+						\State Caso Basado en un Nat
+						\State Borrar(t.RelacionInd.ConsultaN, ValorNat(valorR))
+					\Else
+						\State Caso Basado en un String
+						\State Borrar(t.RelacionInd.ConsultaS, ValorString(valorR))
+					\EndIf
+				\EndIf
+			\Else
+				\If{t.IndiceN.CampoI=c $\yluego$ Definido?(t.IndiceN.Indice, ValorNat(valor))}
+					\State Entonces es el caso de t.IndiceN.CampoI=c.
+					\State Sabemos que c es un campo clave. Entonces eliminamos solo un reg.
+					\State ItConj(ItConj(registro)) itr $\larr$ CrearIt(Significado(t.IndiceN.Indice, ValorNat(valor)))
+					\State Registro r $\larr$ Siguiente(Siguiente(itr))
+					\State Borro el registro de t.registro
+					\State EliminarSiguiente(Siguiente(itr))
+					\State	t.\#Accesos++
+					\State Borro la clave ValorNat(valor) del indice
+					\State Borrar(t.IndiceN.Indice, ValorString(valor))
+					\State Hecho todo esto puede suceder que el Indice de String este en uso
+					\State Si esta en uso, el campo del indice no es c.
+					\If{t.IndiceN.EnUso}
+						\If{BasadoEn}
+							\State Caso Basado en un Nat
+							\State ItConj(ItConj(registro)) sig$\larr$CreaIt(CrearIt(vacio()))
+							\State sig $\larr$ Significado(t.RelacionInd.ConsultaN, ValorNat(valorR))
+							\State Elimino en el dicc de relacion de indice, la clave del registro.
+							\State Borrar(t.RelacionInd.ConsultaN, ValorNat(valorR))
+						\Else
+							\State Caso Basado en un String
+							\State ItConj(ItConj(registro)) sig$\larr$CreaIt(CrearIt(vacio()))
+							\State sig $\larr$ Significado(t.RelacionInd.ConsultaS, ValorString(valorR))
+							\State Elimino en el dicc de relacion de indice, la clave del registro.
+							\State Borrar(t.RelacionInd.ConsultaS, ValorString(valorR))
+						\EndIf
+						\State EliminarSiguiente(sig.S)
+						\If{$\neg$HaySiguiente?(sig.S)}
+							\State No hay otro registro para este valorR en el Indice
+							\State entonces lo elimino.
+							\State Dato valorInd $\larr$ Significado(r, t.IndiceS.campoI)
+							\State Borrar(t.IndiceS.Indice, ValorString(valorInd))
+						\EndIf
+					\Else
+						\State Si no esta en uso, solo tengo que eliminar la relacion de indices.
+						\If{BasadoEn}
+							\State Caso Basado en un Nat
+							\State Borrar(t.RelacionInd.ConsultaN, ValorNat(valorR))
+						\Else
+							\State Caso Basado en un String
+							\State Borrar(t.RelacionInd.ConsultaS, ValorString(valorR))
+						\EndIf
+					\EndIf
+				\EndIf
+			\EndIf
+		\Else
+			\State Hay algun indice, pero no esta basado en el campo c de crit
+			\State itConj(registro) cr $\larr$ CrearIt(t.registros)\complejidad{O(1)}
+			\State Dato valorm $\larr$ Significado(Siguiente(cr), c)
+			\State Registro Delr $\larr$ Siguiente(cr)
+			\While{HaySiguiente(cr) $\land$ $\neg$(valorm=valor)}\complejidad{O(Cardinal(t.registros))}
+					\State Delr $\larr$ Siguiente(cr)
+					\State valorm $\larr$ Significado(Delr, c)		\complejidad{O(1)}
+					\If{valorm=valor}
+						\State EliminarSiguiente(cr);									\complejidad{O(1)}
+						\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
+						\State Ademas tengo que actualizar los indices, usando la relacion de indices
+						\If{t.IndiceS.EnUso $\lor$ t.IndiceN.EnUso}
+							\If{BasadoEn}
+								\State Caso basado en un campo nat
+								\State key$\larr$ ValorNat(Significado(Delr, t.RelacionInd.campoR))
+								\State dataindices $\larr$Significado(t.RelacionInd.ConsultaN, key)
+								\State Borrar(t.RelacionInd.ConsultaN, key)
+							\Else
+								\State Caso basado en un campo string
+								\State key$\larr$ ValorString(Significado(Delr, t.RelacionInd.campoR))
+								\State dataindices $\larr$Significado(t.RelacionInd.ConsultaS, key)
+								\State Borrar(t.RelacionInd.ConsultaS, key)
+							\EndIf						
+							\If{t.IndiceS.EnUso $\land$ t.IndiceN.EnUso}
+								\State EliminarSiguiente(dataindices.S)
+								\State EliminarSiguiente(dataindices.N)
+							\Else
+								\If{t.IndiceS.EnUso}
+									\State EliminarSiguiente(dataindices.S)
+								\Else
+									\If{t.IndiceN.EnUso}
+										\State EliminarSiguiente(dataindices.N)
+									\EndIf
+								\EndIf
+							\EndIf
+							\If{t.IndiceN.EnUso $\yluego$ $\neg$HaySiguiente?(dataindices.N)}
+								\State valN $\larr$ ValorNat(Significado(Delr, t.IndiceN.campoI))
+								\State Borrar(t.IndiceN.Indice, valN)
+							\EndIf
+							\If{t.IndiceS.EnUso $\yluego$ $\neg$HaySiguiente?(dataindices.S)}
+								\State valS $\larr$ ValorString(Significado(Delr, t.IndiceS.campoI))
+								\State Borrar(t.IndiceN.Indice, valN)
+							\EndIf
+						\EndIf
+					\EndIf
+					\State Avanzar(cr)													\complejidad{O(1)}
+			\EndWhile
+		\EndIf	
+	\Else
+		\State No hay indices.
+		\State itConj(registro) cr $\larr$ CrearItConj(t.registros)\complejidad{O(1)}
+		\While{HaySiguiente(cr)}\complejidad{O(Cardinal(t.registros))}
+			\State Registro Delr $\larr$ Siguiente(cr)
+			\State valorm $\larr$ Significado(Delr, c)		\complejidad{O(1)}
+			\If{valorm=valor}
+				\State EliminarSiguiente(cr);									\complejidad{O(1)}
+				\State Dado que el crit solo tiene un campo clave, siempre elimino solo un registro.
+			\EndIf
+			\State Avanzar(cr)													\complejidad{O(1)}
+		\EndWhile
+	\EndIf
+	\State En el peor de los casos no hay indice y eliminar es complejidad O(n).
+	\State En caso de que haya algun indice basado en el campo del crit de borrado,
+	\State la complejidad es O(L) si es un campo string, y O(Log(n)) si es un campo nat.
+	\State Tambien puede suceder que exista algun indice, pero ninguno basado en el campo
+	\State del crit de borrado con costo O(n).
+	\State La actualizacion de los indices se ve soportada en el Diccionario t.RelacionInd
+	\State que nos permite acceder al iterador del conjunto almancenado en su significado,
+	\State dicho iterador contiene el iterador del registro dentro de t.registros que es un conj Linea.
+}{O(n)}
 %	
 %	
 %	\If{t.IndiceS.EnUso $\yluego$ t.IndiceS.CampoI=c}
@@ -524,53 +778,131 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
 \newpage
 \algoritmo{indexar}{in c: campo, in/out t: tab}{}{
-	\If{tipoCampo(c,t)}
+	\If{tipoCampo(c,t.campos)}
 		\State t.IndiceN.EnUso $\larr$ True
 	\Else
 		\State t.IndiceS.EnUso $\larr$ True
 	\EndIf
-	\State	cr $\larr$ CrearItConj(t.registros)
-	\If{tipoCampo?(c,t)}
-			\While{HaySiguiente(cr)}
-						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
-						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
-						\If{Definido?(t.IndiceN.Indice, valor)}
-									\State	regviejos $\larr$ Significado(indC, valor)
-									\State	AgregarRapido(regviejos, itr)
-						\Else
-									\State 	conj(registro) nuevo $\larr$ Vacio()
-									\State 	AgregarRapido(nuevo, itr)
-									\State	DefinirRapido(t.IndiceN.Indice, valor, nuevo)
-						\EndIf
-						\State	Avanzar(cr)
-			\EndWhile
-	\EndIf
-	\If{$\neg$tipoCampo?(c,t)}
-			\While{HaySiguiente(cr)}
-						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
-						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
-						\If{Definido?(t.IndiceS.Indice, valor)}
-									\State	regviejos $\larr$ Significado(indC, valor)
-									\State	AgregarRapido(regviejos, itr)
-						\Else
-									\State 	conj(registro)	 nuevo $\larr$ Vacio()
-									\State 	AgregarRapido(nuevo, itr)
-									\State	DefinirRapido(t.IndiceN.Indice, valor, nuevo)
-						\EndIf
-						\State	Avanzar(cr)
-			\EndWhile	
-	\EndIf
-}{O(1)}
+	\State ItConj(ItConj(registro)) newS $\larr$CrearIt(CrearIt(Vacio()))
+	\State ItConj(ItConj(registro)) newN $\larr$CrearIt(CrearIt(Vacio()))
+	\State $<ItConj(ItConj(registro)),ItConj(ItConj(registro))>$ dataIndices
+	\State Buscamos en la Relacion de Indices segun su campo.
+	\State Primero necesito saber en base a que tipo de campo fue creado.
+	\State Tipo BasadoEn  $\larr$ Significado(t.campos, t.RelacionInd.CampoR)
+	\State itConj(registro) cr $\larr$ CrearItConj(t.registros)
+	\While{HaySiguiente(cr)}
+		\If{tipoCampo?(c,t)}
+			\State	Caso Naturales
+			\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
+			\State	Bool Definido $\larr$Definido?(t.IndiceN.Indice, ValorNat(valor))
+			\State 	itConj(registro) itr $\larr$ Copiar(cr)
+			\If{Definido}
+				\State	Significa que para este valor del indice hay mas de un iterador de conj a reg
+				\State	regviejos $\larr$ Significado(t.IndiceN.Indice, ValorNat(valor))
+				\State	itConj(itConj(registro)) newN $\larr$ AgregarRapido(regviejos, itr)
+			\Else
+				\State 	Conj(itConj(registro)) nuevo $\larr$ Vacio()
+				\State 	newN $\larr$ AgregarRapido(nuevo, itr)
+				\State	Definir(t.IndiceN.Indice, ValorNat(valor), nuevo)
+			\EndIf
+		\Else
+			\State	Caso Strings
+			\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
+			\State	Bool Definido $\larr$Definido?(t.IndiceS.Indice, ValorString(valor))
+			\State 	itConj(registro) itr $\larr$ cr
+			\If{Definido}
+				\State	Significa que para este valor del indice hay mas de un iterador de conj a reg
+				\State	regviejos $\larr$ Significado(t.IndiceS.Indice, ValorString(valor))
+				\State	itConj(itConj(registro)) newS $\larr$ AgregarRapido(regviejos, itr)
+			\Else
+				\State 	Conj(itConj(registro)) nuevo $\larr$ Vacio()
+				\State 	newS $\larr$ AgregarRapido(nuevo, itr)
+				\State	Definir(t.IndiceS.Indice, ValorString(valor), nuevo)
+			\EndIf
+		\EndIf
+		\State Ahora actualizo la relacion de indices
+		\State Dato valorR $\larr$ Significado(Siguiente(cr), t.RelacionInd.CampoR)
+		\State Bool DefinidoR 
+		\If{BasadoEn}
+			\State La relacion de indices esta basada en un campo Natural
+			\State DefinidoR $\larr$ Definido?(t.RelacionInd.ConsultaN, ValorNat(valorR))
+		\Else
+			\State La relacion de indices esta basada en un campo String
+			\State DefinidoR $\larr$ Definido?(t.RelacionInd.ConsultaS, ValorString(valorR))
+		\EndIf
+		\If{DefinidoR}
+			\State Significa que el otro indice esta en uso.
+			\If{BasadoEn}
+				\State La relacion de indices esta basada en un campo Natural
+				\State dataIndices $\larr$ Significado(t.RelacionInd.ConsultaN, ValorNat(valorR))															\If{tipoCampo?(c,t.campos)}
+					\State dataIndices.N $\larr$ newN					
+				\Else
+					\State dataIndices.S $\larr$ newS	
+				\EndIf
+			\Else
+				\State La relacion de indices esta basada en un campo String
+				\State dataIndices $\larr$ Significado(t.RelacionInd.ConsultaS, ValorString(valorR))
+				\If{tipoCampo?(c,t)}
+					\State dataIndices.N $\larr$ newN					
+				\Else
+					\State dataIndices.S $\larr$ newS	
+				\EndIf
+			\EndIf
+		\Else
+			\State Significa que el otro indice no esta en uso.
+			\State dataIndices $\larr$ $<newS, newN>$
+			\If{BasadoEn}
+				\State Definir(t.RelacionInd.ConsultaN, ValorNat(valorR), dataIndices)
+			\Else
+				\State Definir(t.RelacionInd.ConsultaS, ValorString(valorR), dataIndices)
+			\EndIf
+		\EndIf
+		\State	Avanzar(cr)	
+	\EndWhile
+}{O(1)}	
+	
+	
+%	\If{tipoCampo?(c,t)}
+%			\While{HaySiguiente(cr)}
+%						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
+%						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
+%						\If{Definido?(t.IndiceN.Indice, valor)}
+%									\State	regviejos $\larr$ Significado(indC, valor)
+%									\State	AgregarRapido(regviejos, itr)
+%						\Else
+%									\State 	conj(registro) nuevo $\larr$ Vacio()
+%									\State 	AgregarRapido(nuevo, itr)
+%									\State	DefinirRapido(t.IndiceN.Indice, valor, nuevo)
+%						\EndIf
+%						\State	Avanzar(cr)
+%			\EndWhile
+%	\EndIf
+%	\If{$\neg$tipoCampo?(c,t)}
+%			\While{HaySiguiente(cr)}
+%						\State 	Dato	valor $\larr$ Significado(Siguiente(cr), c)
+%						\State 	itConj(registro) itr $\larr$ CrearItConj(Siguiente(cr))
+%						\If{Definido?(t.IndiceS.Indice, valor)}
+%									\State	regviejos $\larr$ Significado(indC, valor)
+%									\State	AgregarRapido(regviejos, itr)
+%						\Else
+%									\State 	conj(registro)	 nuevo $\larr$ Vacio()
+%									\State 	AgregarRapido(nuevo, itr)
+%									\State	DefinirRapido(t.IndiceN.Indice, valor, nuevo)
+%						\EndIf
+%						\State	Avanzar(cr)
+%			\EndWhile	
+%	\EndIf
+%}{O(1)}
 
   \algoritmo{puedoInsertar?}{in r:registro, in t:tab}{res:bool}{
-    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, r.ClavesDicc, registros(t)  )  \complejidad{O(calcular))}
+    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, Campo(r), registros(t)  )  \complejidad{O(calcular))}
  }{O(calcular)}
 
 
   \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
   		\State bool valor $\larr$ True
- 		\If{Cardinal(campos(r))=Cardinal(t.Campos.DiccClaves)}
-				  \State itcampos $\larr$ CrearItString(t.Campos.DiccClaves)
+ 		\If{Cardinal(campos(r))=Cardinal(DiccClaves(t.Campos))}
+				  \State itcampos $\larr$ CrearItString(DiccClaves(t.Campos))
 				  \While{valor $\land$ HaySiguiente(itcampos)} \complejidad{O(1)}
 				  			\State Campo c $\larr$ Siguiente(itcampos) \complejidad{O(1)}
 							\State valor $\larr$ Definido?(r, c) \complejidad{O(1)}
@@ -720,7 +1052,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 \newpage
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
 	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{O(1)}  
-	\State	Se me ocurre hacer un DiccString o DiccNat, dependiendo de tipo sea el campo c, de manera que combinar todos sea complejidad O(Log(Cardinal(cr2))).
+%	\State	Se me ocurre hacer un DiccString o DiccNat, dependiendo de tipo sea el campo c, de manera que combinar todos sea complejidad O(Log(Cardinal(cr2))).
 	\State	Lo malo es que combinarRegistros sera O(Cardinal(cr2)*Log(Cardinal(cr2)))
 	\If{Cardinal(cr2)$\geq$1}\complejidad{O(1)}  
 		Registro rtemp $\larr$ Siguiente(CrearIt(cr2))\complejidad{O(1)}  
@@ -807,10 +1139,10 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
  
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
   	\State 	valor $\larr$ True										\complejidad{O(1)}
-  	\State 	itconjClaves $\larr$ CrearItConj(r.ClavesDicc) \complejidad{O(1)}
-  	\While{valor $\land$ HaySiguiente(itconjClaves)}				\complejidad{O(1)}
-  					\State	val1$\larr$ tipo?(Significado(r,Siguiente(itconjClaves))) \complejidad{O(1)}
-  					\State	val2$\larr$ tipoCampo(Siguiente(itconjClaves),t)	\complejidad{O(1)}
+  	\State 	itconjClaves $\larr$ CrearIt(Campo(r)) \complejidad{O(1)}
+  	\While{valor $\yluego$ HaySiguiente?(itconjClaves)}				\complejidad{O(1)}
+  					\State	val1$\larr$ tipo?(Significado(r, Siguiente(itconjClaves))) \complejidad{O(1)}
+  					\State	val2$\larr$ tipoCampo(Siguiente(itconjClaves), t)	\complejidad{O(1)}
 					\State	valor $\larr$ (val1 = val2)	\complejidad{O(1)}
 					\State	Avanzar(cr);								\complejidad{O(1)}
 	\EndWhile     	
@@ -822,51 +1154,51 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 
 \subsection{Algoritmos operaciones auxiliares}
 
- %\operacion{BuscarEnTabla}{in c: campo,in t: tab}{res: Conj(ItConj(registro))}
- %{c$\subseteq$campos(t)}
- %{$res \igobs BuscarEnTabla(c, t)$}
- %{completar con lo que hace.}
- %{O($xxxxx$)}
- %{Retorna res por referencia, es modificable.} 
- 
 \algoritmo{BuscarEnTabla}{in criterio: registro, in t: tab}{res: Conj(ItConj(registro))}{
 	\State 	Primero busco que campos de r, estan en los campos de t y son del mismo tipo
-	\State	itcampos $\larr$ CrearIt(DiccClaves(t.campos))
+	\State	itcampos $\larr$ DiccClaves(t.campos)
 	\State	Bool Encontrado $\larr$ false
-	\State	campo EncontradoC 	
-	\State	Conj(campo) cj $\larr$ vacio()
-	\State	Vemos si algun campo de criterio esta en los indices
+	\State	Campo EncontradoCampoInd
+	\State	Conj(Campo) cj $\larr$ vacio()
 	\While{HaySiguiente?(itcampos) $\land$ $\neg$Encontrado}
 		\State Campo c $\larr$ Siguiente(itcampos)
-		\If{Definido?(criterio, c)}
+		\State Bool Def $\larr$Definido?(criterio, c)
+		\If{Def}
 			\State bool valorD $\larr$ (Tipo?(Significado(criterio, c))=Significado(t.campos, c))
 			\If{valorD}
+				\State	El campo esta en ambos y es del mismo tipo, lo agrego al conj lineal
 				\State	AgregarRapido(cj, c)
-				\State	Encontrado $\larr$ (t.IndiceS.EnUso $\yluego$ t.IndiceS.CampoI=c)
+				\State	Vemos tambien si el campo c de criterio esta en los indices
+				\State	Bool EncS $\larr$ (t.IndiceS.EnUso $\yluego$ t.IndiceS.CampoI=c)
+				\State	Bool EncN $\larr$ (t.IndiceN.EnUso $\yluego$ t.IndiceN.CampoI=c)
+				\State	Encontrado $\larr$ (EncS $\lor$ EncN)
 				\If{Encontrado}
-					\State	EncontradoC $\larr$ c
+					\State	EncontradoCampoInd $\larr$ c
 				\EndIf
 			\EndIf
 		\EndIf
 		\State	Avanzar(itcri)
 	\EndWhile	
-	\State	Si encontrado es true entonces uso indice, sino recorro todo los registros
+	\State	Si Encontrado es true entonces uso indice, sino recorro todo los registros
 	\If{Encontrado}
-		\State Entonces hay un indice para EncontradoC
-		\If{Significado(t.campos, EncontradoC)}
+		\State Entonces hay un indice para EncontradoCampoInd
+		\If{t.IndiceN.EnUso $\yluego$ t.IndiceN.CampoI=EncontradoCampoInd}
 			\State	Caso Natural
 			\State	Obtengo el valor nat del registro criterio
-			\State	Nat valor $\larr$ ValorNat(Significado(t.campos, EncontradoC))
-			\State	res $\larr$ Significado(t.IndiceN.Indice, valor)
+			\State	Nat valor $\larr$ ValorNat(Significado(criterio, EncontradoCampoInd))
+			\State	Conj(itConj(registro)) res $\larr$ Significado(t.IndiceN.Indice, valor)
 		\EndIf
 		\If{$\neg$Significado(t.campos, EncontradoC)}
 			\State	Caso String
 			\State	Obtengo el valor nat del registro criterio
-			\State	String valor $\larr$ ValorString(Significado(t.campos, EncontradoC))
-			\State	res $\larr$ Significado(t.IndiceS.Indice, valor)
+			\State	String valor $\larr$ ValorString(Significado(criterio, EncontradoCampoInd))
+			\State	Conj(itConj(registro)) res $\larr$ Significado(t.IndiceS.Indice, valor)
 		\EndIf
 	\Else
 		res $\larr$ Coincidencias(criterio, t.registros)
 	\EndIf
+	\State	La complejidad depende de si hay indice para algun campo de criterio,
+	\State	en ese caso la complejidad es O(\#(Campos(criterio))+L + Log(n))
+	\State	En caso contrario es O(\#(Campos(t))+\#(Registros(t)))
  }{O(1)}
  
