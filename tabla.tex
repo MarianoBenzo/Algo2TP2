@@ -175,17 +175,17 @@ $\textbf{usa}${ DiccString(string, alfha),} {DiccNat(nat, beta),}{Nat, String, D
  {Compara los tipos correspondientes a los campos del registro y la tabla.}
  {O($1$)}
  {Retorna res por referencia, no es modificable.} 
-
+\newpage
  %%%%%%% AUXILIARES
  \operacion{BuscarEnTabla}{in c: campo,in t: tab}{res: Conj(ItConj(registro))}
  {c$\subseteq$campos(t)}
  {$res \igobs BuscarEnTabla(c, t)$}
  {}
- {O($xxxxx$)}
+ {O($O(L+Log(n))$)}
  {Retorna res por referencia, es modificable.} 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+
 \subsection{Representación}
 
 \serc{Tabla}
@@ -235,7 +235,7 @@ Conj(itConj()) cj Significado(t.IndiceS.Indice, Significado(r, t.IndiceS.CampoI)
 si Definido?(t.IndiceN.Indice, d) es true, entonces para todo itConj(registro) it que pertenece a \\
 el conj(ItConj(registro)) cj Significado(t.IndiceS.Indice, d), registro r $\larr$Siguiente(it), \\
 r pertenece a t.Registros.
-\newpage
+
 % Todo registro de la tabla pertenece a algun significado de t.IndiceS.Indice
 \item	Si t.IndiceN.EnUso es true y t.IndiceN.CampoI pertenece a t.Campos, \\
 entonces para todo registro R de t.Registros entonces \\
@@ -1049,7 +1049,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %		\State correspondientes.
 %	\EndIf
 
-\newpage
+
 \algoritmo{combinarRegistros}{in c:campo, in cr1:Conj(registro), in cr2:Conj(registro)}{res:Conj(registros)}{
 	\State	itcr1 $\larr$ CrearItConjString(cr1) \complejidad{O(1)}  
 %	\State	Se me ocurre hacer un DiccString o DiccNat, dependiendo de tipo sea el campo c, de manera que combinar todos sea complejidad O(Log(Cardinal(cr2))).
@@ -1104,38 +1104,38 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
  
 \algoritmo{dameColumna}{in c:campo, in cr:Conj(registro)}{res:Conj(dato)}{
   	\State 	Conj(Dato)	cj $\larr$ vacio();				\complejidad{O(1)}
-	\State	La idea es no agregar el mismo dato dos veces, para eso uso un conj
-	\State	del tipo de dato de la columna para hacer consulta.
-	\If{Cardinal(cr)$\geq$1}\complejidad{O(1)}		
-			\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(CrearIt(cr))), c)\complejidad{O(1)}		
-			\If{Tvalor}
-					\State	ConjLog(nat) cj $\larr$ Vacio()\complejidad{O(1)}		
-			\Else
-					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{O(1)}		
-			\EndIf
-			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{O(1)}		
-			\State	cjd $\larr$ Vacio()
-		  	\While{HaySiguiente(itcr)}						\complejidad{O(Cardinal(cr))}
-		  				\State Dato data $\larr$ Significado(Siguiente(itcr), c)
-		  				\If{Tvalor}
-		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{O(Log(n))}
-										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
-										\State	AgregarRapido(cj, valorNat(data))\complejidad{O(1)}
-								\EndIf	
-						\Else
-		  						\If {$\neg$Pertenece?(cj, valorString(data))}\complejidad{O(1)}
-										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
-										\State	AgregarRapido(cj, valorString(data))\complejidad{O(1)}
-								\EndIf	
-						\EndIf
-				\State	Avanzar(itcr);							\complejidad{O(1)}
-			\EndWhile     	
-	\EndIf
-	\State res $\larr$ cjd
-	\State Si la columna es de tipo String, la complejidad es O(n), en caso de ser
-	\State de tipo Nat la complejidad es O(nlog(n)).
+%	\State	La idea es no agregar el mismo dato dos veces, para eso uso un Dicc
+%	\State	del tipo de dato de la columna para hacer consulta.
+%	\If{Cardinal(cr)$\geq$1}\complejidad{O(1)}		
+%			\State	Tvalor $\larr$ Tipo?(Significado(Siguiente(CrearIt(cr))), c)\complejidad{O(1)}		
+%			\If{Tvalor}
+%					\State	DiccNat(nat,bool) cj $\larr$ Vacio()\complejidad{O(1)}		
+%			\Else
+%					\State	ConjString(string) cj $\larr$ Vacio()\complejidad{O(1)}		
+%			\EndIf
+%			\State 	itcr $\larr$ CrearItConj(cr)					\complejidad{O(1)}		
+%			\State	cjd $\larr$ Vacio()
+%		  	\While{HaySiguiente(itcr)}						\complejidad{O(Cardinal(cr))}
+%		  				\State Dato data $\larr$ Significado(Siguiente(itcr), c)
+%		  				\If{Tvalor}
+%		  						\If {$\neg$Pertenece?(cj, valorNat(data))}\complejidad{O(Log(n))}
+%										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
+%										\State	AgregarRapido(cj, valorNat(data))\complejidad{O(1)}
+%								\EndIf	
+%						\Else
+%		  						\If {$\neg$Pertenece?(cj, valorString(data))}\complejidad{O(1)}
+%										\State 	AgregarRapido(cjd, data)\complejidad{O(1)}
+%										\State	AgregarRapido(cj, valorString(data))\complejidad{O(1)}
+%								\EndIf	
+%						\EndIf
+%				\State	Avanzar(itcr);							\complejidad{O(1)}
+%			\EndWhile     	
+%	\EndIf
+%	\State res $\larr$ cjd
+%	\State Si la columna es de tipo String, la complejidad es O(n), en caso de ser
+%	\State de tipo Nat la complejidad es O(nlog(n)).
 	\State Donde n es el cardinal de cr	.
-}{O(nlog(n))}
+}{O(n)}
  
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
   	\State 	valor $\larr$ True										\complejidad{O(1)}

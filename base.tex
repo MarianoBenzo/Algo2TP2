@@ -38,7 +38,7 @@ $\textbf{usa}$
  {true}
  {$res \igobs indices(t)$}
  {Devuelve un conjunto de los indices de la tabla ingresada por parametro.}
- {O($calcular$)}
+ {O($1$)}
  {Se devuelve res por referencia y no es modificable.}
  
 \operacion{campoJoin}{in t1: string, in t2: string, in t: base }{res : itConjTrie(campo)}
@@ -54,32 +54,32 @@ $\textbf{usa}$
  {$True$}
  {$res \igobs nuevaDB()$}
  {Crea una base sin tablas.}
- {O($calcular$)}
+ {O($1$)}
  {}
 
  \operacion{agregarTabla}{in t: tabla, in b: base}{}
  {$b\_0$=b $\land$ nombre(t)$\notin$ tablas(b) $\land$ Vacio?(t.registros)}
  {agregarTabla(t\,$b\_0$)}
  {Agrega una tabla a la base de datos.}
- {O($calcular$)}
+ {O($1$)}
  {Agrega tabla por referencia.} 
  
  \operacion{insertarEntrada}{in reg: registro, in t: string, in b: base}{}
  {$b\_0$=b $\land$ t$\in$tablas(b) $\yluego$ puedoInsertar?(dameTabla(t)\, reg)}
  {insertarEntrada(r\,t \,$b\_0$)}
- {Inserta el registro a la tabla que corresponde al string pasado por parametro.}
- {O($calcular$)}
+ {Inserta el registro a la tabla t.}
+ {O($T$)}
  {} 
  
   \operacion{borrar}{in cr: registro, in t: string, in b: base}{}
- {$b\_0$=b $\land$ t$\in$tablas(b) $\land$ \#(cr.DiccClaves)}
+ {$b\_0$=b $\land$ t$\in$tablas(b) $\land$ \#(DiccClaves(cr))=1}
  {borrar(cr\, t\, $b\_0$)}
  {Borra los registros que cumplan el criterio cr pasado por parametro.}
- {O($calcular$)}
+ {O($T + Log(n)$)}
  {} 	
 
   \operacion{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in b: base}{}
- {b\_0=b $\land$ t1$\sqsupset$t2 $\land$ \{t1, t2\}$\subseteq$tablas(b) $\yluego$ (c$\in$dameTabla(t1, b).diccClaves $\land$ c$\in$dameTabla(t2, b).diccClaves $\land$ $\neg$hayJoin?(t1, t2, b)}
+ {b\_0=b $\land$ t1$\sqsupset$t2 $\land$ \{t1, t2\}$\subseteq$tablas(b) $\yluego$ \\Pertenece?(Campos(dameTabla(t1, b)), c) $\land$ Pertenece?(Campos(dameTabla(t1, b)), c) $\land$ \\$\neg$hayJoin?(t1, t2, b)}
  {generarVistaJoin(cr, t, $b\_0$)}
  {Borra los registros que cumplan el criterio cr pasado por parametro.}
  {O($calcular$)}
@@ -187,7 +187,7 @@ $\textbf{usa}$
 \subsection{Algoritmos}
 
 \algoritmo{tablas}{in b: estr}{res: ConjTrie(string)}{
-  \State $res \larr b.tablas.DiccClaves $ \complejidad{O(1)}
+  \State $res \larr DiccClaves(b.tablas) $ \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{dameTabla}{in t: string, in b: estr}{res: tabla}{
@@ -207,11 +207,12 @@ $\textbf{usa}$
 \algoritmo{nuevaDB}{}{res: estr)}{ 
 	\State String s
 	\State Nat n $\larr$ 0
-  	\State res $\larr$ $\langle \langle s, 0 \rangle, vacio()\rangle$  \complejidad{O(1)} 
+	\State TablaMaxima $\larr$ $< s, 0 >$
+  	\State res $\larr$ $\langle TablaMaxima, vacio()\rangle$  \complejidad{O(1)} 
 }{O(1)}
 
 \algoritmo{agregarTabla}{in t: tabla, in/out b: estr}{}{
-	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t, vacio()\rangle$  \complejidad{O(1)}
+	\State	info\_tabla $\larr$ $\langle t.cantidadDeAccesos, t, vacio()\rangle$  \complejidad{O(1) por ref}
 	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
 }{O(1)}
 
@@ -220,13 +221,13 @@ $\textbf{usa}$
 	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) Por referencia}
 	\State	Agrego el registro a la tabla. \complejidad{O(1)}
 	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1)}
-	\State	agregarRegistro(reg, T)								\complejidad{O(1)}
+	\State	agregarRegistro(reg, T)								\complejidad{O(L+Log(n))}
 	\State	Ahora si hay Joins actualizo la informacion temporal de cada Join.
-	\If{$\neg\emptyset$?(infoT.Joins)} \complejidad{O(1)}
+	\If{$\neg$Vacio?(infoT.Joins)} \complejidad{O(1)}
 				\State	ItConjString(String) itNomTab $\larr$ CrearIt(Claves(infoT.Joins))\complejidad{O(1)}
-				\While{HaySiguiente?(itNomTab)}								\complejidad{O(1)}
+				\While{HaySiguiente?(itNomTab)}								\complejidad{O(W)}
 					\State	info\_join infoJ $\larr$ Obtener(infoT.Joins, Siguiente(NomTab)) \complejidad{O(1)}
-					\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(NomTab),  true\rangle$) \complejidad{O(L)}
+					\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(NomTab),  true\rangle$) \complejidad{O(1)}
 					\State	Encolar es O(L) porque se copia un registro con su cantidad de campos acotada
 					\State	y los valores string copiarlos tiene costo O(L), siendo L el valor string mas largo.
 					\State	Avanzar(itClaves)\complejidad{O(1)}
@@ -236,20 +237,8 @@ $\textbf{usa}$
 			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
 			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
 	\EndIf
-}{O(T*L + Log(n)) siendo n la cantidad de registros en t.}
-
-
-
-
-
-
-
-
-
-
-
-
-
+	\State W la cant de tablas en la base
+}{O(W) }
 
 \algoritmo{borrar}{in cr: registro, in t: string, in/out b: estr}{}{
 	\State info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por ref}
@@ -295,65 +284,124 @@ $\textbf{usa}$
 			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
 			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
 	\EndIf
-}{O(T*L + n)}
+}{O(T + Log(n))}
 
 \algoritmo{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in/out b: estr}{}{
-	\State	Join $\larr$ vacio()
-	\State	T\_actual1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
-	\State	T\_actual2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
-	% Vemos si existe un indice en ambas tablas para c
-	\If{Pertenece?(Indices(T\_actual1), c) $\land$ Pertenece?(Indices(T\_actual1), c)} \complejidad{O(1)}
-			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)  \complejidad{O(calcular)}
-			\If{tipoCampo(T\_actual1, c)}
-					\State	ConjNat(Nat) cjNat $\larr$ vacio()
-					\State	itvalores $\larr$ CrearItConjNat(ind1.PorNat.DiccClaves)
-					\While{HaySiguiente(itvalores)}
-							\State	Registro r $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
-							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
-							\If{$\neg$ Pertenece?(cjNat, n)}
-									\State	AgregarRapido(cjNat, r)
-							\EndIf
-							\State	Avanzar(itvalores)
-					\EndWhile
-					\State	ind2 $\larr$ Obtener(T\_actual2.Indices, c)		
-					\State	itvalores $\larr$ CrearItConjNat(ind2.PorNat.DiccClaves)
-					\While{HaySiguiente(itvalores)}
-							\State	Registro r $\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
-							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
-							\If{$\neg$ Pertenece?(cjNat, n)}
-									\State	AgregarRapido(cjNat, r)
-							\EndIf
-							\State	Avanzar(itvalores)
-					\EndWhile
+	\State	Join $\larr$ vacio() \complejidad{O(1)}
+	\State	Tabla Ta1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
+	\State	Tabla Ta2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
+	\State	Nat n $\larr$Cardinal(Registros(Ta1))\complejidad{O(1)}
+	\State	Nat m $\larr$Cardinal(Registros(Ta2))\complejidad{O(1)}
+	\State	Conj(dato) cjd1$\larr$dameColumna(c, Registros(Ta1)) \complejidad{O(nLog(n))}
+	\State	Conj(dato) cjd2$\larr$dameColumna(c, Registros(Ta2)) \complejidad{O(mLog(m))}
+	\State	Ahora busco la interseccion de estos datos entre los conjuntos cjd1 y cjd2
+	\State	ItConj(dato) itcjd1 $\larr$ CrearIt(cjd1) \complejidad{O(1)}
+	\State	DiccString(String, bool) ds $\larr$ vacio() \complejidad{O(1)}
+	\State	DiccNat(Nat, bool) dn $\larr$ vacio()\complejidad{O(1)}
+	\State	Conj(Dato) cjs $\larr$ vacio()
+	\State	Conj(Dato) cjn $\larr$ vacio()
+	\State	Cargo los valores de t1 en un dicc que depende del tipo del campo c
+	\If{$\neg$tipoCampo(c, Ta1)} \complejidad{O(1)}
+		\State El tipo del campo es string
+		\While{HaySiguiente?(itcjd1)} \complejidad{O(n)}
+			\State Sabemos que el dameColumna no tiene valores repetidos
+	     	\State Definir(ds, ValorString(Siguiente(itcjd1)), true)\complejidad{O(1)}
+			\State Avanzar(itcjd1)\complejidad{O(1)}
+		\EndWhile	
+		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1)}	
+		\State	Ahora buscamos la interseccion
+		\While{HaySiguiente?(itcjd2)} \complejidad{O(m)}
+			\State Sabemos que el dameColumna no tiene valores repetidos
+			\State Bool Def $\larr$ Definido?(ds, ValorString(Siguiente(itcjd2)))\complejidad{O(1)}
+			\If{Def}
+				AgregarRapido(cjs, Siguiente(itcjd2))\complejidad{O(1)}
+		     \EndIf
+			\State	Avanzar(itcjd1)\complejidad{O(1)}
+		\EndWhile	
+	\Else
+		\State El tipo del campo es nat
+		\While{HaySiguiente?(itcjd1)} \complejidad{O(n*log(n))}
+			\State Sabemos que el dameColumna no tiene valores repetidos
+	     	\State Definir(dn, ValorNat(Siguiente(itcjd1)), true)\complejidad{O(Log(n))}
+			\State Avanzar(itcjd1)\complejidad{O(1)}
+		\EndWhile	
+		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1)}	
+		\State	Ahora buscamos la interseccion
+		\While{HaySiguiente?(itcjd2)} \complejidad{O(m*Log(n))}
+			\State Sabemos que el dameColumna no tiene valores repetidos
+			\State Bool Def $\larr$ Definido?(dn, ValorString(Siguiente(itcjd2)))\complejidad{O(log(n))}
+			\If{Def}
+				AgregarRapido(cjn,Siguiente(itcjd2))\complejidad{O(1)}
+		     \EndIf
+			\State	Avanzar(itcjd2)\complejidad{O(1)}
+		\EndWhile
+	\EndIf
+	\State Si hay algun valor en la interseccion, con esos valores hago el join.
+	\If{$\neg$Vacio?(cjs) $\lor$ $\neg$Vacio?(cjn)}
+		\If{$\neg$Vacio?(cjs)}
+			\State its $\larr$ CrearIt(cjs)
+			\While{HaySiguiente?(its)}
+				\State	Registro regModelo $\larr$ Definir(vacio(), c, Siguiente(its))
+				
+			\EndWhile
+		\EndIf
+	\EndIf
+%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%
+%%%%%%%%%
+%	% Vemos si existe un indice en ambas tablas para c
+%	\If{Pertenece?(Indices(T\_actual1), c) $\land$ Pertenece?(Indices(T\_actual1), c)} \complejidad{O(1)}
+%			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)  \complejidad{O(calcular)}
+%			\If{tipoCampo(T\_actual1, c)} \complejidad{O(1)}
+%					\State	ConjNat(Nat) cjNat $\larr$ vacio() \complejidad{O(1)}
+%					\State	itvalores $\larr$ CrearIt(ind1.PorNat.DiccClaves) 
 %					\While{HaySiguiente(itvalores)}
-%							\State	r1 $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
-%							\State	r2	$\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+%							\State	Registro r $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
+%							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
+%							\If{$\neg$ Pertenece?(cjNat, n)}
+%									\State	AgregarRapido(cjNat, r)
+%							\EndIf
+%							\State	Avanzar(itvalores)
+%					\EndWhile
+%					\State	ind2 $\larr$ Obtener(T\_actual2.Indices, c)		
+%					\State	itvalores $\larr$ CrearItConjNat(ind2.PorNat.DiccClaves)
+%					\While{HaySiguiente(itvalores)}
+%							\State	Registro r $\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+%							\State	Nat n $\larr$ ValorNat(Obtener(r, c))
+%							\If{$\neg$ Pertenece?(cjNat, n)}
+%									\State	AgregarRapido(cjNat, r)
+%							\EndIf
+%							\State	Avanzar(itvalores)
+%					\EndWhile
+%%					\While{HaySiguiente(itvalores)}
+%%							\State	r1 $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
+%%							\State	r2	$\larr$ Obtener(ind2.PorNat, Siguiente(itvalores))
+%%							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
+%%							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
+%%							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
+%%							\State	AgregarRapido(Join,DameUno(nuevor))
+%%							\State	Avanzar(itvalores)
+%%					\EndWhile
+%			\Else
+%					\State	itvalores $\larr$ CrearItConjString(ind1.PorString.DiccClaves)
+%					\While{HaySiguiente(itvalores)}
+%							\State	r1 $\larr$ Obtener(ind1.PorString, Siguiente(itvalores))
+%							\State	r2	$\larr$ Obtener(ind2.PorString, Siguiente(itvalores))
 %							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
 %							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
 %							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
-%							\State	AgregarRapido(Join,DameUno(nuevor))
+%							\State	AgregarRapido(Join, DameUno(nuevor))
 %							\State	Avanzar(itvalores)
 %					\EndWhile
-			\Else
-					\State	itvalores $\larr$ CrearItConjString(ind1.PorString.DiccClaves)
-					\While{HaySiguiente(itvalores)}
-							\State	r1 $\larr$ Obtener(ind1.PorString, Siguiente(itvalores))
-							\State	r2	$\larr$ Obtener(ind2.PorString, Siguiente(itvalores))
-							\State	cj1 $\larr$ AgregarRapido(vacio(), r1)
-							\State	cj2 $\larr$ AgregarRapido(vacio(), r2)
-							\State	nuevor $\larr$ combinarRegistros(c, cj1, cj2)
-							\State	AgregarRapido(Join, DameUno(nuevor))
-							\State	Avanzar(itvalores)
-					\EndWhile
-			\EndIf
-	\Else
-			\State	cjr1 $\larr$ T\_actual1.registros
-			\State	cjr2 $\larr$ T\_actual1.registros
-			\State	Join$\larr$combinarRegistros(c, cjr1,cjr2)
-	\EndIf
-	\State info\_join $\larr$ $\langle 0, vacio(), vacio(), c, tipoCampo(T\_actual1, c), Join\rangle$
-	\State Definir(b.Joins,	$\langle t1, t2\rangle$ , info\_join)
-
+%			\EndIf
+%	\Else
+%			\State	cjr1 $\larr$ T\_actual1.registros
+%			\State	cjr2 $\larr$ T\_actual1.registros
+%			\State	Join$\larr$combinarRegistros(c, cjr1,cjr2)
+%	\EndIf
+%	\State info\_join $\larr$ $\langle 0, vacio(), vacio(), c, tipoCampo(T\_actual1, c), Join\rangle$
+%	\State Definir(b.Joins,	$\langle t1, t2\rangle$ , info\_join)
 }{O(1)}
 
 \algoritmo{borrarJoin}{in t1: string, in t2: string, in/out b: estr}{}{
@@ -405,7 +453,7 @@ $\textbf{usa}$
 				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
 				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
 				\If{data.Accion}
-					\State 	Si es True entonces la accion es agregar un registro al join
+					\State 	La accion es agregar un registro al join
 					\State 	Para hacer esto necesito saber a que tabla se agrego el registro
 					\State 	NombreTabla NomTorigen $\larr$ data.NomOrigen \complejidad{O(1) por ref}
 					\State 	Sabiendo la tabla de origen, necesito identificar la otra tabla para ver si
@@ -414,10 +462,11 @@ $\textbf{usa}$
 					\State	Dicc(campo,dato) regModelo $\larr$ vacio()
 					\State	Definir(regModelo, c, Significado(r, c))
 					\State	Si hay indice en la tabla para el campo c y ademas es campo clave
-					\State	BuscarEnTabla(tab2, regModelo) tiene complejidad O(L) u O(Log(n))
+					\State	BuscarEnTabla(tab, regModelo) tiene complejidad O(L) u O(Log(n))
 					\State	dependiendo del tipo del campo c.
-					\State	Si no hay indice para el campo c entonces BuscarEnTabla(tab2, regModelo)
-					\State	tiene complejidad O(n+m)
+					\State	Si no hay indice para el campo c entonces BuscarEnTabla(tab, regModelo)
+					\State	tiene complejidad O(m) siendo m la cant de registros en tab.
+					\State 	Registro rotro $\larr$ vacio()
 					\If{NomTorigen=t1}
 						\State	Entonces el otro registro lo tengo que buscar en t2
 						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab2, regModelo))
@@ -425,15 +474,18 @@ $\textbf{usa}$
 						\State	Entonces el otro registro lo tengo que buscar en t1
 						\State	Registro rotro $\larr$ Siguiente(BuscarEnTabla(tab1, regModelo))
 					\EndIf
-					\State	Registro rnuevo $\larr$ UnirRegistros(r, rotro)
-					\If{info$\_$join.campoT}
-						\State	El tipo del campo es Natural.
-						\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-						\State	Definir(info$\_$join.JoinN, key, itnew)
-					\Else
-						\State	El tipo del campo es String.
-						\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
-						\State	Definir(info$\_$join.JoinS, key, itnew)
+					\If{$\neg$Vacio?(rotro)}
+						\State Si habia un registro que cumplia con lo pedido
+						\State	Registro rnuevo $\larr$ UnirRegistros(r, rotro)
+						\If{info$\_$join.campoT}
+							\State	El tipo del campo es Natural.
+							\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
+							\State	Definir(info$\_$join.JoinN, key, itnew)
+						\Else
+							\State	El tipo del campo es String.
+							\State	itConj(registro) itnew $\larr$ AgregarRapido(info$\_$join.JoinC, rnuevo)
+							\State	Definir(info$\_$join.JoinS, key, itnew)
+						\EndIf
 					\EndIf
 				\Else	CasoBorrado
 					\If{info$\_$join.campoT}
@@ -451,7 +503,7 @@ $\textbf{usa}$
 		\EndWhile
 	\EndIf
 	\State res $\larr$ info$\_$join.JoinC
-}{O(1)}
+}{O(Tamaño(infoj.Rcambios)*)}
 
 \algoritmo{cantidadDeAccesos}{in t: string, in b: base}{res: nat}{
   \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
