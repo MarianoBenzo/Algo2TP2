@@ -81,15 +81,15 @@ $\textbf{usa}$
   \operacion{generarVistaJoin}{in t1: string, in t2: string, in c: campo, in b: base}{}
  {b\_0=b $\land$ t1$\sqsupset$t2 $\land$ \{t1, t2\}$\subseteq$tablas(b) $\yluego$ \\Pertenece?(Campos(dameTabla(t1, b)), c) $\land$ Pertenece?(Campos(dameTabla(t1, b)), c) $\land$ \\$\neg$hayJoin?(t1, t2, b)}
  {generarVistaJoin(cr, t, $b\_0$)}
- {Borra los registros que cumplan el criterio cr pasado por parametro.}
- {O($calcular$)}
+ {Genera el Join, entre las tablas pasadas por parametro.}
+ {O($(n+m)*(L+Log((n+m)))$)}
  {} 	
 
    \operacion{borrarJoin}{in t1: string, in t2: string, in b: base}{}
  {$b\_0$=b $\land$ hayJoin?(t1\, t2\, b)}
  {borrarJoin(t1\, t2\, $b\_0$)}
- {Borra correspondiente a los nombres de tablas, pasados por parametro.}
- {O($calcular$)}
+ {Borra el join entre tablas, pasadas por parametro.}
+ {O($1$)}
  {}
 
 %%%%%%% Otras Operaciones %%%%%%%%%%%
@@ -98,7 +98,7 @@ $\textbf{usa}$
  {t$\in$tablas(b)}
  {$res \igobs registros(t\, b)$}
  {Retorna el conjunto de registros correspondientes al nombre de tabla pasado por parametro}
- {O(1)}
+ {O(1) por ref}
  {Se retorna el conjunto de registros por referencia.} 
 
 
@@ -106,36 +106,36 @@ $\textbf{usa}$
  {\{t1\, t2\}$\subseteq$tablas(b) $\land$ hayJoin?(t1\,t2\,b)}
  {$res \igobs vistaJoin(t1\, t2\, b)$}
  {Retorna el conjunto de registros correspondientes al nombre de tabla pasado por parametro}
- {O($calcular$)}
+ {O($R*(L+ Log(n*m))$)}
  {Se retorna el conjunto de registros por referencia.} 
 
  \operacion{cantidadDeAccesos}{in t: string, in b: base}{res: nat}
  {t$\in$tablas(b)}
  {$res \igobs cantidadDeAccesos(t\,b)$}
  {Retorna la cantidad de modificaciones correspondientes al nombre de tabla pasado por parametro.}
- {O(1)}
+ {O(1) por ref}
  {Se retorna res por referencia.} 
 
  \operacion{tablaMaxima}{in b: base}{res: string}
  {$\neg\emptyset$?(tablas(b))}
  {$res \igobs tablaMaxima(t\,b)$}
  {Retorna el nombre de la tabla con la mayor cantidad de modificaciones.}
- {O(1)}
- {Se retorna el nombre de la tabla por referencia.} 
+ {O(1) por ref}
+ {Se retorna el nombre de la tabla por referencia, no es modificable.} 
   
  \operacion{encontrarMaximo}{in t: string, in ct: conj(string), in b: base}{res: string}
  {\{t\}$\cup$ct $\subseteq$tablas(b)}
  {$res \igobs tablaMaxima(t\,b)$}
- {Retorna ...}
- {O($calcular$)}
- {Se retorna el nombre de la tabla por referencia.}
+ {Retorna el nombre de alguna de las tablas con mayor cantidad de accesos.}
+ {O($1$)}
+ {Se retorna el nombre de la tabla por referencia, no es modificable.}
   
- \operacion{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(registro)}
+ \operacion{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(ItConj(registro))}
  {t$\in$tablas(b)}
  {$res \igobs tablaMaxima(t\,b)$}
- {Retorna ...}
- {O($calcular$)}
- {Se retorna el nombre de la tabla por referencia.}
+ {Retorna el conjunto de los iteradores de registro al conjunto de registros de la tabla.}
+ {O($Cantidad de registros$)}
+ {Se retorna por referencia, es modificable.}
   
  
 \newpage
@@ -187,55 +187,55 @@ $\textbf{usa}$
 \subsection{Algoritmos}
 
 \algoritmo{tablas}{in b: estr}{res: ConjTrie(string)}{
-  \State $res \larr DiccClaves(b.tablas) $ \complejidad{O(1)}
-}{O(1)}
+  \State $res \larr DiccClaves(b.tablas) $ \complejidad{O(1) por ref}
+}{O(1) por ref}
 
 \algoritmo{dameTabla}{in t: string, in b: estr}{res: tabla}{
-  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
-  \State $res \larr info.TActual $ \complejidad{O(1)}
-}{O(1)}
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1) por ref}
+  \State $res \larr info.TActual $ \complejidad{O(1) por ref}
+}{O(1) por ref}
 
 \algoritmo{hayJoin?}{in t1: string, in t2: string, in b: estr}{res: bool}{
 	\State   res $\larr$Definido?(Obtener(b, t1).Joins,t2) $\larr$ Definido?(Obtener(b, t2).Joins,t1)
-}{O(1)}
+}{O(1) por ref}
 
 \algoritmo{campoJoin}{in t1: string, in t2: string, in b: estr}{res: campo}{
 		\State res$\larr$ Obtener(Obtener(b, t1).Joins, t2).campoJ
-}{O(1)}
+}{O(1) por ref}
 
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
 \algoritmo{nuevaDB}{}{res: estr)}{ 
 	\State String s
 	\State Nat n $\larr$ 0
 	\State TablaMaxima $\larr$ $< s, 0 >$
-  	\State res $\larr$ $\langle TablaMaxima, vacio()\rangle$  \complejidad{O(1)} 
-}{O(1)}
+  	\State res $\larr$ $\langle TablaMaxima, vacio()\rangle$  \complejidad{O(1) por ref} 
+}{O(1) por ref}
 
 \algoritmo{agregarTabla}{in t: tabla, in/out b: estr}{}{
 	\State	info\_tabla $\larr$ $\langle cantidadDeAccesos(t), t, vacio()\rangle$  \complejidad{O(1) por ref}
-	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1)}
-}{O(1)}
+	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1) por ref}
+}{O(1) por ref}
 
 \algoritmo{insertarEntrada}{in reg: registro, in t: string, in/out b: estr}{}{
-	\State	Obtenemos la tabla es O(1) porque su nombre esta acotado.
-	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) Por referencia}
-	\State	Agrego el registro a la tabla. \complejidad{O(1)}
-	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1)}
+	\State	Obtenemos la tabla es O(1) por ref porque su nombre esta acotado.
+	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por referencia}
+	\State	Agrego el registro a la tabla. \complejidad{O(1) por ref}
+	\State	Tabla T $\larr$ infoT.TActual \complejidad{O(1) por ref}
 	\State	agregarRegistro(reg, T)								\complejidad{O(L+Log(n))}
 	\State	Ahora si hay Joins actualizo la informacion temporal de cada Join.
-	\If{$\neg$Vacio?(infoT.Joins)} \complejidad{O(1)}
-				\State	ItConjString(String) itNomTab $\larr$ CrearIt(Claves(infoT.Joins))\complejidad{O(1)}
+	\If{$\neg$Vacio?(infoT.Joins)} \complejidad{O(1) por ref}
+				\State	ItConjString(String) itNomTab $\larr$ CrearIt(Claves(infoT.Joins))\complejidad{O(1) por ref}
 				\While{HaySiguiente?(itNomTab)}								\complejidad{O(W)}
-					\State	info\_join infoJ $\larr$ Obtener(infoT.Joins, Siguiente(NomTab)) \complejidad{O(1)}
-					\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(NomTab),  true\rangle$) \complejidad{O(1)}
+					\State	info\_join infoJ $\larr$ Obtener(infoT.Joins, Siguiente(NomTab)) \complejidad{O(1) por ref}
+					\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(NomTab),  true\rangle$) \complejidad{O(1) por ref}
 					\State	Encolar es O(L) porque se copia un registro con su cantidad de campos acotada
 					\State	y los valores string copiarlos tiene costo O(L), siendo L el valor string mas largo.
-					\State	Avanzar(itClaves)\complejidad{O(1)}
+					\State	Avanzar(itClaves)\complejidad{O(1) por ref}
 				\EndWhile
 	\EndIf
 	\If{CantidadDeAccesos(T) $\>$b.TablaMaxima.\#Modif}
 			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
-			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
+			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1) por ref}
 	\EndIf
 	\State W la cant de tablas en la base
 }{O(W) }
@@ -246,14 +246,14 @@ $\textbf{usa}$
 	\State NombreTabla NomTab $\larr$ NombreTabla(T)
 	\State La eliminacion en primera etapa depende de si hay
 	\State	 joins con la tabla pasada por parametro
-	\If{$\neg\emptyset$?(Claves(infoT.Joins))} \complejidad{O(1)}
+	\If{$\neg\emptyset$?(Claves(infoT.Joins))} \complejidad{O(1) por ref}
 			\State Creo el iterador, para navegar los nombres de tablas con los que tiene Join
-			\State itNom $\larr$ CrearIt(Claves(infoT.Joins)) \complejidad{O(1)}
+			\State itNom $\larr$ CrearIt(Claves(infoT.Joins)) \complejidad{O(1) por ref}
 			\While{HaySiguiente?(itNom)} \complejidad{O(Cant de tablas)}
-					\State info\_join infoJ $\larr$ Siguiente(itNom) \complejidad{O(1)}
+					\State info\_join infoJ $\larr$ Siguiente(itNom) \complejidad{O(1) por ref}
 					\State Verifico si el Join esta creado en base al 
 					\State campo del cr pasado por parametro.
-					\If{infoJ.campoJ=DameUno(Campos(cr))} \complejidad{O(1)}
+					\If{infoJ.campoJ=DameUno(Campos(cr))} \complejidad{O(1) por ref}
 							\State	Entonces solo actualizo la cola temporal del join
 							\State	Registro reg $\larr$ Buscar(cr, T) \complejidad{O(L + Log(n))}
 							\State	Encolar(infoJ.Rcambios, $\langle reg, Siguiente(itNom),  False\rangle$)\complejidad{O(L)}
@@ -267,7 +267,7 @@ $\textbf{usa}$
 							\State	Luego agrego estos registros a la cola temporal de cambios del join
 							\While{HaySiguiente?(itReg)}
 									\State	Encolar(infoJ.Rcambios, $\langle Siguiente(itReg), NomTab,  False\rangle$) \complejidad{O(L)}
-									\State Avanzar(itReg)\complejidad{O(1)}
+									\State Avanzar(itReg)\complejidad{O(1) por ref}
 							\EndWhile
 					\EndIf
 			\EndWhile
@@ -281,7 +281,7 @@ $\textbf{usa}$
 	\State	borrarRegistro(r, $T\_$actual)						\complejidad{O(T*L + n)}
 	\If{CantidadDeAccesos(T) $\>$b.TablaMaxima.\#Modif}
 			\State	b.TablaMaxima.NomTabla $\larr$ Copiar(Nombre(T)) \complejidad{O(L)}
-			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1)}
+			\State	b.TablaMaxima.\#Modif $\larr$ Copiar(CantidadDeAccesos(T))\complejidad{O(1) por ref}
 	\EndIf
 }{O(T + Log(n))}
 
@@ -291,59 +291,59 @@ $\textbf{usa}$
 	\State	Tipo campoT $\larr$ tipoCampo(c, Ta1)
 	\State	DiccTrie(string; itConj(registro))  JoinS $\larr$ Vacio()
 	\State	DiccNat(nat; itConj(registro)) JoinN  $\larr$ Vacio()
-	\State	Conj(Registro) JoinC $\larr$ vacio() \complejidad{O(1)}
+	\State	Conj(Registro) JoinC $\larr$ vacio() \complejidad{O(1) por ref}
       								
-	\State	Tabla Ta1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1)}
-	\State	Tabla Ta2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1)}
-	\State	Nat n $\larr$Cardinal(Registros(Ta1))\complejidad{O(1)}
-	\State	Nat m $\larr$Cardinal(Registros(Ta2))\complejidad{O(1)}
+	\State	Tabla Ta1 $\larr$	Obtener(b.tablas, t1).Tactual		\complejidad{O(1) por ref}
+	\State	Tabla Ta2 $\larr$	Obtener(b.tablas, t2).Tactual		\complejidad{O(1) por ref}
+	\State	Nat n $\larr$Cardinal(Registros(Ta1))\complejidad{O(1) por ref}
+	\State	Nat m $\larr$Cardinal(Registros(Ta2))\complejidad{O(1) por ref}
 	\State	Conj(dato) cjd1$\larr$dameColumna(c, Registros(Ta1)) \complejidad{O(nLog(n))}
 	\State	Conj(dato) cjd2$\larr$dameColumna(c, Registros(Ta2)) \complejidad{O(mLog(m))}
 	\State	Ahora busco la interseccion de estos datos entre los conjuntos cjd1 y cjd2
-	\State	ItConj(dato) itcjd1 $\larr$ CrearIt(cjd1) \complejidad{O(1)}
-	\State	DiccString(String, bool) ds $\larr$ vacio() \complejidad{O(1)}
-	\State	DiccNat(Nat, bool) dn $\larr$ vacio()\complejidad{O(1)}
+	\State	ItConj(dato) itcjd1 $\larr$ CrearIt(cjd1) \complejidad{O(1) por ref}
+	\State	DiccString(String, bool) ds $\larr$ vacio() \complejidad{O(1) por ref}
+	\State	DiccNat(Nat, bool) dn $\larr$ vacio()\complejidad{O(1) por ref}
 	\State	Conj(Dato) cjD $\larr$ vacio()
 	\State	Cargo los valores de t1 en un dicc que depende del tipo del campo c
-	\If{$\neg$campoT} \complejidad{O(1)}
+	\If{$\neg$campoT} \complejidad{O(1) por ref}
 		\State El tipo del campo es string
 		\While{HaySiguiente?(itcjd1)} \complejidad{O(n)}
 			\State Sabemos que el dameColumna no tiene valores repetidos
-	     	\State Definir(ds, ValorString(Siguiente(itcjd1)), true)\complejidad{O(1)}
-			\State Avanzar(itcjd1)\complejidad{O(1)}
+	     	\State Definir(ds, ValorString(Siguiente(itcjd1)), true)\complejidad{O(1) por ref}
+			\State Avanzar(itcjd1)\complejidad{O(1) por ref}
 		\EndWhile	
-		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1)}	
+		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1) por ref}	
 		\State	Ahora buscamos la interseccion
 		\While{HaySiguiente?(itcjd2)} \complejidad{O(m)}
 			\State Sabemos que el dameColumna no tiene valores repetidos
-			\State Bool Def $\larr$ Definido?(ds, ValorString(Siguiente(itcjd2)))\complejidad{O(1)}
+			\State Bool Def $\larr$ Definido?(ds, ValorString(Siguiente(itcjd2)))\complejidad{O(1) por ref}
 			\If{Def}
-				AgregarRapido(cjD, Siguiente(itcjd2))\complejidad{O(1)}
+				AgregarRapido(cjD, Siguiente(itcjd2))\complejidad{O(1) por ref}
 		     \EndIf
-			\State	Avanzar(itcjd1)\complejidad{O(1)}
+			\State	Avanzar(itcjd1)\complejidad{O(1) por ref}
 		\EndWhile	
 	\Else
 		\State El tipo del campo es nat
 		\While{HaySiguiente?(itcjd1)} \complejidad{O(n*log(n))}
 			\State Sabemos que el dameColumna no tiene valores repetidos
 	     	\State Definir(dn, ValorNat(Siguiente(itcjd1)), true)\complejidad{O(Log(n))}
-			\State Avanzar(itcjd1)\complejidad{O(1)}
+			\State Avanzar(itcjd1)\complejidad{O(1) por ref}
 		\EndWhile	
-		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1)}	
+		\State	ItConj(dato) itcjd2 $\larr$ CrearIt(cjd2) \complejidad{O(1) por ref}	
 		\State	Ahora buscamos la interseccion
 		\While{HaySiguiente?(itcjd2)} \complejidad{O(m*Log(n))}
 			\State Sabemos que el dameColumna no tiene valores repetidos
 			\State Bool Def $\larr$ Definido?(dn, ValorString(Siguiente(itcjd2)))\complejidad{O(log(n))}
 			\If{Def}
-				AgregarRapido(cjD,Siguiente(itcjd2))\complejidad{O(1)}
+				AgregarRapido(cjD,Siguiente(itcjd2))\complejidad{O(1) por ref}
 		     \EndIf
-			\State	Avanzar(itcjd2)\complejidad{O(1)}
+			\State	Avanzar(itcjd2)\complejidad{O(1) por ref}
 		\EndWhile
 	\EndIf
 	\State Si hay algun valor en la interseccion, con esos valores hago el join.
-	\If{$\neg$Vacio?(cjD)}\complejidad{O(1)}
+	\If{$\neg$Vacio?(cjD)}\complejidad{O(1) por ref}
 		\State Caso Strings
-		\State its $\larr$ CrearIt(cjD) \complejidad{O(1)}
+		\State its $\larr$ CrearIt(cjD) \complejidad{O(1) por ref}
 		\While{HaySiguiente?(its)} \complejidad{O((n+m)*(L+Log(n*m)))}
 			\State	Registro regModelo $\larr$ Definir(vacio(), c, Siguiente(its))
 			\State	Como el campo es clave en ambas tablas
@@ -353,28 +353,28 @@ $\textbf{usa}$
 			\State Registro r1 Siguiente(cj1) $\larr$ BuscarEnTabla(regModelo, ta1)\complejidad{O(L+Log(n*m))}
 			\State Registro r2 Siguiente(cj1) $\larr$ BuscarEnTabla(regModelo, ta1)\complejidad{O(L+Log(n*m))}
 			\If{$\neg$campoT}
-				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1)}
-				\State Definir(JoinS, ValorString(Siguiente(its)), itnuevo)\complejidad{O(1)}
+				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1) por ref}
+				\State Definir(JoinS, ValorString(Siguiente(its)), itnuevo)\complejidad{O(1) por ref}
 			\Else
-				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1)}
+				\State itConj(Registro) itnuevo AgregarRapido(JoinC, UnirRegistros(r1, r2))\complejidad{O(1) por ref}
 				\State Definir(JoinN, ValorNat(Siguiente(its), itnuevo)\complejidad{O(Log(n+m))}
 			\EndIf
-			\State Avanzar(its)\complejidad{O(1)}
+			\State Avanzar(its)\complejidad{O(1) por ref}
 		\EndWhile
 	\EndIf
-	\State info\_join $\larr$ $<Rcambios, campoJ, campoT, JoinS, JoinN, JoinC>$\complejidad{O(1)}
-	\State Definir(Ta1.Joins, t2, info\_join)\complejidad{O(1)}
-	\State Definir(Ta2.Joins, t1, info\_join)\complejidad{O(1)}
-}{O(1)}
+	\State info\_join $\larr$ $<Rcambios, campoJ, campoT, JoinS, JoinN, JoinC>$\complejidad{O(1) por ref}
+	\State Definir(Ta1.Joins, t2, info\_join)\complejidad{O(1) por ref}
+	\State Definir(Ta2.Joins, t1, info\_join)\complejidad{O(1) por ref}
+}{O(1) por ref}
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%
 %%%%%%%%%
 %	% Vemos si existe un indice en ambas tablas para c
-%	\If{Pertenece?(Indices(T\_actual1), c) $\land$ Pertenece?(Indices(T\_actual1), c)} \complejidad{O(1)}
+%	\If{Pertenece?(Indices(T\_actual1), c) $\land$ Pertenece?(Indices(T\_actual1), c)} \complejidad{O(1) por ref}
 %			\State	ind1 $\larr$ Obtener(T\_actual1.Indices, c)  \complejidad{O(calcular)}
-%			\If{tipoCampo(T\_actual1, c)} \complejidad{O(1)}
-%					\State	ConjNat(Nat) cjNat $\larr$ vacio() \complejidad{O(1)}
+%			\If{tipoCampo(T\_actual1, c)} \complejidad{O(1) por ref}
+%					\State	ConjNat(Nat) cjNat $\larr$ vacio() \complejidad{O(1) por ref}
 %					\State	itvalores $\larr$ CrearIt(ind1.PorNat.DiccClaves) 
 %					\While{HaySiguiente(itvalores)}
 %							\State	Registro r $\larr$ Obtener(ind1.PorNat, Siguiente(itvalores))
@@ -429,7 +429,7 @@ $\textbf{usa}$
 	\State Tabla tab2 $\larr$ DameTabla(t2, b)
 	\State Borrar(tab1.Joins, t2)
 	\State Borrar(tab2.Joins, t1)
-}{O(1)}
+}{O(1) por ref}
 
 
 % \operacion{buscar}{in criterio: registro, in t: string, in b: base}{res: conj(registro)}
@@ -443,17 +443,17 @@ $\textbf{usa}$
 	\State	info\_tabla infot $\larr$ Significado(b.tablas, t) \complejidad{O(1) por ref}
 	\State	Tabla tab $\larr$ infot.TActual \complejidad{O(1) por ref}
 	\State	res $\larr$ BuscarEnTabla(criterio, tab) 
-}{O(1)}
+}{O(1) por ref}
 
 
 
 
 
 \algoritmo{registros}{in t: string, in b: base}{res: Conj(registros)}{
-  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
-  \State $tab \larr info.TActual $ \complejidad{O(1)}
-  \State $res \larr registros(tab) $ \complejidad{O(1)}
-}{O(1)}
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1) por ref}
+  \State $tab \larr info.TActual $ \complejidad{O(1) por ref}
+  \State $res \larr registros(tab) $ \complejidad{O(1) por ref}
+}{O(1) por ref}
 
 
 \algoritmo{vistaJoin}{in t1: string, in t2: string, in/out b: estr}{}{
@@ -463,10 +463,10 @@ $\textbf{usa}$
 	\State	Tabla	tab2 $\larr$ infot2.TActual	\complejidad{O(1) por ref}
 	\State	info$\_$join	infoj $\larr$ Significado(infot1.Joins, t2) \complejidad{O(1) por ref}
 	\State	Campo c $\larr$ infoj.campoJ \complejidad{O(1) por ref}
-	\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1)}
+	\If{$\neg$EsVacia?(infoj.Rcambios)} \complejidad{O(1) por ref}
 		\State	Hubo cambios desde la generacion del join o del ultimo vistaJoin
 		\While{$\neg$EsVacia?(infoj.Rcambios)}
-				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1)}
+				\State	DatoCambio data $\larr$ Proximo(infoj.Rcambios) \complejidad{O(1) por ref}
 				\State	Desencolar(infoj.Rcambios) \complejidad{O(1) por ref}
 				\State	Registro r $\larr$ data.Reg \complejidad{O(1) por ref}
 				\If{data.Accion}
@@ -523,11 +523,11 @@ $\textbf{usa}$
 }{O(Tamaño(infoj.Rcambios)*)}
 
 \algoritmo{cantidadDeAccesos}{in t: string, in b: base}{res: nat}{
-  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
-  \State $tab \larr info.TActual $ \complejidad{O(1)}
-  \State $res \larr cantidadDeAcccesos(tab) $ \complejidad{O(1)}
-}{O(1)}
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1) por ref}
+  \State $tab \larr info.TActual $ \complejidad{O(1) por ref}
+  \State $res \larr cantidadDeAcccesos(tab) $ \complejidad{O(1) por ref}
+}{O(1) por ref}
 
 \algoritmo{tablaMaxima}{in b: base}{res: string}{
-  \State $res \larr b.TablaMaxima.NomTabla $ \complejidad{O(1)}  
-}{O(1)}
+  \State $res \larr b.TablaMaxima.NomTabla $ \complejidad{O(1) por ref}  
+}{O(1) por ref}
