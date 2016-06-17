@@ -160,10 +160,22 @@
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item El Nombre de la tabla es un String acotado.
-  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
-  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
-  \item 
+  \item El Nombre de las tablas es un String acotado.
+  \item Índices es un arreglo de tamaño 2, que aloja el Índice correspondiente según el orden de creación.
+  \item Para toda Dato que es clave en Índice, su significado llamémoslo sign está incluido en Registros.
+  \item El nombre de la TablaMaxima está definido en Tablas.
+  \item El nombre de la TablaMaxima corresponde a una del conjunto de tablas más modificadas.
+  \item En Tmax $\#$Modif es igual a la cantidad de modificaciones de la tabla NomTabla.
+  \item $\#$Modif de TablaMaxima es mayor o igual a todas las cantidades de modificaciones de las tablas en el conjunto de claves de Tablas.
+  \item Cada NombreTabla definido en Tablas es igual al nombre de TActual en info$\_$tabla de su significado.
+  \item Todas las claves de Joins, de todos los significados de las tablas definidas en Tablas, pertenecen al conjunto de claves de Tablas.
+  \item Para todo info$\_$tabla, el nombre de TActual no está definido en Joins.
+  \item para todo info$\_$tabla, el nombre de TActual pertenece al conjunto de claves del Joins de las claves de su Joins.
+  \item Para todo info$\_$join, el tipo de campoJ es igual a campoT.
+  \item Para todo DatoCambio, NomOrigen es igual a TActual o a la clave que le corresponde en Joins.
+  \item Si campoT es true JoinS esta vacio, y si es false JoinN esta vacio.
+  \item En DatoCambio, si Accion es true entonces Reg pertence al conjunto de registros de NomOrigen.
+  \item En DatoCambio, si Accion es false entonces Reg no pertence al conjunto de registros de NomOrigen.
 
 \end{enumerate}
 
