@@ -1,18 +1,18 @@
 
 \section{Modulo Campo es String}
-\section{Registro}
+\section{Modulo Registro}
 
 \subsection{Interfaz}
 
 \sexc{registro}
-$\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
-\generos{reg, itReg}
-
+\generos{reg}
 
 
 
 \subsubsection*{Operaciones}
 %%%%%% observadores basicos %%%%%%
+Cuando se utiliza conj se está utilizando el conjunto lineal provisto por la cátedra. En las complejidades C denota el campo de mayor longitud de un conjunto o registro al que acompaña.
+
 \operacion{nReg}{}{res:reg}
 {true}
 {res $\igobs$ $\emptyset$}
@@ -20,10 +20,36 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 {O(1)}
 {}
 
+\operacion{Definido?}{in r:reg in c:campo}{res:Bool}
+  {$true$}
+  {$res \igobs def?(c,r)$}
+  {Indica si el campo esta definido}
+  {$O(Longitud(c))$}
+  {}
 
+ \operacion{Definir}{in/out r:reg in c:campo, in d:dato}{}
+  {$r=r_0$}
+  {$d \igobs Definir(c, d, r_0)$}
+  {Se define s en el diccionario}
+  {$O(Longitud(c))$}
+  {$d$ se define por referencia}
+
+ \operacion{Borrar}{in/out r:reg in c:campo}{}
+ {$r \igobs r_0 \land def?(c,r)$}
+ {$r \igobs Borrar(c,r_0)$}
+ {Elimina el campo c}
+ {$O(Longitud(c))$}
+ {}
+
+ \operacion{Significado}{in r:reg in c:campo}{res:dato}
+ {$def?(c,r)$}
+ {$res \igobs obtener(c,r)$}
+ {Se retorna el significado de c}
+ {$O(Longitud(c))$}
+ {}
 
 %%%%%%%%%%%%%%%%%%%%%%% Otras Operaciones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\operacion{campos}{in r: reg}{res : conjonj(campo)}
+\operacion{campos}{in r: reg}{res : conj(campo)}
  {true}
  {$res \igobs alias(res, claves(r))$}
  {Devuelve un conjunto de campos que son claves del registro ingresado por parametro}
@@ -34,35 +60,35 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
  {$\#$campos(crit) = 1}
  {$res \igobs borrar?(crit, r)$}
  {Devuelve true si y solo si todos los campos de crit pertenecen a campos de r.}
- {O($1$)} 
+ {O($Longitud(dameUno(campos(crit)))$)} 
  {}
 
-\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{res : reg}
- {$ true $}
- {$res \igobs agregarCampos(r_1, r_2) $}
- {agrega los datos de los campos faltantes de r2 a los campos de r1 en res}
- {O($#campos(r_2)+#campos(r_1))$} 
- {}
+%\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{res : reg}
+% {$ true $}
+% {$res \igobs agregarCampos(r_1, r_2) $}
+% {agrega los datos de los campos faltantes de r2 a los campos de r1 en res}
+% {O($\#campos(r_2)+\#campos(r_1))$} 
+% {}
  
- \operacion{copiarCampos}{in/out  $r_1$: reg, in  cc: conj(campo), in $r_2$: reg}{res : reg}
-{$true $}
-{$res \igobs copiarCampos(cc, r_1, r_2)$}
-{copia los datos que se encuentran en los campos de r2 a r1}
-{O($#campos(r_2)+#campos(r_1)$)}
-{}
+% \operacion{copiarCampos}{in/out  $r_1$: reg, in  cc: conj(campo), in $r_2$: reg}{res : reg}
+%{$true $}
+%{$res \igobs copiarCampos(cc, r_1, r_2)$}
+%{copia los datos que se encuentran en los campos de r2 a r1}
+%{O($\#campos(r_2)+\#campos(r_1)$)}
+%{}
 
 \operacion{coincideAlguno}{in  $r_1$: reg, in cc: conj(campo), in  $r_2$: reg}{res : bool}
  {cc $\subseteq campos(r_1)\cap$ campos($r_2$)}
  {$res \igobs coincideAlguno(r_1, r_2)$}
  {Devuelve true si y solo si alguno de los campos(dato) de cc pertenece a r1 y r2}
- {O($1$)}
+ {O($\#cc*C$)}
  {}
  
 \operacion{coincidenTodos}{in $r_1$: reg, in cc: conj(campo), in $r_2$: reg}{res : bool }
  {cc $\subseteq campos(r_1) \cap$ campos($r_2$)}
  {$res \igobs coincidenTodos(r_1, cc, r_2) $}
  {Devuelve ture si y solo si todos los campos(dato) de cc pertenecen a r1 y r2}
- {O($1$) } 
+ {O($\#cc*C$) } 
  {}
  
 \operacion{enTodos}{in c: campo, in cr: conj(registro)}{res : bool}
@@ -73,17 +99,24 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
  {}
 
 \operacion{unirRegistros}{in c: campo, in $r_1$:reg, in $r_2$: reg}{res:registro}
-{$c \pertenece campos(r_1) \land c \pertenece (campos(r_2))$}
+{$c \in campos(r_1) \land c \in (campos(r_2))$}
 {$res \igobs combinarTodos(c,r_1,ag( \emptyset , r_2))) )$}
 {Devuelve el registro que combina los valores de $r_1$ y $r_2$ }
-{O($1$)}
+{O($\#campos(r_1)*C$)}
+{$r_1$ y $r_2$ son tomados por referencia}
+
+\operacion{CombinarTodos}{in c: campo, in $r$:reg, in $cr$: conj(reg)}{res:registro}
+{$c \in campos(r_1) \land enTodos(c,cr))$}
+{$res \igobs combinarTodos(c,r_1, cr)$}
+{Devuelve el registro que combina los valores de $r_1$ y un registro apropiado de cr}
+{O($\#campos(r_1)*C *\#(cr)$)}
 {$r_1$ y $r_2$ son tomados por referencia}
 
 
 
 \subsection{Representación}
 
-\serc{DiccString(campo, dato)}
+\serc{dlex}{\donde{dlex}{subdic: diccString(campo,dato)}}
 
 
 \subsubsection*{Invariante de representación}
@@ -91,8 +124,7 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 
 
 \subsubsection*{Función de abstracción}
-\abs{DiccTrie}{reg}{d}{r}{\IF vacía?($d$.claves) THEN vacío ELSE definir(prim($d$).claves, prim($d$).significado, Abs(fin($d$))) FI}
-}
+\abs{reg}{reg}{d}{r}{Abs(dlex)}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,85 +132,102 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 
 \subsection{Algoritmos}
 
+\algoritmo{iDefinir}{in r:reg, in c:campo, in d:dato}{}{
+    \State $Definir(r,c,d)$    \complejidad{O(Longitud(c))}   
+}{O(Longitud(c))}
+
+
+
+\algoritmo{iDefinido?}{in r:reg, in c:campo}{res:bool}{
+  
+  \State $res \larr Definido?(r,c)$     \complejidad{O(Longitud(c))}   
+ }{O(Longitud(c))}
+
+
+
+\algoritmo{iSignificado}{in r:reg, in c:campo}{res:dato}{
+     \State $res\larr significado(c, r.subdic)$        \complejidad{O(Longitud(c))}
+}{O(Longitud(c))}
+
+
+
+\algoritmo{iBorrar}{in/out r:reg, in c:campo}{}{
+  
+  \State $Borrar(r.subdic)$     \complejidad{O(Longitud(c))}   
+  
+   		
+}{O(Longitud(c))}
+
 \algoritmo{campos}{in r: reg}{res: Conj(campo)}{
-  \State cn $\larr$ vacio() \complejidad{O(1)}
-  \State it $\larr$ crearItDicc(r)
-  \While {haySiguiente(it)} \complejidad{O(1)}
-          \State agregar(cn, clave.siguiente(it)) \complejidad{O(1)}
-          \State avanzar(it) \complejidad{O(1)}
- \EndWhile
-  \State res $\larr$ cn \complejidad{O(1)}
+  
+  \State res $\larr$ DiccClaves(r.subdic) \complejidad{O(1)}
 }{O(1)}
 
 
 \algoritmo{borrar?}{in crit: reg in r: reg}{res: bool}{
-  \State cc $\larr$ crit.campos \complejidad{O(1)}
-  \State res $\larr$ coincidenTodos(crit, cc, r): \complejidad{O(1)}
-}{O(1)}
+    \State res $\larr$ coincidenTodos(crit, campos(crit), r): \complejidad{O(Longitud(dameUno(campos(crit))))}
+}{O(Longitud(dameUno(campos(crit))))}
 
  
+% 
+%\algoritmo{agregarCampos}{in $r_1$: reg in $r_2$: reg}{res:reg}{
+%    \State $cc \larr $   \complejidad{O(1)}
+%    \State res $\larr$ copiarCampos(cc,$r_2,r_1$) \complejidad{O($\#campos(r_1)+\#campos(r_2)$)}
+%}{O(1)}
+%
+%%%%hasta acá está todo
+% 
+%  \algoritmo{copiarCampos}{in cc: conj(campo) in/out r1: reg, in r2: reg}{res:reg}{
+%	\State res $larr$ res
+% }{O(1)}
  
-\algoritmo{agregarCampos}{in $r_1$: reg in $r_2$: reg}{res:}{
-    \State cc $\larr$ $r_2$.campos / campos($r_1$) \complejidad{O(#(campos($r_1$))+#(campos($r_2$)))}
-    \State res $\larr$ copiarCampos(cc,$r_2,r_1$) \complejidad{O()}
-}{O(1)}
-
+   \algoritmo{iCoincideAlguno}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
+	 \State $it \larr CrearIt(cc)$ \complejidad{O(1)}
+		\State $res \larr false$    	\complejidad{O(1)}	
+    		\While{$(\not res) \land HaySiguiente(it)$} \complejidad{O($\#cc$)}
+    			\State $res \larr Significado(r1, Siguiente(it))=Significado(r2, Siguiente(it))$ \complejidad{O($longitud(siguiente(it))$)=O(C)}
+    		\EndWhile           
+ }{O($\#cc*C$)}
  
-  \algoritmo{copiarCampos}{in cc: conj(campo) in/out r1: reg, in r2: reg}{}{
-    \State  itcc $\larr$ crearItConj(cc) \complejidad{O(1)}
-    \While {haySiguiente(itcc)} \complejidad{O(1)}
-                    \State definir(r1, siguiente(itcc), obtener) \complejidad{O(long())}
-                    \State avanzar(itcc) \complejiad{O(1)}
-    \EndWhile
- }{O(1)}
+    \algoritmo{iCoincidenTodos}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
+    		\State $it \larr CrearIt(cc)$ \complejidad{O(1)}
+		\State $res \larr true$    	\complejidad{O(1)}	
+    		\While{$res \land HaySiguiente(it)$} \complejidad{O($\#cc$)}
+    			\State $res \larr Significado(r1,Siguiente(it))=Significado(r2,Siguiente(it))$ \complejidad{O($longitud(siguiente(it))$)=O(C)}
+    		\EndWhile
+    		  
+ }{O($\#cc*C$)}
+ \begin{flushright} Donde C es la longitud del campo más largo en cc \end{flushright} 
  
-   \algoritmo{coincideAlguno}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
-   \State res $\larr$ false \complejidad {O(1)}
-          \If {$\not$ vacio?(cc)}  \complejidad {O(1)}
-              \State itcc $\larr$ crearItConj(cc) \complejidad {O(1)}
-   \While {haySiguiente(ittcc)} \complejidadd {O(1)}
-          \If {obtener(siguiente(itcc),$r_1$) == obtener(siguiente(itcc),r2)}
-                  \State res $\larr$  true \complejidad {O(1)}
-           \EndIf
-          \State avanzar(itcc) \complejidad {O(1)}
-    \EndWhile
- }{O(1)}
- 
-    \algoritmo{coincidenTodos}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
-    \State res $\larr$ true \complejidad {O(1)}
-    \State itcc $\larr$ crearItConj(cc) \complejidad {O(1)}
-    \While {haySiguiente(itcc) $\land$ res} \complejidadd {O(1)}
-          \If { $\not$(obtener(siguiente(itcc)\, r1) == obtener(siguiente(itcr)\, r2))}
-                  \State res $\larr$  false \complejidad {O(1)}
-           \EndIf
-          \State avanzar(itcc)\complejidad {O(1)}
-    \EndWhile
- }{O(1)}
- 
-    \algoritmo{enTodos}{in c:campo in cr: conj(reg)}{res:bool}{
+    \algoritmo{iEnTodos}{in c:campo in cr: conj(reg)}{res:bool}{
     \State res $\larr$ True \complejidad{O(1)}
-    \State itcr $\larr$  CrearItConj(cr) \complejidad{O($\#$(cr))}
-    \State \While {haySiguiente(itcr) $\land$ res} \complejidad{O($\#$(cr))}
-                \If { $\not$ pertenece(c,siguiente(itcr))} \complejidad{O(1)}
-                    \State res $\larr$ false \complejidad{O(1)}
-                \EndIf
+    \State it $\larr$  CrearIt(cr) \complejidad{O(1)}
+    \While {haySiguiente(it) $\land$ res} \complejidad{O($\#$(cr))}
+    		\State res $\larr$ Definido?(c,siguiente(it)) \complejidad{O(1)}
+    		\State Avanzar(it)
     \EndWhile   
  }{O($\#$(cr))}
  
-  \algoritmo{combinarTodos}{in c: campo in r1: reg in cr: conj(reg)}{}{
-    \State itcr $\larr$  CrearItConjDic(cr) \complejidad{O($\#$(cr))}
-    \State \While {haySiguiente(itcr) $\land$ res} \complejidad{O($\#$(cr))}
-                \If {obtener(c,siguiente(itcr) == obtener(c,r)} \complejidad{O(1)}
-                    \State agregarCampos(r, siguiente(itcr)) \complejidad{O(1)}
+  \algoritmo{iCombinarTodos}{in c: campo in r1: reg in cr: conj(reg)}{res:reg}{
+    \State it $\larr$  CrearIt(cr) \complejidad{O(1)}
+    \State Bool f $\larr$ true
+   \State \While {haySiguiente(it) $\land$ f} \complejidad{O($\#(cr)$)}
+               \If {Significado(r,c)=Significado(Siguiente(it),c)} \complejidad{O(1)}
+                    \State res $\larr$ unirRegistros(c,r, siguiente(it)) \complejidad{O($\#campos(r_1)*C$)}
+                   \State f $\larr$ false \complejidad{O(1)}
                 \EndIf
-    \EndWhile   
- }{O($\#$(cr))}
+                \State Avanzar(it)
+   \EndWhile   
+ }{O($\#campos(r_1)*C *\#(cr)$)}
  
-   \algoritmo{unirRegistros}{in c: campo in $r_1$: reg in $r_2$: reg}{res: reg}{
-    \State $res$ \larr nReg() \coplejidad{O(1)}
-    \State agregarCampos($res, r_1$) \complejidad{O(1)}
-    \State agregarCampos($res, r_2$) \complejidad{O(1)}
- }{O($\#$(cr))}
+   \algoritmo{iUnirRegistros}{in c: campo in $r_1$: reg in $r_2$: reg}{res: reg}{
+    \State $res \larr r_2 $
+    \State $it \larr CrearIt(campos(r_1))$
+   \While{HaySiguiente(it)}  \complejidad{O($\#campos(r_1)$)}
+   		\State $Definir(res, Siguiente(it), Significado(r_1, Siguiente(it)))$ \complejidad{O($longitud(siguiente(it))$)=O(C)}
+  	\EndWhile 
+    
+ }{O($\#campos(r_1)*C$)}
      
 
  

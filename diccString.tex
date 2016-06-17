@@ -23,11 +23,11 @@
   {}
 
  \operacion{Definir}{in/out d:diccString(String, \sigma) in n:String, in s:\sigma}{}
-  {$\neg def?(n,d) \land d=d_0$}
+  {$d=d_0$}
   {$d \igobs Definir(n, s, d_0)$}
   {Se define s en el diccionario}
-  {$O(Longitud(n)+copy(s))$}
-  {$s$ se define por referencia}
+  {$O(Longitud(n))$}
+  {$s$ se define por referencia. En caso de ya estar definido n, pisa la definición anterior}
 
  \operacion{Borrar}{in/out d:diccString(String, \sigma) in n:String}{}
  {$d \igobs d_0 \land def?(n,d)$}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.4.22)  17 JUN 2016 12:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.4.22)  17 JUN 2016 14:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -5712,7 +5712,7 @@ Missing character: There is no ³ in font nullfont!
 Missing character: There is no n in font nullfont!
 ! Undefined control sequence.
 l.180 \tadOperacion
-                   {Abs}{DiccString(String $\sigma$) d}{dicc(String $\sigma$...
+                   {Abs}{diccString(string)/d}{$dicc(String \sigma)$}{Rep ($...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -5722,7 +5722,7 @@ and I'll forget about whatever was undefined.
 Missing character: There is no A in font nullfont!
 Missing character: There is no b in font nullfont!
 Missing character: There is no s in font nullfont!
-Missing character: There is no D in font nullfont!
+Missing character: There is no d in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no c in font nullfont!
 Missing character: There is no c in font nullfont!
@@ -5733,26 +5733,15 @@ Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no g in font nullfont!
 Missing character: There is no ( in font nullfont!
-Missing character: There is no S in font nullfont!
+Missing character: There is no s in font nullfont!
 Missing character: There is no t in font nullfont!
 Missing character: There is no r in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no g in font nullfont!
 Missing character: There is no ) in font nullfont!
+Missing character: There is no / in font nullfont!
 Missing character: There is no d in font nullfont!
-Missing character: There is no d in font nullfont!
-Missing character: There is no i in font nullfont!
-Missing character: There is no c in font nullfont!
-Missing character: There is no c in font nullfont!
-Missing character: There is no ( in font nullfont!
-Missing character: There is no S in font nullfont!
-Missing character: There is no t in font nullfont!
-Missing character: There is no r in font nullfont!
-Missing character: There is no i in font nullfont!
-Missing character: There is no n in font nullfont!
-Missing character: There is no g in font nullfont!
-Missing character: There is no ) in font nullfont!
 Missing character: There is no R in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no p in font nullfont!
@@ -5764,13 +5753,9 @@ Overfull \hbox (20.0pt too wide) in paragraph at lines 179--181
  []
 
 
-Overfull \hbox (6.0729pt too wide) in paragraph at lines 179--181
-\OML/cmm/m/it/10 ^^[$
- []
-
-
-Overfull \hbox (6.0729pt too wide) in paragraph at lines 179--181
-\OML/cmm/m/it/10 ^^[$
+Overfull \hbox (60.84056pt too wide) in paragraph at lines 179--181
+\OML/cmm/m/it/10 dicc\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 String^^[\OT1/cmr/m/n/10
+ )$
  []
 
 
@@ -5817,7 +5802,7 @@ Overfull \hbox (20.0pt too wide) in paragraph at lines 182--183
 
 ! Undefined control sequence.
 l.184 \tadOperacion
-                   {AbsAux}{diccString(String \sigma)/d  conj(String)/c}{dic...
+                   {AbsAux}{diccString(String )/d  conj(String)/c}{dicc(Stri...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -5847,17 +5832,45 @@ Missing character: There is no r in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no g in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no / in font nullfont!
+Missing character: There is no d in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no o in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no j in font nullfont!
+Missing character: There is no ( in font nullfont!
+Missing character: There is no S in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no g in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no / in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no d in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no c in font nullfont!
+Missing character: There is no ( in font nullfont!
+Missing character: There is no S in font nullfont!
+Missing character: There is no t in font nullfont!
+Missing character: There is no r in font nullfont!
+Missing character: There is no i in font nullfont!
+Missing character: There is no n in font nullfont!
+Missing character: There is no g in font nullfont!
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.184 ...peracion{AbsAux}{diccString(String \sigma
-                                                  )/d  conj(String)/c}{dicc(...
+l.184 ...g )/d  conj(String)/c}{dicc(String \sigma
+                                                  )}{$Rep (d) \land c \subse...
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.184 ...cString(String \sigma)/d  conj(String)/c}
-                                                  {dicc(String \sigma)}{$Rep...
+l.184 ...)/d  conj(String)/c}{dicc(String \sigma)}
+                                                  {$Rep (d) \land c \subsete...
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
 you forgot something else, as in `\hbox{$x}'. In such cases
@@ -5895,9 +5908,8 @@ Overfull \hbox (20.0pt too wide) in paragraph at lines 184--185
  []
 
 
-Overfull \hbox (147.665pt too wide) in paragraph at lines 184--185
-\OML/cmm/m/it/10 ^^[\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 =dconj\OT1/cmr/m/n/10 (\O
-ML/cmm/m/it/10 String\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 =c[][]$
+Overfull \hbox (9.9618pt too wide) in paragraph at lines 184--185
+\OML/cmm/m/it/10 ^^[\OT1/cmr/m/n/10 )[]$
  []
 
 
