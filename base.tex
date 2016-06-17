@@ -9,10 +9,9 @@
 
 \subsection{Interfaz}
 
-\sexc{Base}
-$\textbf{usa}$  
-\generos{nat, string, tabla, regisro, campo, dato}
+\sexc{BaseDeDatos, nat, string,} {tabla, registro, campo, dato,}{ DiccString(String, alfha), DiccNat(Nat, beta)}
 
+\generos{base}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsubsection*{Operaciones}
@@ -170,16 +169,13 @@ $\textbf{usa}$
 
 
 \subsubsection*{Función de abstracción}
-%\abs{sistema}{CampusSeguro}{s}{cs}
-%$s.campus \igobs campus(cs)$ $\land$ \\
-%$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
-%$s.hippies \igobs hippies(cs)$ $\land$ \\
-%$s.agentes \igobs agentes(cs)$ $\land$ \\
-%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+\abs{Base}{BaseDeDatos}{b}{cb}
+
+$ Tablas(b)\igobs tablas(cb)$ $\land$ \\
+$((\paratodo{NombreTabla}{n}) Pertenece?(n, Tablas(b)) \impluego DameTabla(n, b) \igobs dameTabla(n,cb))$ \\
+$((\paratodo{NombreTabla}{n1, n2}) (Definido?(n1, b.tablas) \land Definido?(n2, b.tablas)) \impluego HayJoin?(n, b) \igobs HayJoin?(n,cs) \yluego campoJoin(n1,n2, b)=campoJoin(n1,n2, cb))$ \\
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -196,18 +192,18 @@ $\textbf{usa}$
 }{O(1) por ref}
 
 \algoritmo{hayJoin?}{in t1: string, in t2: string, in b: estr}{res: bool}{
-	\State   res $\larr$Definido?(Obtener(b, t1).Joins,t2) $\larr$ Definido?(Obtener(b, t2).Joins,t1)
+	\State   res $\larr$(Definido?(Obtener(b, t1).Joins,t2) $\larr$ Definido?(Obtener(b, t2).Joins,t1))  \complejidad{O(1) por ref}
 }{O(1) por ref}
 
 \algoritmo{campoJoin}{in t1: string, in t2: string, in b: estr}{res: campo}{
-		\State res$\larr$ Obtener(Obtener(b, t1).Joins, t2).campoJ
+		\State res$\larr$ Obtener(Obtener(b, t1).Joins, t2).campoJ \complejidad{O(1) por ref}
 }{O(1) por ref}
 
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
 \algoritmo{nuevaDB}{}{res: estr)}{ 
-	\State String s
-	\State Nat n $\larr$ 0
-	\State TablaMaxima $\larr$ $< s, 0 >$
+	\State String s \complejidad{O(1) }
+	\State Nat n $\larr$ 0\complejidad{O(1)}
+	\State TablaMaxima $\larr$ $< s, 0 >$\complejidad{O(1) por ref}
   	\State res $\larr$ $\langle TablaMaxima, vacio()\rangle$  \complejidad{O(1) por ref} 
 }{O(1) por ref}
 
