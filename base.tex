@@ -19,7 +19,7 @@ $\textbf{usa}$
 
 
 %%%%%% observadores basicos %%%%%%
-
+%
 \operacion{tablas}{in b: base }{res : ItConjString(NombreTabla)}
  {true}
  {$res \igobs nombre(t)$}
@@ -27,13 +27,13 @@ $\textbf{usa}$
  {O($1$)}
  {Se retorna res por copia, por ser un tipo basico.}
 
-\operacion{dameTabla}{in b: base }{res : tabla}
+\operacion{dameTabla}{in t: string, in b: base }{res : tabla}
  {true}
- {$res \igobs claves(t)$}
- {Devuelve un conjunto de campos que son claves en la tabla ingresada por parametro.}
+ {$res \igobs dameTabla(t,b)$}
+ {Devuelve la tabla correspondiente al nombre ingresado por parametro.}
  {O($1$)}
- {Se devuelve un iterador al conjunto claves por referencia.}
- 
+ {Se devuelve la tabla correspondiente por referencia.}
+
 \operacion{hayJoin?}{in t1: string, in t2: string, in t: base }{res : bool}
  {true}
  {$res \igobs indices(t)$}
@@ -84,7 +84,7 @@ $\textbf{usa}$
  {Borra los registros que cumplan el criterio cr pasado por parametro.}
  {O($calcular$)}
  {} 	
- 
+
    \operacion{borrarJoin}{in t1: string, in t2: string, in b: base}{}
  {$b\_0$=b $\land$ hayJoin?(t1\, t2\, b)}
  {borrarJoin(t1\, t2\, $b\_0$)}
@@ -98,7 +98,7 @@ $\textbf{usa}$
  {t$\in$tablas(b)}
  {$res \igobs registros(t\, b)$}
  {Retorna el conjunto de registros correspondientes al nombre de tabla pasado por parametro}
- {O($calcular$)}
+ {O(1)}
  {Se retorna el conjunto de registros por referencia.} 
 
 
@@ -113,14 +113,14 @@ $\textbf{usa}$
  {t$\in$tablas(b)}
  {$res \igobs cantidadDeAccesos(t\,b)$}
  {Retorna la cantidad de modificaciones correspondientes al nombre de tabla pasado por parametro.}
- {O($calcular$)}
+ {O(1)}
  {Se retorna res por referencia.} 
 
  \operacion{tablaMaxima}{in b: base}{res: string}
  {$\neg\emptyset$?(tablas(b))}
  {$res \igobs tablaMaxima(t\,b)$}
  {Retorna el nombre de la tabla con la mayor cantidad de modificaciones.}
- {O($calcular$)}
+ {O(1)}
  {Se retorna el nombre de la tabla por referencia.} 
   
  \operacion{encontrarMaximo}{in t: string, in ct: conj(string), in b: base}{res: string}
@@ -188,6 +188,11 @@ $\textbf{usa}$
 
 \algoritmo{tablas}{in b: estr}{res: ConjTrie(string)}{
   \State $res \larr b.tablas.DiccClaves $ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{dameTabla}{in t: string, in b: estr}{res: tabla}{
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
+  \State $res \larr info.TActual $ \complejidad{O(1)}
 }{O(1)}
 
 \algoritmo{hayJoin?}{in t1: string, in t2: string, in b: estr}{res: bool}{
@@ -376,6 +381,16 @@ $\textbf{usa}$
 }{O(1)}
 
 \newpage
+
+
+
+\algoritmo{registros}{in t: string, in b: base}{res: Conj(registros)}{
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
+  \State $tab \larr info.TActual $ \complejidad{O(1)}
+  \State $res \larr registros(tab) $ \complejidad{O(1)}
+}{O(1)}
+
+
 \algoritmo{vistaJoin}{in t1: string, in t2: string, in/out b: estr}{}{
 	\State	info$\_$tabla	infot1 $\larr$ Significado(b.Tablas, t1)\complejidad{O(1) por ref}
 	\State	Tabla	tab1 $\larr$ infot1.TActual	\complejidad{O(1) por ref}
@@ -437,6 +452,18 @@ $\textbf{usa}$
 	\EndIf
 	\State res $\larr$ info$\_$join.JoinC
 }{O(1)}
+
+\algoritmo{cantidadDeAccesos}{in t: string, in b: base}{res: nat}{
+  \State $info \larr Significado(b.tablas, t) $ \complejidad{O(1)}
+  \State $tab \larr info.TActual $ \complejidad{O(1)}
+  \State $res \larr cantidadDeAcccesos(tab) $ \complejidad{O(1)}
+}{O(1)}
+
+\algoritmo{tablaMaxima}{in b: base}{res: string}{
+  \State $res \larr b.TablaMaxima $ \complejidad{O(1)}
+  
+}{O(1)}
+
 %	
 %	
 %	
