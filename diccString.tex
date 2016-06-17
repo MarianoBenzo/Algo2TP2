@@ -2,7 +2,7 @@
 
 \subsection{Interfaz}
 
-\sexc{Diccionario(String, \sigma)}
+\sexc{Diccionario(String, \sigma) Iterador Bidireccional (Tupla(String , \sigma))}
 \generos{diccString(String, \sigma), itDiccString(String, \sigma), itClavesString}
 
   \subsection*{Operaciones del diccionario}
@@ -43,7 +43,7 @@
  {$O(Longitud(n))$}
  {}
  
- \operacion{DiccClaves}{in d:diccString(String \sigma) }{res: conj}
+ \operacion{DiccClaves}{in d:diccString(String \sigma) }{res: conj(string)}
  {$TRUE$}
  {$res \igobs claves(d)$}
  {Se retorna el conjunto de claves del diccionario}
@@ -177,8 +177,17 @@ nodo\serc{enodo)}{
 \end{enumerate}
 
 \subsubsection*{Función de abstracción}
-%\AbsFc[dicc]{dicc($\kappa,\sigma$)}[d]{\IF vacío?($d$.claves) THEN vacío ELSE definir(prim($d$.claves), significado(prim($d$.claves)), Abs(fin($d$))) FI}
+\tadOperacion{Abs}{diccString(string)/d}{$dicc(String \sigma)$}{Rep ($d$)}
 
+\tadAxioma{Abs(d)}{AbsAux(d d.claves)}
+
+\tadOperacion{AbsAux}{diccString(String )/d  conj(String)/c}{dicc(String \sigma)}{$Rep (d) \land c \subseteq d.claves $}
+
+\tadAxioma{AbsAux(d,c)}{\IF $\emptyset ? (c)$ 
+							THEN $\emptyset$ 
+							ELSE $efinir(dameUno(c), significado(dameUno(c), d),AbsAux(d,sinUno(c)))$ 
+						FI}
+						
 \subsubsection*{Respresentación del iterador}
 
   El iterador del diccionario lo recorre en orden lexicográfico. Los significados están por referencia.Se explica con el iterador bidireccional no modificable.

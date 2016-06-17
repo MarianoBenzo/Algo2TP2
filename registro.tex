@@ -1,4 +1,5 @@
 
+\section{Modulo Campo es String}
 \section{Registro}
 
 \subsection{Interfaz}
@@ -17,17 +18,17 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 {res $\igobs$ $\emptyset$}
 {Crea un registro nuevo,vacio}
 {O(1)}
-{No tiene Aliasing}
+{}
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%% Otras Operaciones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\operacion{campos}{in r: reg}{res : itConj(campo)}
+\operacion{campos}{in r: reg}{res : conjonj(campo)}
  {true}
  {$res \igobs alias(res, claves(r))$}
  {Devuelve un conjunto de campos que son claves del registro ingresado por parametro}
  {O($1$)}
- {Se devuelve un iterador al conjunto, hay aliasing}
+ {Se devuelve el conjunto por referencia, hay Aliasing}
 
 \operacion{borrar?}{in crit: reg, in r: reg}{res : bool}
  {$\#$campos(crit) = 1}
@@ -36,19 +37,19 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
  {O($1$)} 
  {}
 
-\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{}
- {$ r_1 \igobs r1_0 $}
- {$r_1 \igobs agregarCampos(r1_0, r2) $}
- {agrega los datos de los campos faltantes de r2 a los campos de r1}
- {O($1$)} 
+\operacion{agCampos}{in/out  $r_1$: reg, in  $r_2$: reg}{res : reg}
+ {$ true $}
+ {$res \igobs agregarCampos(r_1, r_2) $}
+ {agrega los datos de los campos faltantes de r2 a los campos de r1 en res}
+ {O($#campos(r_2)+#campos(r_1))$} 
  {}
  
- \operacion{copiarCampos}{in/out  $r_1$: reg, in  cc: conj(campo), in $r_2$: reg}{}
-{$r1 \igobs r1_0 \land  cc \in campos(r_2) $}
-{$r1 \igobs copiarCampos(cc, r1_0, r2)$}
+ \operacion{copiarCampos}{in/out  $r_1$: reg, in  cc: conj(campo), in $r_2$: reg}{res : reg}
+{$true $}
+{$res \igobs copiarCampos(cc, r_1, r_2)$}
 {copia los datos que se encuentran en los campos de r2 a r1}
-{O($1$)}
-{}%
+{O($#campos(r_2)+#campos(r_1)$)}
+{}
 
 \operacion{coincideAlguno}{in  $r_1$: reg, in cc: conj(campo), in  $r_2$: reg}{res : bool}
  {cc $\subseteq campos(r_1)\cap$ campos($r_2$)}
@@ -78,9 +79,8 @@ $\textbf{usa}$ {nat, dato, campo, conjTrie, string, itConj}
 {O($1$)}
 {$r_1$ y $r_2$ son tomados por referencia}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newpage
+
 \subsection{Representación}
 
 \serc{DiccString(campo, dato)}
