@@ -158,7 +158,7 @@
   	\State	itcd $\larr$ CrearItConj(cd)				
   	\State	minimo $\larr$ Siguiente(itcd)
   	\State 	\While{HaySiguiente(itcd)}
-  					\State	\If {Siguiente(itcd)<=minimo} 
+  					\State	\If {Siguiente(itcd)$\leq$minimo} 
 							  	\State	minimo $\larr$ Siguiente(itcd);
 				\State	\EndIf				
 				\State	Avanzar(itcr);
@@ -169,7 +169,7 @@
   	\State	itcd $\larr$ CrearItConj(cd)				
   	\State	maximo $\larr$ Siguiente(itcd)
   	\State 	\While{HaySiguiente(itcd)}
-  					\State	\If {maximo<=Siguiente(itcd)} 
+  					\State	\If {maximo$\leq$Siguiente(itcd)} 
 							  	\State	minimo $\larr$ Siguiente(itcd);
 					\State	\EndIf				
 				\State	Avanzar(itcr);
@@ -182,5 +182,22 @@
 	\State	\Else
 			  		\State	res $\larr valorNat(d1) \leq valorNat(d2)			$
 	\State	\EndIf				
- }{O(1)}
+ }{O(valorStr(d1))}
  
+\subsubsection*{Algoritmos de operaciones auxiliares}
+\algoritmo{$\leq$}{in s1: string, in s2: string}{res: bool}{
+  	\State $Nat n \larr Longitud(d1)$
+  	\State $Nat m \larr Longitud(d2)$
+  	\State $Nat i \larr 0$
+  	\State $Nat j \larr 0$
+  	\While{$(i \leq n ) \land (j \leq m)$}
+  		\If{$ord(n[i]) > ord(m[j]))$}
+  			\State $i \larr n$
+  		\EndIf
+  		\If{$ord(n[i]) < ord(m[j]))$}
+  			\State $j \larr m$
+  		\EndIf
+  		\State $i \larr i+1$
+  	\EndWhile
+  	\State $res \larr i \leq n$
+ }{O(valorStr(d1))}
