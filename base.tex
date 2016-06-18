@@ -174,9 +174,9 @@
   \item Para todo info$\_$join, el tipo de campoJ es igual a campoT.
   \item Para todo DatoCambio, NomOrigen es igual a TActual o a la clave que le corresponde en Joins.
   \item Si campoT es true JoinS esta vacio, y si es false JoinN esta vacio.	
-  \item En el caso campoT es false, en JoinS todas las claves, ese diccionario estan relacionadas cada una\\
-  string S con solo iterador de conjunto a registro it, que apunta al registro r $\larr$Siguiente(it). Al cual si\\
-  buscamos el dato d $\larr$Significado(r, campoJ), y hacemos ValorString(d) es igual a S
+%  \item En el caso campoT es false, en JoinS todas las claves, ese diccionario estan relacionadas cada una\\
+%  string S con solo iterador de conjunto a registro it, que apunta al registro r $\larr$Siguiente(it). Al cual si\\
+%  buscamos el dato d $\larr$Significado(r, campoJ), y hacemos ValorString(d) es igual a S
   
   
   \item Para toda string t1, t2, si Pertenece?(Tablas(b), t1) y Pertenece?(Tablas(b), t1) entonces\\
@@ -190,6 +190,8 @@
   Si infojoin.CampoT es false entonces para todo String s, si Definido?(infoJoin.JoinS, s) entonces\\
   el registro r $\larr$Siguiente(Significado(infoJoin.JoinS, s)) es tal que \\
   ValorNat(Significado(r, infojoin.CampoJ))=s.
+  
+  
   
   
   
