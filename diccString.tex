@@ -107,6 +107,7 @@
   {$O(1)$}
   {$res$ no es modficable.}
 
+\newpage
   \operacion{SiguienteSignificado}{in it: itDiccString(String,\sigma) in n:String}{res:$\sigma$}
   {HaySiguiente?($it$)}
   {alias($res$ $\igobs$ Siguiente($it$).significado)}
@@ -151,7 +152,7 @@
   {}
 
 
-
+\newpage
 \subsection{Representacion}
 diccString\serc{dLex)}{
 	\\
@@ -254,7 +255,7 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
 }{O(Longitud(n))}
 
 
-
+\newpage
 \algoritmo{iSignificado}{in d:diccString, in n:String}{res:$\sigma$}{
   
   \State $aux \larr d.raiz$     \complejidad{O(1)}   
@@ -310,6 +311,7 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
   \State $res \larr d.claves$
 }{O(1), d.claves se pasa por referencia}
 
+\newpage
 \algoritmo{Maximo}{in/out d:diccString(String \sigma)}{res: $String$}{
   \State $aux \larr d.raiz$     \complejidad{O(1)}   
   \State $res \larr Vacia()$
@@ -417,6 +419,7 @@ itDiccString($String$, $\sigma$)\serc{itdLex)}{
   \State $res \larr it.significados.anterior*.dato$ \complejidad{O(1)(es una referencia)}
 }{O(1)}
 
+\newpage
 \algoritmo{iAvanzar}{in/out it:itDiccString, in n:String}{}{
   \State $it.claves \larr it.claves.siguiente$ \complejidad{O(1)(es una referencia)}
   \State $it.significados \larr it.significados.siguiente$ \complejidad{O(1)(es una referencia)}

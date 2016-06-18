@@ -4,7 +4,7 @@
 %\section{Placa es Nat}
 
 %\section{Nombre es String}
-
+\newpage
 \section{Tabla}
 
 \subsection{Interfaz}
@@ -145,6 +145,7 @@
  {Devuelve el conjunto de registros de la tabla, que coinciden con los valores de r.}
  {O($Cardinal(cj)$)}
  {Retorna res por referencia.} 
+ 
 
   \operacion{hayCoincidencia}{in r: registro,in cjc: Conj(campo), in cjr: Conj(registro)}{res:bool}
  {$True$}
@@ -175,8 +176,9 @@
  {Compara los tipos correspondientes a los campos del registro y la tabla.}
  {O($1$)}
  {Retorna res por referencia, no es modificable.} 
-\newpage
+
  %%%%%%% AUXILIARES
+ \newpage
  \operacion{BuscarEnTabla}{in c: campo,in t: tab}{res: Conj(ItConj(registro))}
  {c$\subseteq$campos(t)}
  {$res \igobs BuscarEnTabla(c, t)$}
@@ -968,7 +970,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 % {Devuelve el conjunto de registros de la tabla, que coinciden con los valores de r.}
 % {O($L+Log(n)$)}
 % {Retorna res por referencia,.}
-
+\newpage
 \algoritmo{coincidencias}{in crit:registro, in cr:Conj(registro)}{res:Conj(ItConj(registro))}{
  	\State Conj(registro) salida	$\larr$ Vacio() \complejidad{O(1) por ref}
 	\State Debemos comparar todos los registros de cr.
@@ -1116,6 +1118,7 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %\\
 %\bullet Al agregar a res es seguro que no hay repetidos por haber sido volcados al diccionario previamente, que en ambos casos no permiten claves repetidas. 
 %\\
+\newpage
 \algoritmo{mismosTipos}{in r:registro, in t:tab}{res:bool}{
   	\State 	valor $\larr$ True										\complejidad{O(1) por ref}
   	\State 	itconjClaves $\larr$ CrearIt(Campo(r)) \complejidad{O(1) por ref}

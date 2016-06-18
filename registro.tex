@@ -56,6 +56,7 @@ Cuando se utiliza conj se est√° utilizando el conjunto lineal provisto por la c√
  {O($1$)}
  {Se devuelve el conjunto por referencia, hay Aliasing}
 
+\newpage
 \operacion{borrar?}{in crit: reg, in r: reg}{res : bool}
  {$\#$campos(crit) = 1}
  {$res \igobs borrar?(crit, r)$}
@@ -128,7 +129,7 @@ Cuando se utiliza conj se est√° utilizando el conjunto lineal provisto por la c√
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+
 
 \subsection{Algoritmos}
 
@@ -189,6 +190,7 @@ Cuando se utiliza conj se est√° utilizando el conjunto lineal provisto por la c√
     		\EndWhile           
  }{O($\#cc*C$)}
  
+ \newpage
     \algoritmo{iCoincidenTodos}{in r1: reg in cc: conj(campo) in r2: reg}{res:bool}{
     		\State $it \larr CrearIt(cc)$ \complejidad{O(1)}
 		\State $res \larr true$    	\complejidad{O(1)}	

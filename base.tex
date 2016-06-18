@@ -108,6 +108,7 @@
  {O($R*(L+ Log(n*m))$)}
  {Se retorna el conjunto de registros por referencia.} 
 
+\newpage
  \operacion{cantidadDeAccesos}{in t: string, in b: base}{res: nat}
  {t$\in$tablas(b)}
  {$res \igobs cantidadDeAccesos(t\,b)$}
@@ -137,7 +138,7 @@
  {Se retorna por referencia, es modificable.}
   
  
-\newpage
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
@@ -157,6 +158,7 @@
 		\donde{DatoCambio}{\tupla{Reg: Registro, NomOrigen: NombreTabla, Accion: Bool}}
 }
 
+\newpage
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
@@ -200,7 +202,7 @@
 
 \end{enumerate}
 
-
+\newpage
 \subsubsection*{Función de abstracción}
 \abs{Base}{BaseDeDatos}{b}{cb}
 
@@ -211,7 +213,7 @@ $((\paratodo{NombreTabla}{n1, n2}) (Definido?(n1, b.tablas) \land Definido?(n2, 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+
 
 \subsection{Algoritmos}
 
@@ -233,6 +235,7 @@ $((\paratodo{NombreTabla}{n1, n2}) (Definido?(n1, b.tablas) \land Definido?(n2, 
 }{O(1) por ref}
 
 %%%%%%%%%%%%% generadores %%%%%%%%%%%%%
+
 \algoritmo{nuevaDB}{}{res: estr)}{ 
 	\State String s \complejidad{O(1) }
 	\State Nat n $\larr$ 0\complejidad{O(1)}
@@ -245,6 +248,7 @@ $((\paratodo{NombreTabla}{n1, n2}) (Definido?(n1, b.tablas) \land Definido?(n2, 
 	\State	Definir(b.tablas, nombre(t), info\_tabla)								 \complejidad{O(1) por ref}
 }{O(1) por ref}
 
+\newpage
 \algoritmo{insertarEntrada}{in reg: registro, in t: string, in/out b: estr}{}{
 	\State	Obtenemos la tabla es O(1) por ref porque su nombre esta acotado.
 	\State	info\_tabla infoT $\larr$	Obtener(b.tablas, t).TActual		\complejidad{O(1) por referencia}

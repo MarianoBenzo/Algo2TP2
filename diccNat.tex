@@ -96,7 +96,7 @@ $true \iff ((\paratodo{estr(nat, \sigma)}{n_1, n_2})(n_1 \in arbol(e.dicc) \land
 \item Todos las claves de los elementos del arbos estan en la lista claves y viceversa.
 \end{enumerate}
 
-
+\newpage
 \subsubsection*{Función de abstracción}
 \abs{diccNat(nat, \sigma)}{dicc(nat, \sigma)}{d}{c}
 $((\paratodo{nat}{k})( k \in claves(c) \implies $\\$(\exists n: estr(nat, \sigma))(n \in arbol(d.dicc) \land n.clave = k) \land (k \in d.Claves)) \land $\\$((\paratodo{nat}{k})(k \in d.Claves) \implies k \in claves(c)) \land $\\$ ((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d.dicc) \implies n.clave \in claves(c)))) \yluego $\\$((\paratodo{estr(nat, \sigma)}{n})(n \in arbol(d.dicc) \implies obtener(c,n.clave) \igobs n.significado)$
