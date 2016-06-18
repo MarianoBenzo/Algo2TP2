@@ -872,8 +872,8 @@ $((\paratodo{campo}{c}) Definido?(s.Campos, c) \impluego Significado(s.Campos, c
 %}{O(1) por ref}
 
   \algoritmo{puedoInsertar?}{in r:registro, in t:tab}{res:bool}{
-    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, Campo(r), registros(t)  )  \complejidad{O(calcular))}
- }{O(calcular)}
+    \State res $\larr$ campatible(r,t) $\land$ $\neg$hayCoincidencia( r, Campo(r), registros(t)  )  \complejidad{O(Cardinal(registros(t)))}
+ }{O(Cardinal(registros(t)))}
 
 
   \algoritmo{compatible}{in r:registro, int t:tab}{res:bool}{
