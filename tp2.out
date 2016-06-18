@@ -1,32 +1,31 @@
-\BOOKMARK [1][-]{section.1}{Tabla}{}% 1
-\BOOKMARK [2][-]{subsection.1.1}{Interfaz}{section.1}% 2
-\BOOKMARK [2][-]{subsection.1.2}{Representaci\363n}{section.1}% 3
-\BOOKMARK [2][-]{subsection.1.3}{Algoritmos}{section.1}% 4
-\BOOKMARK [2][-]{subsection.1.4}{Algoritmos operaciones auxiliares}{section.1}% 5
-\BOOKMARK [1][-]{section.2}{Tipo es Bool}{}% 6
-\BOOKMARK [1][-]{section.3}{Dato\(\)}{}% 7
-\BOOKMARK [2][-]{subsection.3.1}{Interfaz}{section.3}% 8
-\BOOKMARK [2][-]{subsection.3.2}{Representaci\363n}{section.3}% 9
-\BOOKMARK [2][-]{subsection.3.3}{Algoritmos}{section.3}% 10
-\BOOKMARK [2][-]{subsection.3.4}{Algoritmos operaciones auxiliares}{section.3}% 11
-\BOOKMARK [1][-]{section.4}{Diccionario por Naturales}{}% 12
-\BOOKMARK [2][-]{subsection.4.1}{Interfaz}{section.4}% 13
-\BOOKMARK [2][-]{subsection.4.2}{Representaci\363n}{section.4}% 14
-\BOOKMARK [2][-]{subsection.4.3}{Algoritmos}{section.4}% 15
-\BOOKMARK [1][-]{section.5}{Modulo Diccionario Lexicografico\(String, \)}{}% 16
-\BOOKMARK [2][-]{subsection.5.1}{Interfaz}{section.5}% 17
-\BOOKMARK [2][-]{subsection.5.2}{Operaciones del iterador}{section.5}% 18
-\BOOKMARK [2][-]{subsection.5.3}{Representacion}{section.5}% 19
-\BOOKMARK [2][-]{subsection.5.4}{Algoritmos}{section.5}% 20
-\BOOKMARK [3][-]{subsubsection.5.4.1}{Algoritmos del Diccionario}{subsection.5.4}% 21
-\BOOKMARK [3][-]{subsubsection.5.4.2}{Algoritmos del iterador}{subsection.5.4}% 22
-\BOOKMARK [1][-]{section.6}{Modulo Campo es String}{}% 23
-\BOOKMARK [1][-]{section.7}{Modulo Registro}{}% 24
-\BOOKMARK [2][-]{subsection.7.1}{Interfaz}{section.7}% 25
-\BOOKMARK [2][-]{subsection.7.2}{Representaci\363n}{section.7}% 26
-\BOOKMARK [2][-]{subsection.7.3}{Algoritmos}{section.7}% 27
-\BOOKMARK [1][-]{section.8}{NombreTabla es String}{}% 28
-\BOOKMARK [1][-]{section.9}{Base de Datos}{}% 29
-\BOOKMARK [2][-]{subsection.9.1}{Interfaz}{section.9}% 30
-\BOOKMARK [2][-]{subsection.9.2}{Representaci\363n}{section.9}% 31
-\BOOKMARK [2][-]{subsection.9.3}{Algoritmos}{section.9}% 32
+\BOOKMARK [1][-]{section.1}{Tipo es Bool}{}% 1
+\BOOKMARK [1][-]{section.2}{Dato\(\)}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Interfaz}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Representaci\363n}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Algoritmos}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Modulo Campo es String}{}% 6
+\BOOKMARK [1][-]{section.4}{Modulo Registro}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Interfaz}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Representaci\363n}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.3}{Algoritmos}{section.4}% 10
+\BOOKMARK [1][-]{section.5}{Tabla}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Interfaz}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Representaci\363n}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.3}{Algoritmos}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.4}{Algoritmos operaciones auxiliares}{section.5}% 15
+\BOOKMARK [1][-]{section.6}{NombreTabla es String}{}% 16
+\BOOKMARK [1][-]{section.7}{Base de Datos}{}% 17
+\BOOKMARK [2][-]{subsection.7.1}{Interfaz}{section.7}% 18
+\BOOKMARK [2][-]{subsection.7.2}{Representaci\363n}{section.7}% 19
+\BOOKMARK [2][-]{subsection.7.3}{Algoritmos}{section.7}% 20
+\BOOKMARK [1][-]{section.8}{Diccionario por Naturales}{}% 21
+\BOOKMARK [2][-]{subsection.8.1}{Interfaz}{section.8}% 22
+\BOOKMARK [2][-]{subsection.8.2}{Representaci\363n}{section.8}% 23
+\BOOKMARK [2][-]{subsection.8.3}{Algoritmos}{section.8}% 24
+\BOOKMARK [1][-]{section.9}{Modulo Diccionario Lexicografico\(String, \)}{}% 25
+\BOOKMARK [2][-]{subsection.9.1}{Interfaz}{section.9}% 26
+\BOOKMARK [2][-]{subsection.9.2}{Operaciones del iterador}{section.9}% 27
+\BOOKMARK [2][-]{subsection.9.3}{Representacion}{section.9}% 28
+\BOOKMARK [2][-]{subsection.9.4}{Algoritmos}{section.9}% 29
+\BOOKMARK [3][-]{subsubsection.9.4.1}{Algoritmos del Diccionario}{subsection.9.4}% 30
+\BOOKMARK [3][-]{subsubsection.9.4.2}{Algoritmos del iterador}{subsection.9.4}% 31

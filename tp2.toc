@@ -1,33 +1,32 @@
 \select@language {spanish}
-\contentsline {section}{\numberline {1}Tabla}{2}{section.1}
-\contentsline {subsection}{\numberline {1.1}Interfaz}{2}{subsection.1.1}
-\contentsline {subsection}{\numberline {1.2}Representaci\IeC {\'o}n}{5}{subsection.1.2}
-\contentsline {subsection}{\numberline {1.3}Algoritmos}{7}{subsection.1.3}
-\contentsline {subsection}{\numberline {1.4}Algoritmos operaciones auxiliares}{16}{subsection.1.4}
-\contentsline {section}{\numberline {2}Tipo es Bool}{17}{section.2}
-\contentsline {section}{\numberline {3}Dato($\ensuremath {\mathalpha \xspace }$)}{17}{section.3}
-\contentsline {subsection}{\numberline {3.1}Interfaz}{17}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Representaci\IeC {\'o}n}{19}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Algoritmos}{20}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Algoritmos operaciones auxiliares}{21}{subsection.3.4}
-\contentsline {section}{\numberline {4}Diccionario por Naturales}{21}{section.4}
-\contentsline {subsection}{\numberline {4.1}Interfaz}{21}{subsection.4.1}
-\contentsline {subsection}{\numberline {4.2}Representaci\IeC {\'o}n}{22}{subsection.4.2}
-\contentsline {subsection}{\numberline {4.3}Algoritmos}{23}{subsection.4.3}
-\contentsline {section}{\numberline {5}Modulo Diccionario Lexicografico($String$, $\ensuremath {\mathsigma \xspace }$)}{26}{section.5}
-\contentsline {subsection}{\numberline {5.1}Interfaz}{26}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}Operaciones del iterador}{27}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}Representacion}{28}{subsection.5.3}
-\contentsline {subsection}{\numberline {5.4}Algoritmos}{29}{subsection.5.4}
-\contentsline {subsubsection}{\numberline {5.4.1}Algoritmos del Diccionario}{29}{subsubsection.5.4.1}
-\contentsline {subsubsection}{\numberline {5.4.2}Algoritmos del iterador}{32}{subsubsection.5.4.2}
-\contentsline {section}{\numberline {6}Modulo Campo es String}{34}{section.6}
-\contentsline {section}{\numberline {7}Modulo Registro}{34}{section.7}
-\contentsline {subsection}{\numberline {7.1}Interfaz}{34}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}Representaci\IeC {\'o}n}{35}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}Algoritmos}{37}{subsection.7.3}
-\contentsline {section}{\numberline {8}NombreTabla es String}{38}{section.8}
-\contentsline {section}{\numberline {9}Base de Datos}{38}{section.9}
-\contentsline {subsection}{\numberline {9.1}Interfaz}{38}{subsection.9.1}
-\contentsline {subsection}{\numberline {9.2}Representaci\IeC {\'o}n}{41}{subsection.9.2}
-\contentsline {subsection}{\numberline {9.3}Algoritmos}{43}{subsection.9.3}
+\contentsline {section}{\numberline {1}Tipo es Bool}{2}{section.1}
+\contentsline {section}{\numberline {2}Dato($\ensuremath {\mathalpha \xspace }$)}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Interfaz}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Representaci\IeC {\'o}n}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Algoritmos}{4}{subsection.2.3}
+\contentsline {section}{\numberline {3}Modulo Campo es String}{5}{section.3}
+\contentsline {section}{\numberline {4}Modulo Registro}{5}{section.4}
+\contentsline {subsection}{\numberline {4.1}Interfaz}{5}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Representaci\IeC {\'o}n}{7}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Algoritmos}{8}{subsection.4.3}
+\contentsline {section}{\numberline {5}Tabla}{9}{section.5}
+\contentsline {subsection}{\numberline {5.1}Interfaz}{9}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Representaci\IeC {\'o}n}{13}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Algoritmos}{15}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Algoritmos operaciones auxiliares}{25}{subsection.5.4}
+\contentsline {section}{\numberline {6}NombreTabla es String}{26}{section.6}
+\contentsline {section}{\numberline {7}Base de Datos}{26}{section.7}
+\contentsline {subsection}{\numberline {7.1}Interfaz}{26}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Representaci\IeC {\'o}n}{29}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Algoritmos}{31}{subsection.7.3}
+\contentsline {section}{\numberline {8}Diccionario por Naturales}{36}{section.8}
+\contentsline {subsection}{\numberline {8.1}Interfaz}{36}{subsection.8.1}
+\contentsline {subsection}{\numberline {8.2}Representaci\IeC {\'o}n}{37}{subsection.8.2}
+\contentsline {subsection}{\numberline {8.3}Algoritmos}{38}{subsection.8.3}
+\contentsline {section}{\numberline {9}Modulo Diccionario Lexicografico($String$, $\ensuremath {\mathsigma \xspace }$)}{41}{section.9}
+\contentsline {subsection}{\numberline {9.1}Interfaz}{41}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Operaciones del iterador}{42}{subsection.9.2}
+\contentsline {subsection}{\numberline {9.3}Representacion}{44}{subsection.9.3}
+\contentsline {subsection}{\numberline {9.4}Algoritmos}{45}{subsection.9.4}
+\contentsline {subsubsection}{\numberline {9.4.1}Algoritmos del Diccionario}{45}{subsubsection.9.4.1}
+\contentsline {subsubsection}{\numberline {9.4.2}Algoritmos del iterador}{47}{subsubsection.9.4.2}
