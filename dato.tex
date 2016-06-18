@@ -9,9 +9,9 @@
 
 \subsection{Interfaz}
 
-\sexc{dato}
-$\textbf{usa}$  
-\generos{nat, string, tipo}
+\sexc{TAD Dato}
+
+\generos{dato}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -25,14 +25,14 @@ $\textbf{usa}$
  {$res \igobs tipo?(d)$}
  {Devuelve el tipo del dato ingresado por parametro.}
  {O($1$)}
- {Se retorna res por referencia.}
+ {}
 
 \operacion{valorNat}{in d: dato }{res : nat}
  {Nat?(d)}
  {$res \igobs valorNat(t)$}
  {Devuelve valor numerido del dato por parametro.}
  {O($1$)}
- {Se devuelve res por referencia.}
+ {}
 
 \operacion{valorString}{in d: dato }{res : string}
  {String?(d)}
@@ -94,42 +94,36 @@ $\textbf{usa}$
  {O($Cardinal(cd)$)}
  {Retorna res por referencia.}
 
-  \operacion{<=}{in d1: dato, in d2: dato}{res:bool}
+  \operacion{$\leq$}{in d1: dato, in d2: dato}{res:bool}
  {mismoTipo?(d1,d2)}
- {$res \igobs <=(d1,d2)$}
- {Retorna el maximo entre los valores del conjunto de datos pasado por parametro.}
- {O($Cardinal(cd)$)}
- {Retorna res por referencia.}
- oincidenTodos(crit,campos(crit),Siguiente(cr))
+ {$res \igobs d1 \leq d2)$}
+ {Retorna si d1 es menor o igual a d2}
+ {O($long(k)$)}
+ {}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Representación}
 
-\serc{dato}{{\tupla{Valor: $\alpha$, TipoValor: bool}
+\serc{dat}{{\tupla{Valor: $\alpha$, TipoValor: bool}
   }
 }
 
 \subsubsection*{Invariante de representación}
 
 \begin{enumerate}
-  \item El Nombre de la tabla es un String acotado.
-  \item Indices es un arreglo de tamaño 2, que aloja el Indice correspondiente segun el orden de creacion.
-  \item Para toda Dato que es clave en Indice, su significado llamemoslo sign esta incluido en Registros.
-  \item 
-
+  \item La estructura siempre representa un dato valido en tanto \alpha sea Nat o String
 \end{enumerate}
 
+\rep{dat}{d}{true}
 
-%\subsubsection*{Función de abstracción}
-%\abs{sistema}{CampusSeguro}{s}{cs}
-%$s.campus \igobs campus(cs)$ $\land$ \\
-%$s.estudiantes \igobs estudiantes(cs)$ $\land$ \\
-%$s.hippies \igobs hippies(cs)$ $\land$ \\
-%$s.agentes \igobs agentes(cs)$ $\land$ \\
-%$((\paratodo{nombre}{n}) s.hippies.definido(n) \impluego s.hippies.obtener(n) \igobs posEstYHippie(n,cs)$ $\lor$ \\
-%$(\paratodo{nombre}{n}) s.estudiantes.definido(n) \impluego s.estudiantes.obtener(n) \igobs posEstYHippie(n,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).pos \igobs posAgente(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantSanciones \igobs cantSanciones(pl,cs))$ \\
-%$(\paratodo{placa}{pl}) s.agentes.definido(pl) \impluego s.estudiantes.obtener(pl).cantCapturas \igobs cantCapturas(pl,cs))$ \\
+\subsection*{Funcion de Abstracción}
+
+\tadOperacion{Abs}{dato/d }{dato/c}{$Rep (d)$}
+
+\tadAxioma{Abs(d)}{\IF $Nat? (d)$ 
+							THEN $Nat? (c) \land valorNat(c) =valorNat(d)$ 
+							ELSE $String? (c) \land valorString(c) =valorString(d)$
+						FI}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
@@ -182,15 +176,11 @@ $\textbf{usa}$
 	\State 	\EndWhile   
  }{O(Cardinal(cd))}
 
-   \algoritmo{<=}{in d1: dato, in d2: dato}{res: bool}{
+   \algoritmo{$\leq$}{in d1: dato, in d2: dato}{res: bool}{
   	\State	\If {String?(d1)} 
-			  		\State	res $\larr$ valorStr(d1)<=valorStr(d2)
+			  		\State	res $\larr valorStr(d1) \leq valorStr(d2)$
 	\State	\Else
-			  		\State	res $\larr$ valorNat(d1)<=valorNat(d2)			
+			  		\State	res $\larr valorNat(d1) \leq valorNat(d2)			$
 	\State	\EndIf				
  }{O(1)}
  
- 
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Algoritmos operaciones auxiliares}
